@@ -1,0 +1,37 @@
+.product-img img.product-image {
+    max-width: 50px;
+    height: auto;
+    max-height: 50px; /* Giới hạn chiều cao của hình ảnh */
+    object-fit: cover; /* Đảm bảo hình ảnh giữ nguyên tỉ lệ */
+    margin: 0 auto; /* Căn giữa hình ảnh */
+    display: block; /* Đảm bảo rằng hình ảnh là block-level element */
+    border: 2px solid #e0e0e0; /* Khung viền xung quanh hình ảnh, bạn có thể điều chỉnh độ dày */
+    border-radius: 5px; /* Làm bo tròn các góc viền */
+}
+
+.product-img {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    background-color: #f8f8f8;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    height: 300px; /* Chiều cao cố định cho khung ảnh */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.single-product-wrapper {
+    background: #fff;
+    padding: 15px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.single-product-wrapper:hover {
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+}

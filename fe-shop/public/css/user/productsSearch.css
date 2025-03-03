@@ -1,0 +1,365 @@
+.single-product-wrapper {
+    display: inline-block; /* Make products behave like inline elements */
+    width: 20%; /* Set width to accommodate three per row (adjust slightly if needed) */
+    margin: 10px; /* Add margins for spacing between products */
+    text-align: center; /* Center content within products */
+    box-sizing: border-box; /* Ensure margins and padding don't affect width calculation */
+    overflow: hidden; /* Prevent overflow on hover effects (optional) */
+    border: 1px solid #ddd; /* Add subtle border (optional) */
+    border-radius: 5px; /* Add rounded corners (optional) */
+    vertical-align: top;
+    justify-content: center; /* Căn giữa nội dung bên trong sản phẩm */
+    align-items: center;
+}
+
+.container {
+    text-align: center;
+}
+
+.single-product-wrapper img {
+    width: 100%; /* Ensure images fill product width */
+    height: 300px; /* Maintain image aspect ratio */
+    object-fit: cover;
+}
+
+.product-description {
+    padding: 15px; /* Add padding for content within product */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.product-description .product-name{
+    color: black;
+    padding: 10px 8px;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: left;
+    white-space: nowrap; /* Không cho phép xuống dòng */
+    overflow: hidden;    /* Ẩn phần text tràn ra ngoài */
+    text-overflow: ellipsis; /* Hiển thị dấu "..." */
+}
+.product-price {
+    color: black;
+    padding: 10px 8px;
+    font-weight: bold;
+    text-align: left;
+}
+
+
+.pagination nav div{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+}
+
+.product-description .product-name{
+    white-space: nowrap; /* Không cho phép xuống dòng */
+    overflow: hidden;    /* Ẩn phần text tràn ra ngoài */
+    text-overflow: ellipsis; /* Hiển thị dấu "..." */
+}
+/*.product-main-total{*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    justify-content: center;*/
+/*}*/
+
+
+@media (max-width: 992px) { /* Responsive adjustments for medium screens */
+    .product {
+        width: 40%; /* Adjust width to two products per row on medium screens */
+    }
+}
+
+@media (max-width: 768px) { /* Responsive adjustments for small screens */
+    .product {
+        width: 100%; /* Display one product per row on small screens */
+    }
+}
+
+/* Styles for product detail page */
+.seller_info {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.seller_name {
+    font-size: 1.5em;
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: inline-block;
+    max-width: 300px;
+    width: 100%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.seller_actions {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.seller_actions .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1em;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.seller_actions .chat-btn {
+    background-color: #28a745;
+}
+
+.seller_actions .chat-btn:hover {
+    background-color: #218838;
+}
+
+.seller_actions .shop-btn {
+    background-color: #007bff;
+}
+
+.seller_actions .shop-btn:hover {
+    background-color: #0056b3;
+}
+
+.single_product_thumb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.product_thumbnail {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+}
+
+.image-magnifier-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.magnified-image {
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    top: 0;
+    left: 420px;
+    background-size: 800px 800px;
+    background-position: 0 0;
+}
+
+.seller_info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}.single-product-wrapper {
+     display: inline-block; /* Make products behave like inline elements */
+     width: 20%; /* Set width to accommodate three per row (adjust slightly if needed) */
+     margin: 10px; /* Add margins for spacing between products */
+     text-align: center; /* Center content within products */
+     box-sizing: border-box; /* Ensure margins and padding don't affect width calculation */
+     overflow: hidden; /* Prevent overflow on hover effects (optional) */
+     border: 1px solid #ddd; /* Add subtle border (optional) */
+     border-radius: 5px; /* Add rounded corners (optional) */
+     vertical-align: top;
+    justify-content: center;
+ }
+
+.single-product-wrapper img {
+    width: 100%; /* Ensure images fill product width */
+    height: 300px; /* Maintain image aspect ratio */
+    object-fit: cover;
+}
+
+.product-description {
+    padding: 15px; /* Add padding for content within product */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.product-description .product-name{
+    color: black;
+    padding: 10px 8px;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: left;
+    white-space: nowrap; /* Không cho phép xuống dòng */
+    overflow: hidden;    /* Ẩn phần text tràn ra ngoài */
+    text-overflow: ellipsis; /* Hiển thị dấu "..." */
+}
+.product-price{
+    padding: 10px 8px;
+    text-align: left;
+}
+.pagination nav div{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+}
+
+.product-description .product-name{
+    white-space: nowrap; /* Không cho phép xuống dòng */
+    overflow: hidden;    /* Ẩn phần text tràn ra ngoài */
+    text-overflow: ellipsis; /* Hiển thị dấu "..." */
+}
+/*.product-main-total{*/
+/*    display: flex;*/
+/*    flex-wrap: wrap;*/
+/*    justify-content: center;*/
+/*}*/
+
+
+@media (max-width: 992px) { /* Responsive adjustments for medium screens */
+    .product {
+        width: 40%; /* Adjust width to two products per row on medium screens */
+    }
+}
+
+@media (max-width: 768px) { /* Responsive adjustments for small screens */
+    .product {
+        width: 100%; /* Display one product per row on small screens */
+    }
+}
+
+/* Styles for product detail page */
+.seller_info {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.seller_name {
+    font-size: 1.5em;
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: inline-block;
+    max-width: 300px;
+    width: 100%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.seller_actions {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.seller_actions .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1em;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.seller_actions .chat-btn {
+    background-color: #28a745;
+}
+
+.seller_actions .chat-btn:hover {
+    background-color: #218838;
+}
+
+.seller_actions .shop-btn {
+    background-color: #007bff;
+}
+
+.seller_actions .shop-btn:hover {
+    background-color: #0056b3;
+}
+
+.single_product_thumb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.product_thumbnail {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 800px;
+}
+
+.image-magnifier-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#product-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.magnified-image {
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    top: 0;
+    left: 420px;
+    background-size: 800px 800px;
+    background-position: 0 0;
+}
+
+.seller_info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}

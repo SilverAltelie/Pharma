@@ -1,0 +1,308 @@
+.discounted-product-wrapper {
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.original-price {
+    color: #888;
+    text-decoration: line-through;
+    margin-right: 10px;
+    font-size: 1rem !important;
+}
+
+.promo-bar-container {
+    position: relative;
+    display: inline-block;
+}
+
+.promo-bar-image {
+    display: block;
+    width: 100%; /* Hoặc chiều rộng bạn mong muốn */
+    height: 30px;
+}
+
+.promo-bar-text {
+    position: absolute;
+    top: 50%; /* Điều chỉnh vị trí chữ */
+    left: 110px;
+    transform: translate(-50%, -50%);
+    color: white !important; /* Màu chữ */
+    text-align: left;
+}
+
+.promo-bar-text h3 {
+    font-size: 20px; /* Kích thước chữ */
+    font-weight: bold;
+    color: white;
+    margin: 0;
+    text-align: left;
+}
+
+.promo-bar-text p {
+    font-size: 16px;
+    margin: 5px 0 0;
+}
+
+
+.discounted-price {
+    color: #d0011b!important;
+    font-weight: bold!important;
+    text-transform: lowercase!important;
+}
+
+.ratings-section .rating-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Khoảng cách giữa các phần tử, bạn có thể điều chỉnh */
+    color: black;
+}
+
+.ratings-section .stars {
+    margin-right: 10px;
+    display: flex;
+}
+
+.ratings-section .stars span {
+    font-size: 20px; /* Kích thước ngôi sao, bạn có thể điều chỉnh */
+    margin-right: 5px; /* Khoảng cách giữa các ngôi sao */
+    margin-bottom: 20px;
+}
+
+.upper {
+    background-color: transparent;
+    cursor: pointer;
+    align-items: center;
+}
+
+.sale-off-zone {
+    font-weight: 500 !important;
+    margin-bottom: 2px !important;
+    color: #d52132;
+    background: #fae9eb;
+    width: 80px;
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+.upper button {
+    border: transparent;
+    border-right-color: grey;
+
+    background: transparent;
+    padding-right: 10px;
+}
+
+.core {
+    align-items: center;
+    display: flex;
+}
+
+.mini-voucher {
+    width: 100%;
+}
+
+.mini-vouchers__label {
+    color: #757575;
+    flex-shrink: 0;
+    font-size: 15px;
+    font-weight: 400;
+    margin: 0;
+    text-transform: capitalize;
+    width: 200px;
+}
+
+.single_product_details_area .single_product_desc .nice-select .current {
+    line-height: 45px;
+    text-align: center;
+}
+
+ .shopee-input-quantity {
+    background: #fff;
+     align-items: center;
+     display: flex;
+}
+
+.suQW3X {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border: 1px solid rgba(0, 0, 0, .09);
+    border-radius: 2px;
+    color: rgba(0, 0, 0, .8);
+    cursor: pointer;
+    display: flex;
+    font-size: .875rem;
+    font-weight: 300;
+    height: 32px;
+    justify-content: center;
+    letter-spacing: 0;
+    line-height: 1;
+    outline: none;
+    transition: background-color .1s cubic-bezier(.4,0,.6,1);
+    width: 32px;
+}
+
+.u00pLG {
+    -webkit-appearance: none;
+    border-left: 0;
+    border-radius: 0;
+    border-right: 0;
+    box-sizing: border-box;
+    cursor: text;
+    font-size: 16px;
+    font-weight: 400;
+    height: 32px;
+    text-align: center;
+    width: 50px;
+}
+
+.Bf9ap6 {
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+    z-index: -1000;
+}
+
+.shopee-svg-icon {
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    fill: currentColor;
+    position: relative;
+}
+
+.rel-link {
+    color: rgba(0, 0, 0, .87);
+    color: #05a;
+    font-size: 13px;
+    -webkit-text-decoration: none;
+    text-decoration: none;
+}
+
+
+ .out-of-stock {
+     color: gray;
+ }
+
+/* Thêm hiệu ứng rung */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-30px); }
+    50% { transform: translateX(30px); }
+    75% { transform: translateX(-30px); }
+    100% { transform: translateX(0); }
+}
+
+.shake {
+    animation: shake 0.5s;
+}
+
+.text-sale-corner {
+    --tw-text-opacity: 1;
+    color: rgba(238, 77, 45, var(--tw-text-opacity));
+    font-weight: 500;
+    font-size: .75rem;
+    line-height: .875rem;
+    padding-bottom: 0.125rem;
+    padding-top: .125rem;
+    padding-left: .25rem;
+    padding-right: .25rem;
+}
+
+.bg-sale-corner {
+    --tw-bg-opacity: 1;
+    background-color: rgba(254, 238, 234, var(--tw-bg-opacity));
+    position: absolute; /* Đặt vị trí tuyệt đối cho nhãn giảm giá */
+    top: 10px; /* Khoảng cách từ trên cùng */
+    right: 10px; /* Khoảng cách từ bên phải */
+    z-index: 10; /* Đảm bảo nhãn được đặt trên các phần tử khác */
+
+}
+
+
+
+.qty h3 {
+    align-items: center;
+    color: #757575;
+    flex-shrink: 0;
+    font-size: inherit;
+    font-weight: 400;
+    margin: 0;
+    text-transform: capitalize;
+    width: 110px;
+}
+
+.qty {
+    color: #757575;
+    margin-top: 16px;
+}
+
+label {
+    align-content: center;
+}
+
+.mini-vouchers__label h3 {
+    display: block;
+    font-size: 1.17em;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+
+.mini-vouchers__wrapper {
+    height: 1.375rem;
+    min-width: calc(100% - 245px);
+}
+
+.flex-no-overflow {
+    width: 0;
+}
+
+.flex-auto {
+    flex: 1 1 auto;
+}
+
+.mini-vouchers__vouchers {
+    display: flex;
+    flex-shrink: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.theme--ofs .mini-vouchers .voucher-ticket--seller-mini-solid {
+    background: rgba(208, 1, 27, .08);
+}
+
+.theme--ofs .mini-vouchers .voucher-briefing__code, .theme--ofs .mini-vouchers .voucher-briefing__discount, .theme--ofs .mini-vouchers .voucher-ticket, .theme--ofs .mini-vouchers .voucher-ticket__promo {
+    color: #d0011b;
+}
+
+.mini-voucher-with-popover {
+    margin-right: .625rem;
+    position: relative;
+}
+
+.voucher-ticket--seller-mini-solid {
+    align-items: center;
+    background: rgba(208, 1, 27, .08);
+    border: 0;
+    color: #ee4d2d;
+    cursor: default;
+    display: flex;
+    justify-content: center;
+    padding: 3px 7px;
+    position: relative;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.voucher-ticket {
+    max-width: 100%;
+}

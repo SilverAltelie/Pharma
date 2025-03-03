@@ -1,0 +1,138 @@
+.products-show{
+    display: flex;
+    flex-direction: row;
+}
+.products-filter{
+    width: 20%;
+}
+.products-content{
+    width: 80%;
+}
+
+.sort-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-top: 20px; /* Cách Trên */
+    margin-left: 1230px; /*Cách phải*/
+}
+
+
+.sort-container form {
+    display: flex;
+    align-items: center;
+}
+
+.sort-container label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.essence-btn{
+    background: rgba(92, 121, 232, 0.1);
+    border: 1px solid blue;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .03);
+    color: blue;
+    outline: 0;
+    overflow: visible;
+    position: relative;
+}
+
+
+
+.sort-container select {
+    padding: 10px;
+    border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+    .sort-container {
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .sort-container label {
+        margin-right: 5px;
+    }
+}
+
+.classynav ul li {
+    position: relative;
+}
+
+.classynav ul li .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    min-width: 200px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.classynav ul li:hover > .dropdown {
+    display: block;
+}
+
+.classynav ul li .dropdown li {
+    width: 100%;
+}
+
+.classynav ul li .dropdown li .dropdown {
+    top: 0;
+    left: 100%;
+}
+
+#salePopup .modal-content {
+    border-radius: 15px;
+}
+
+#salePopup .modal-header {
+    background-color: #f8f9fa;
+    border-radius: 15px 15px 0 0;
+}
+
+#salePopup .modal-title {
+    color: #007bff;
+}
+
+#salePopup .modal-body {
+    padding: 20px;
+}
+
+#salePopup .modal-footer {
+    border-top: none;
+}
+
+.product-img-container {
+    display: flex;
+    align-items: flex-start;
+}
+
+.product-img {
+    position: relative;
+    overflow: hidden;
+}
+
+.zoom-result {
+    display: none;
+    width: 400px;
+    height: 400px;
+    border: 1px solid #ddd;
+    margin-left: 20px;
+    overflow: hidden;
+}
+
+.magnifier {
+    position: absolute;
+    display: none;
+    width: 150px;
+    height: 150px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 7px rgba(255, 255, 255, 0.85),
+                0 0 7px 7px rgba(0, 0, 0, 0.25),
+                inset 0 0 40px 2px rgba(0, 0, 0, 0.25);
+    cursor: none;
+    z-index: 100;
+}

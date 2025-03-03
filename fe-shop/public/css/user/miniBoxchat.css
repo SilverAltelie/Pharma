@@ -1,0 +1,136 @@
+.seller_info {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.seller_name {
+    font-size: 1.5em;
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: inline-block;
+    max-width: 300px;
+    width: 100%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.seller_actions {
+    margin-top: 15px;
+}
+
+.seller_actions .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1em;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.seller_actions .chat-btn {
+    background-color: #28a745;
+}
+
+.seller_actions .chat-btn:hover {
+    background-color: #218838;
+}
+
+.seller_actions .shop-btn {
+    background-color: #007bff;
+}
+
+.seller_actions .shop-btn:hover {
+    background-color: #0056b3;
+}
+
+#chat-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+#chat-window {
+    width: 300px;
+    height: 400px;
+}
+
+#chat-content {
+    height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    max-width: 70%;
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    word-wrap: break-word;
+}
+
+.sender {
+    align-self: flex-end;
+    background-color: #007bff;
+    color: white;
+}
+
+.receiver {
+    align-self: flex-start;
+    background-color: #f1f0f0;
+    color: black;
+}
+
+#chat-icon button.messenger-icon {
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0084ff;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#chat-icon button.messenger-icon:hover {
+    background-color: #0070d8;
+    transform: scale(1.05);
+}
+
+#chat-icon i {
+    font-size: 30px;
+    color: white;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#minimize-chat, #close-chat {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#minimize-chat {
+    margin-right: 10px; /* Adjust this value to control the space between buttons */
+}
+
+#minimize-chat i, #close-chat i {
+    font-size: 14px;
+}

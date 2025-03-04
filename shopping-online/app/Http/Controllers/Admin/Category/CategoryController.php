@@ -21,6 +21,7 @@ class CategoryController extends Controller
     public function index()
     {
         //
+        return Category::paginate(10);
     }
 
     /**
@@ -29,7 +30,7 @@ class CategoryController extends Controller
     public function create()
     {
         //
-        
+
     }
 
     /**

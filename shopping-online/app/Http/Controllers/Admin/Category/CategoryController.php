@@ -1,18 +1,23 @@
 <?php
 
 namespace App\Http\Controllers\Admin\Category;
-use App\Models\Category;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Services\Category\CategoryCreateService;
-use App\Http\Requests\Category\CategoryCreateRequest;
+use App\Http\Requests\Admin\Category\CategoryRequest;
+use App\Models\Category;
+use App\Services\Admin\Category\CategoryCreateService;
+use App\Services\Admin\Category\CategoryDeleteService;
+use App\Services\Admin\Category\CategoryUpdateService;
 
 class CategoryController extends Controller
 {
-    protected $categoryService;
+    protected $categoryCreateService;
+    protected $categoryUpdateService;
+    protected $categoryDeleteService;
 
-    public function __construct(CategoryCreateService $categoryService) {
-        $this->categoryService = $categoryService;
+    public function __construct(CategoryCreateService $categoryCreateService, CategoryUpdateService $categoryUpdateService, CategoryDeleteService $categoryDeleteService) {
+        $this->categoryCreateService = $categoryCreateService;
+        $this->categoryUpdateService = $categoryUpdateService;
+        $this->categoryDeleteService = $categoryDeleteService;
     }
 
     /**
@@ -36,11 +41,11 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CategoryCreateRequest $request)
+    public function store(CategoryRequest $request)
     {
         try {
             $validated = $request->validated();
-            $category = $this->categoryService->handle($validated);
+            $category = $this->categoryCreateService->handle($validated);
 
             return response()->json([
                 'message' => 'Category created successfully',
@@ -75,16 +80,39 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CategoryController $categoryController)
+    public function update(CategoryRequest $request, $id)
     {
-        //
+        try {
+            $validated = $request->validated();
+            $category = $this->categoryUpdateService->handle($validated, $id);
+
+            return response()->json([
+                'message' => 'Category updated successfully',
+                'data' => $category
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(CategoryController $categoryController)
+    public function destroy($id)
     {
         //
+        try {
+            $category = $this->categoryDeleteService->handle($id);
+            return response()->json([
+                'message' => 'Category deleted successfully',
+                'data' => $category
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

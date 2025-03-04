@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\Category\CategoryController;
+use App\Http\Controllers\Admin\Product\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,5 +28,14 @@ Route::prefix('admin')->group(function () {
     Route::prefix('category')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
         Route::post('/create', [CategoryController::class, 'store']);
+        Route::post('/update/{id}', [CategoryController::class, 'update']);
+        Route::post('/delete/{id}', [CategoryController::class, 'destroy']);
+    });
+
+    Route::prefix('product')->group(function () {
+        Route::get('/', [ProductController::class, 'index']);
+        Route::post('/create', [ProductController::class, 'store']);
+        Route::post('/update/{id}', [ProductController::class, 'update']);
+        Route::post('/delete/{id}', [ProductController::class, 'destroy']);
     });
 });

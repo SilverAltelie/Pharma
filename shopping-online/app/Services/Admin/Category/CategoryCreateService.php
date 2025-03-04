@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Services\Category;
+namespace App\Services\Admin\Category;
 
 use App\Models\Category;
-use Illuminate\Support\Facades\DB;
 
 class CategoryCreateService
 {

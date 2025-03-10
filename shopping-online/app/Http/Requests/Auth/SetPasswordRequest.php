@@ -24,8 +24,6 @@ class SetPasswordRequest extends FormRequest
         return [
             //
             'email' => 'required|email',
-            'token' => 'required',
-            'password' => 'required|min:6'
         ];
     }
 }

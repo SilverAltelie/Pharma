@@ -52,17 +52,31 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Product $product)
+    public function show($id)
     {
         //
+        $product = Product::findOrFail($id);
+
+        $variants = $product->variants;
+
+        $reviews = $product->reviews;
+
+        $product->variants = $variants;
+
+        $product->reviews = $reviews;
+
+        return $product;
+
+
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
         //
+        return Product::findOrFail($id);
     }
 
     /**

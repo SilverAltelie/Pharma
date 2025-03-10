@@ -8,8 +8,24 @@ class ProductCreateService
 {
     public function handle($data) {
 
-        $images = isset($data['images']) ? array_map(fn($image) => base64_encode(file_get_contents($image)), $data['images']) : [];
+        $product = Product::create([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'content' => $data['content'],
+            'category_id' => $data['category_id'],
+            'quantity' => $data['quantity'],
+            'price' => $data['price'],
+            'status' => $data['status'],
+            'image' => $data['image'],
+        ]);
 
-        return Product::create((array) $data);
+        /*if (isset($data['images'])) {
+            foreach ($data['images'] as $image) {
+                $product->images()->create(['image' => $image]);
+            }
+        }*/
+
+        return $product;
+
     }
 }

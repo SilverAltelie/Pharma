@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
 export default function Products() {
-    interface Product {
+    /*interface Product {
         id: number;
         imageAlt: string;
         imageSrc: string;
         title: string;
         price: string;
-    }
+    }*/
 
     const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
@@ -20,12 +20,12 @@ export default function Products() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch("/api/data");
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`);
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }
                 const data = await res.json();
-                setProducts(data.products);
+                setProducts(data.data);
             } catch (error) {
                 console.error("Error:", error);
             }
@@ -33,9 +33,30 @@ export default function Products() {
         fetchData();
     }
     , []);
+
+    async function handleDelete(id:any) {
+        const isConfirmed = window.confirm("Bạn có chắc muốn xóa sản phẩm?")
+
+        if (!isConfirmed) return;
+
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/delete/${id}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!res.ok) {
+                throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
+            }
+        } catch (error) {
+            throw new Error();
+        }
+    }
     return (
         <AdminLayout>
-      <div className="bg-white">
+      <div className="bg-white h-full">
         <div className="flex flex-col justify-between mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
             <div className="flex items-center mb-6 justify-between">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900">Sản phẩm đang bán</h2>
@@ -45,8 +66,8 @@ export default function Products() {
             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
           >
 
-            <FaPlus /> 
-          </button>            
+            <FaPlus />
+          </button>
           </a>
 
           </div>
@@ -59,17 +80,18 @@ export default function Products() {
                     className="absolute top-2 right-2 z-50 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition"
                     ><FaPencil /></button>
                     <button
-                    onClick={() => router.push(`#`)}
+                    onClick={() => handleDelete(product.id)}
                     className="absolute top-2 right-12 z-50 bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition"
                     ><FaTrash /></button>
                 </div>
-                  
-                <img
-                  alt={product.imageAlt}
-                  src={product.imageSrc}
-                  className="aspect-square w-full rounded-md bg-gray-200 lg:aspect-auto lg:h-80"
-                />
-                <div className="mt-4 flex justify-between">
+
+                  <img
+                      alt={product.description}
+                      src={`data:image/png;base64,${product.image}`}
+                      className="aspect-square w-full rounded-md bg-gray-200 lg:aspect-auto lg:h-80"
+                  />
+
+                  <div className="mt-4 flex justify-between">
                   <div>
                     <h3 className="text-sm text-gray-700">
                       <a className="no-underline text-black" href={`/admin/products/${product.id}`}>
@@ -88,4 +110,5 @@ export default function Products() {
       </AdminLayout>
     )
   }
+
   

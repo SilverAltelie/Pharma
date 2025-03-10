@@ -1,58 +1,88 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ChevronDownIcon } from '@heroicons/react/16/solid'
 import AdminLayout from '../../admin-layout'
+import { useRouter } from 'next/navigation';
+
 
 export default function CategoryCreate() {
+  const router = useRouter();
   const [categories, setCategories] = useState<any[]>([])
 
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch('/api/admin-data')
-        const data = await res.json()
-        setCategories(data.categories)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`);
+        if (!res.ok) {
+          console.error('Lỗi API:', res.status, res.statusText);
+          return;
+        }
+
+        const text = await res.text(); // Lấy dữ liệu dạng text
+        console.log('Phản hồi dạng text:', text);
+
+        const data = JSON.parse(text); // Chuyển đổi thành JSON
+        setCategories(data.data);
       } catch (error) {
-        console.error('Lỗi khi lấy danh mục:', error)
+        console.error('Lỗi khi lấy danh mục:', error);
+        setCategories([]);
       }
     }
+
     fetchCategories()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const formData = new FormData(e.currentTarget)
-    const name = formData.get('name') as string
-    const description = formData.get('description') as string
-    const status = formData.get('status') as string
-    const parent_id = formData.get('parent_id') || null
+    if (!(e.currentTarget instanceof HTMLFormElement)) {
+      console.error("Lỗi: e.currentTarget không phải là form");
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const description = formData.get("description") as string;
+    const status = formData.get("status") as string;
+    const parent_id = formData.get("parent_id") || null;
 
     try {
-      const res = await fetch('/api/admin/category/create', {
-        method: 'POST',
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/create`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          "Content-Type": "application/json",
+          "Accept": "application/json",
         },
-        body: JSON.stringify({ name, description, status, parent_id })
-      })
+        body: JSON.stringify({ name, description, status, parent_id }),
+      });
 
-      const result = await res.json()
+      const text = await res.text();
+      console.log("Phản hồi dạng text:", text);
+
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch (error) {
+        console.error("Lỗi parse JSON:", error, "Dữ liệu nhận được:", text);
+        alert("Lỗi phản hồi từ server, vui lòng thử lại!");
+        return;
+      }
+
       if (res.ok) {
-        alert('Thêm danh mục thành công!')
+        alert("Thêm danh mục thành công!");
+        router.push("/admin/categories");
       } else {
-        alert('Lỗi: ' + result.message)
+        alert("Lỗi: " + (result.message || "Lỗi không xác định"));
       }
     } catch (error) {
-      console.error('Lỗi khi gửi yêu cầu:', error)
+      console.error("Lỗi khi gửi yêu cầu:", error);
+      alert("Không thể kết nối đến server!");
     }
-  }
+  };
 
   return (
     <AdminLayout>
-      <div className="isolate bg-white px-6 py-12 sm:py-12 lg:px-8">
+      <div className="isolate h-full bg-white px-6 py-12 sm:py-12 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
             Thêm danh mục mới

@@ -14,9 +14,16 @@ class ProductUpdateService
             return false;
         }
 
-        $images = isset($data['images']) ? array_map(fn($image) => base64_encode(file_get_contents($image)), $data['images']) : [];
-
-        $product->update((array) $data);
+        $product->update([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'content' => $data['content'],
+            'category_id' => $data['category_id'],
+            'quantity' => $data['quantity'],
+            'price' => $data['price'],
+            'status' => $data['status'],
+            'image' => $data['image'],
+        ]);
 
         return $product;
     }

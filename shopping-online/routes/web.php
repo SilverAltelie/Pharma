@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/verify-email/{uuid}', [AuthController::class, 'verifyEmail'])
+    ->middleware('signed') // Xác thực ký số
+    ->name('auth.verify');
+

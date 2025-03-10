@@ -17,10 +17,26 @@ export default function Login() {
     setError('');
 
     try {
-      const token = await loginService(email, password);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/auth/login`,{
+        method: 'POST',
+        headers: {
+          'Content-Type':'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({email, password}),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Đăng nhập thất bại');
+      }
+
+      const data = await res.json();
+      const token = data.token;
+
       localStorage.setItem('token', token);
       alert('Đăng nhập thành công');
-      router.push('/');
+      router.push('/admin');
     } catch (err: any) {
       setError(err.message || 'Đăng nhập không thành công');
     }
@@ -104,8 +120,6 @@ export default function Login() {
                 </button>
               </div>
             </form>
-  
-            
               
           </div>
         </div>

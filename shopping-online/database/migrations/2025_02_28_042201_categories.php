@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('status', ['0', '1'])->default('1');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
         });
@@ -28,5 +28,6 @@ return new class extends Migration
     public function down(): void
     {
         //
+        Schema::dropIfExists('categories');
     }
 };

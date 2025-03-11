@@ -7,11 +7,25 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class LoginService {
-    public function handle($data) {
-        $user = User::where('email',$data->email)->first();
+    public function handle($data)
+    {
+        $user = User::where('email', $data['email'])->first();
 
-        if (!$user||!Hash::check($data->password, $user->password))
-            return null;
+        if (!$user) {
+            return response()->json(['error' => 'Email không tồn tại'], 404);
+        }
 
-        return $user->createToken('MyApp')->plainTextToken;    }
+        if (!Hash::check($data['password'], $user->password)) {
+            return response()->json(['error' => 'Mật khẩu không đúng'], 401);
+        }
+
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Trả về token ở dạng JSON
+        return response()->json([
+            'token' => $token,
+        ]);
+    }
+
 }

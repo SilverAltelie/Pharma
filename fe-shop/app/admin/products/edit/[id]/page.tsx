@@ -2,75 +2,113 @@
 
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
-import { Field, Label, Switch } from '@headlessui/react'
 import { use, useEffect, useState } from 'react'
 import AdminLayout from '@/app/admin/admin-layout'
+import {useRouter} from "next/navigation";
 
 export default function UpdateProduct( {params}: {params: Promise<{id: number}>}) {
   const {id} = use(params);
+  const router = useRouter();
 
-  const [agreed, setAgreed] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [product, setProduct] = useState<{ title?: string; quantity?: number; price?: number; content?: string; category?: string; active?: number }>({});
-  const [image, setImage] = useState<string | null>(null);
-  
+  const [product, setProduct] = useState<{ title?: string; description?: string ;quantity?: number; price?: number; content?: string; image: string; category_id?: string; active?: number }>({});
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageBase64, setImageBase64] = useState<string | null>(null);
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [imageBase64, setImageBase64] = useState<string | null>(null);
 
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setImagePreview(base64String);
-        setImageBase64(base64String.split(",")[1]); // Bỏ phần "data:image/png;base64,"
-      };
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
 
-      reader.readAsDataURL(file);
-    }
-  };
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setImagePreview(base64String); // Hiển thị ảnh preview
+                setImageBase64(base64String.split(",")[1]); // Lưu base64 (bỏ phần đầu)
+            };
 
-  const handleSubmit = async () => {
-    if (!imageBase64) return alert("Vui lòng tải lên ảnh!");
+            reader.readAsDataURL(file);
+        }
+    };
 
-    const response = await fetch("/api/upload", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: imageBase64 }),
-    });
 
-    if (response.ok) {
-      alert("Ảnh đã được lưu vào database!");
-    } else {
-      alert("Lỗi khi lưu ảnh.");
-    }
-  };
+
+    const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.currentTarget);
+        const title = formData.get("title") as string || product.title;
+        const price = Number(formData.get("price") as string) || product.price;
+        const quantity = Number(formData.get("quantity") as string) || product.quantity;
+        const description = formData.get("description") as string || product.description;
+        const status = formData.get("status") as string || product.active;
+        const category_id = (formData.get("category_id") as string || product.category_id);
+        const content = formData.get("content") as string || product.content;
+
+
+        if (!title || isNaN(price as number) || isNaN(quantity as number) || !category_id || !description) {
+            alert("Vui lòng điền đầy đủ thông tin!");
+            return;
+        }
+
+        const payload = {
+            title: title,
+            price: price,
+            quantity: quantity,
+            content: content,
+            description: description,
+            status: status,
+            category_id: category_id,
+            image: imageBase64 || product.image, // Chỉ lấy một ảnh duy nhất
+        };
+
+
+        console.log(payload);
+
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/update/${id}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" ,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(payload), // Gửi mảng ảnh
+        });
+
+        if (response.ok) {
+            alert("Ảnh đã được lưu vào database!");
+            router.push('/admin/products');
+
+        } else {
+            alert(`Lỗi khi lưu ảnh.${JSON.stringify(payload)}`);
+
+        }
+    };
 
     useEffect(() => {
         async function fetchData() {
             try {
-            const res = await fetch("/api/admin-data");
-            const json = await res.json();
-            setCategories(json.categories);
-            setProduct(json.products.find((product: any) => product.id == id));
+            const productRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`);
+            const ProductJson = await productRes.json();
+            const categoryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`);
+            const categoryJson = await categoryRes.json();
+            setCategories(categoryJson.data);
+            setProduct(ProductJson.data.find((product: any) => product.id == id));
             } catch (error) {
             console.error("Lỗi khi gọi API: ", error);
             }
         }
         fetchData();
-        }, []);
+    }, []);
 
 
-        if (categories.length === 0 || !product) {
-            return <p className="text-center py-6">Đang tải dữ liệu...</p>;
-        }
+    if (categories.length === 0 || !product) {
+        return <p className="text-center py-6">Đang tải dữ liệu...</p>;
+    }
 
   return (
     <AdminLayout>
-    <form className='bg-white px-80'>
+    <form onSubmit={handleSubmit} className='bg-white px-80'>
         <h2 className="font-semibold text-gray-900">Sửa sản phẩm</h2>
     <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
           <div>
@@ -89,13 +127,13 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             </div>
           </div>
           <div>
-            <label htmlFor="last-name" className="block text-sm/6 font-semibold text-gray-900">
+            <label htmlFor="quantity" className="block text-sm/6 font-semibold text-gray-900">
               Số lượng
             </label>
             <div className="mt-2.5">
               <input
-                id="last-name"
-                name="last-name"
+                id="quantity"
+                name="quantity"
                 type="text"
                 defaultValue={product?.quantity || ''}
                 autoComplete="family-name"
@@ -104,13 +142,13 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             </div>
           </div>
           <div>
-            <label htmlFor="last-name" className="block text-sm/6 font-semibold text-gray-900">
+            <label htmlFor="price" className="block text-sm/6 font-semibold text-gray-900">
               Giá cả
             </label>
             <div className="mt-2.5">
               <input
-                id="last-name"
-                name="last-name"
+                id="price"
+                name="price"
                 type="text"
                 defaultValue={product?.price || ''}
                 autoComplete="family-name"
@@ -139,7 +177,7 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             <div className="mt-2.5">
               <select
                 id="category"
-                defaultValue={product?.category || ''}
+                defaultValue={product?.category_id || ''}
                 name="category"
                 autoComplete="category"
                 className="block border-2 w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
@@ -151,21 +189,35 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             </div>
           </div>
 
-          <div className="col-span-full">
-            <label htmlFor="photo" className="block text-sm font-medium text-gray-900">Ảnh sản phẩm</label>
-            <div className="mt-2 flex items-center gap-x-3">
-                {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="w-44 h-44 object-cover rounded-md" />
+        <div className="col-span-full">
+            <label htmlFor="photo" className="block text-sm font-medium text-gray-900">
+                Ảnh sản phẩm
+            </label>
+            <div className="mt-2">
+                {imagePreview || product.image ? (
+                    <img
+                        src={imagePreview || `${process.env.NEXT_PUBLIC_API_URL}/${product.image}`}
+                        alt="Ảnh cũ"
+                        className="w-24 h-24 object-cover rounded-md"
+                    />
                 ) : (
-                <UserCircleIcon aria-hidden="true" className="size-12 text-gray-300" />
+                    <UserCircleIcon aria-hidden="true" className="size-12 text-gray-300" />
                 )}
-                <input type="file" id="photo" accept="image/*" className="hidden" onChange={handleImageChange} />
-                <label htmlFor="photo" className="cursor-pointer rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
-                Đăng
-                </label>
             </div>
-            </div>
-          <div className="sm:col-span-2">
+            <input
+                type="file"
+                id="photo"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+            />
+            <label htmlFor="photo" className="cursor-pointer mt-2 inline-block rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
+                Đăng ảnh
+            </label>
+        </div>
+
+
+        <div className="sm:col-span-2">
             <label htmlFor="status" className="block text-sm/6 font-semibold text-gray-900">
               Trạng thái
             </label>
@@ -192,27 +244,10 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             </div>
           </div>
           
-          <Field className="flex items-center gap-x-4 sm:col-span-2">
-            <Switch
-              checked={agreed}
-              onChange={() => setAgreed(!agreed)}
-              className={`${agreed ? 'bg-indigo-600' : 'bg-gray-200'} 
-              relative inline-flex h-6 w-11 items-center rounded-full transition`}
-            >
-              <span
-                className={`${
-                  agreed ? 'translate-x-6' : 'translate-x-1'
-                } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-              />
-            </Switch>
-            <Label className="text-sm text-gray-600">
-              Bằng cách lựa chọn mục này, bạn sẽ chia sẻ cho chúng tôi thông tin cá nhân.
-            </Label>
-          </Field>
+
         </div>
         <div className="my-5">
           <button 
-            onClick={handleSubmit}
             type="submit"
             className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >

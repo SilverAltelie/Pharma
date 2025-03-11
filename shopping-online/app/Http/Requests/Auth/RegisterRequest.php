@@ -11,7 +11,7 @@ class RegisterRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,22 @@ class RegisterRequest extends FormRequest
     {
         return [
             //
+            'name' => 'required|string',
             'email' => 'required|string|email',
+            'password' => 'required|string|min:6',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'name.required' => 'Tên là bắt buộc.',
+            'email.required' => 'Email là bắt buộc.',
+            'email.email' => 'Email không hợp lệ.',
+            'email.unique' => 'Email đã tồn tại.',
+            'password.required' => 'Mật khẩu là bắt buộc.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+        ];
+    }
+
 }

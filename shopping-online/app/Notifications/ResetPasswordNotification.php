@@ -25,7 +25,7 @@ class ResetPasswordNotification extends Notification
 
     public function toMail($notifiable)
     {
-        $url = URL::to("/auth/reset-password?token={$this->token}&email={$notifiable->email}");
+        $url = URL::to("http://localhost:3000/auth/reset-password?token={$this->token}&email={$notifiable->email}");
 
         return (new MailMessage)
             ->subject('Đặt lại mật khẩu')

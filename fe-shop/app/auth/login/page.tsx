@@ -47,6 +47,8 @@ export default function Login() {
       const message = query.get('message');
       if (message === 'email-verified-successfully') {
         setNotification('Email của bạn đã được xác minh thành công! Vui lòng đăng nhập.');
+      } else if (message === 'password-reset-successfully') {
+        setNotification('Mật khẩu của bạn đã được đặt lại thành công! Vui lòng đăng nhập.');
       }
     };
     fetchMessage();

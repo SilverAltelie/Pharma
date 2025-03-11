@@ -23,11 +23,24 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const [data, setData] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+
   useEffect(() => {
+
     async function fetchData() {
+
       try {
-        const res = await fetch("/api/data");
+        const token = localStorage.getItem('token');
+
+        const res = await fetch(`http://localhost:8000/api/home`,{
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (!res.ok) {
+          throw new Error('HTTP status ' + res.status);
+        }
         const json = await res.json();
         setData(json);
       } catch (error) {

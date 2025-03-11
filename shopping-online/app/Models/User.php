@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,28 +11,32 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasUuids, HasApiTokens;
+
+    protected $keyType = 'string'; // UUID là chuỗi
+    public $incrementing = false;  // Tắt tăng tự động cho id
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'name',        // Cho phép name được gán giá trị
+        'email',       // Cho phép email được gán giá trị
+        'password',    // Cho phép password được gán giá trị
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $hidden = [
         'password',
         'remember_token',
     ];
+
 
     /**
      * The attributes that should be cast.
@@ -45,5 +50,9 @@ class User extends Authenticatable
 
     public function roles() {
         return $this->belongsTo(Role::class, 'user_roles');
+    }
+
+    public function reviews() {
+        return $this->hasMany(Review::class, 'user_id');
     }
 }

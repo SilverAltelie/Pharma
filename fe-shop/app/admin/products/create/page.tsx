@@ -5,54 +5,113 @@ import { ChevronDownIcon } from '@heroicons/react/16/solid'
 import { Field, Label, Switch } from '@headlessui/react'
 import { use, useEffect, useState } from 'react'
 import AdminLayout from '@/app/admin/admin-layout'
+import {ReactFormState} from "react-dom/client";
+import {jsonString} from "next/dist/client/components/react-dev-overlay/server/shared";
+import {useRouter} from "next/navigation";
 
 export default function ProductCreate() {
 
-  const [agreed, setAgreed] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [image, setImage] = useState<string | null>(null);
-  
+    const [categories, setCategories] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+    const [imageBase64List, setImageBase64List] = useState<string[]>([]);
+    const router = useRouter();
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageBase64, setImageBase64] = useState<string | null>(null);
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            const files = Array.from(event.target.files);
+            const previews: string[] = [];
+            const base64List: string[] = [];
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
+            files.forEach((file) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result as string;
+                    previews.push(base64String);
+                    base64List.push(base64String.split(",")[1]); // Bỏ phần đầu "data:image/png;base64,"
 
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setImagePreview(base64String);
-        setImageBase64(base64String.split(",")[1]); // Bỏ phần "data:image/png;base64,"
-      };
+                    // Cập nhật state sau khi xử lý xong tất cả ảnh
+                    if (previews.length === files.length) {
+                        setImagePreviews(previews);
+                        setImageBase64List(base64List);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    };
 
-      reader.readAsDataURL(file);
-    }
-  };
 
-  const handleSubmit = async () => {
-    if (!imageBase64) return alert("Vui lòng tải lên ảnh!");
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+/*
+        if (imageBase64List.length === 0) return alert("Vui lòng tải lên ít nhất một ảnh!");
+*/
 
-    const response = await fetch("/api/upload", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: imageBase64 }),
-    });
+        event.preventDefault();
 
-    if (response.ok) {
-      alert("Ảnh đã được lưu vào database!");
-    } else {
-      alert("Lỗi khi lưu ảnh.");
-    }
-  };
+        const formData = new FormData(event.currentTarget);
+        const title = formData.get("title") as string;
+        const price = Number(formData.get("price") as string);
+        const quantity = Number(formData.get("quantity") as string);
+        const description = formData.get("description") as string;
+        const status = formData.get("status") as string;
+        const category_id = (formData.get("category_id") as string);
+        const content = formData.get("content") as string;
+
+
+        if (!title || isNaN(price) || isNaN(quantity) || !category_id || !description) {
+            alert("Vui lòng điền đầy đủ thông tin!");
+            return;
+        }
+
+        if (imageBase64List.length === 0) {
+            alert("Vui lòng tải lên ít nhất một ảnh!");
+            return;
+        }
+
+        const payload = {
+            title: title,
+            price: price,
+            quantity: quantity,
+            content: content,
+            description: description,
+            status: status,
+            category_id: category_id,
+            image: imageBase64List[0], // Mảng ảnh base64
+        };
+
+        console.log(payload);
+
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/create`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" ,
+                            'Accept': 'application/json',
+    },
+            body: JSON.stringify(payload), // Gửi mảng ảnh
+        });
+
+        if (response.ok) {
+            alert("Ảnh đã được lưu vào database!");
+            router.push('/admin/products');
+
+        } else {
+            alert(`Lỗi khi lưu ảnh.${JSON.stringify(payload)}`);
+
+        }
+    };
+
 
     useEffect(() => {
         async function fetchData() {
             try {
-            const res = await fetch("/api/admin-data");
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json",
+                    'Accept': 'application/json',
+                }
+            });
             const json = await res.json();
-            setCategories(json.categories);
+            setCategories(json.data);
             } catch (error) {
             console.error("Lỗi khi gọi API: ", error);
             }
@@ -67,7 +126,7 @@ export default function ProductCreate() {
 
   return (
     <AdminLayout>
-    <form className='bg-white px-80'>
+    <form onSubmit={handleSubmit} className='bg-white px-80'>
         <h2 className="font-semibold text-gray-900">Thêm sản phẩm</h2>
     <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
           <div>
@@ -85,13 +144,13 @@ export default function ProductCreate() {
             </div>
           </div>
           <div>
-            <label htmlFor="last-name" className="block text-sm/6 font-semibold text-gray-900">
+            <label htmlFor="quantity" className="block text-sm/6 font-semibold text-gray-900">
               Số lượng
             </label>
             <div className="mt-2.5">
               <input
-                id="last-name"
-                name="last-name"
+                id="quantity"
+                name="quantity"
                 type="text"
                 autoComplete="family-name"
                 className="block w-full border-2 rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
@@ -99,19 +158,34 @@ export default function ProductCreate() {
             </div>
           </div>
           <div>
-            <label htmlFor="last-name" className="block text-sm/6 font-semibold text-gray-900">
+            <label htmlFor="price" className="block text-sm/6 font-semibold text-gray-900">
               Giá cả
             </label>
             <div className="mt-2.5">
               <input
-                id="last-name"
-                name="last-name"
+                id="price"
+                name="price"
                 type="text"
                 autoComplete="family-name"
                 className="block w-full border-2 rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
               />
             </div>
           </div>
+
+        <div>
+            <label htmlFor="last-name" className="block text-sm/6 font-semibold text-gray-900">
+                Mô tả sơ bộ
+            </label>
+            <div className="mt-2.5">
+                <input
+                    id="description"
+                    name="description"
+                    type="text"
+                    autoComplete="family-name"
+                    className="block w-full border-2 rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+                />
+            </div>
+        </div>
           <div className="sm:col-span-2">
             <label htmlFor="content" className="block w-full text-sm/6 font-semibold text-gray-900">
               Mô tả chi tiết sản phẩm
@@ -126,38 +200,41 @@ export default function ProductCreate() {
             </div>
           </div>
           <div className="sm:col-span-2">
-            <label htmlFor="email" className="block text-sm/6 font-semibold text-gray-900">
+            <label htmlFor="category_id" className="block text-sm/6 font-semibold text-gray-900">
               Danh mục
             </label>
             <div className="mt-2.5">
               <select
-                id="category"
-                name="category"
-                autoComplete="category"
+                id="category_id"
+                name="category_id"
+                autoComplete="category_id"
                 className="block border-2 w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
               >
                 {categories.map((category: any) => (
-                  <option key={category.id}>{category.name}</option>
+                    <option key={category.id} value={category.id}>{category.name}</option>
                 ))}
                 </select>
             </div>
           </div>
 
-          <div className="col-span-full">
+        <div className="col-span-full">
             <label htmlFor="photo" className="block text-sm font-medium text-gray-900">Ảnh sản phẩm</label>
-            <div className="mt-2 flex items-center gap-x-3">
-                {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="w-44 h-44 object-cover rounded-md" />
+            <div className="mt-2 flex flex-wrap gap-3">
+                {imagePreviews.length > 0 ? (
+                    imagePreviews.map((preview, index) => (
+                        <img key={index} src={preview} alt={`Preview ${index}`} className="w-24 h-24 object-cover rounded-md" />
+                    ))
                 ) : (
-                <UserCircleIcon aria-hidden="true" className="size-12 text-gray-300" />
+                    <UserCircleIcon aria-hidden="true" className="size-12 text-gray-300" />
                 )}
-                <input type="file" id="photo" accept="image/*" className="hidden" onChange={handleImageChange} />
-                <label htmlFor="photo" className="cursor-pointer rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
-                Đăng
-                </label>
             </div>
-            </div>
-          <div className="sm:col-span-2">
+            <input type="file" id="photo" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
+            <label htmlFor="photo" className="cursor-pointer mt-2 inline-block rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
+                Đăng ảnh
+            </label>
+        </div>
+
+        <div className="sm:col-span-2">
             <label htmlFor="status" className="block text-sm/6 font-semibold text-gray-900">
               Trạng thái
             </label>
@@ -171,8 +248,8 @@ export default function ProductCreate() {
                     aria-label="status"
                     className="col-start-1 border-2 row-start-1 w-full appearance-none rounded-md py-2 pr-7 pl-3.5 text-base text-gray-500 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                   >
-                    <option value={0}>Ẩn</option>
-                    <option value={1}>Hiện</option>
+                    <option value={'0'}>Ẩn</option>
+                    <option value={'1'}>Hiện</option>
                   </select>
                   <ChevronDownIcon
                     aria-hidden="true"
@@ -182,28 +259,10 @@ export default function ProductCreate() {
               </div>
             </div>
           </div>
-          
-          <Field className="flex items-center gap-x-4 sm:col-span-2">
-            <Switch
-              checked={agreed}
-              onChange={() => setAgreed(!agreed)}
-              className={`${agreed ? 'bg-indigo-600' : 'bg-gray-200'} 
-              relative inline-flex h-6 w-11 items-center rounded-full transition`}
-            >
-              <span
-                className={`${
-                  agreed ? 'translate-x-6' : 'translate-x-1'
-                } inline-block h-4 w-4 transform rounded-full bg-white transition`}
-              />
-            </Switch>
-            <Label className="text-sm text-gray-600">
-              Bằng cách lựa chọn mục này, bạn sẽ chia sẻ cho chúng tôi thông tin cá nhân.
-            </Label>
-          </Field>
+
         </div>
         <div className="my-5">
-          <button 
-            onClick={handleSubmit}
+          <button
             type="submit"
             className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >

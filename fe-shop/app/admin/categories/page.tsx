@@ -12,33 +12,106 @@ export default function CategoriesTable() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/admin-data");
-        const json = await res.json();
+        const res = await fetch("http://localhost:8000/api/admin/category");
 
-        // Xử lý dữ liệu để nhóm cha-con
-        const categoryMap = json.categories.reduce((acc: any, category: any) => {
-          acc[category.id] = { ...category, children: [] };
-          return acc;
-        }, {});
+        if (!res.ok) {
+          throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
+        }
 
-        json.categories.forEach((category: any) => {
-          if (category.parent_id !== null) {
-            categoryMap[category.parent_id]?.children.push(categoryMap[category.id]);
+        const text = await res.text();
+        console.log("Raw API response:", text); // Kiểm tra dữ liệu
+
+        let json;
+        try {
+          json = JSON.parse(text);
+        } catch (error) {
+          throw new Error("API không trả về JSON hợp lệ!");
+        }
+
+        console.log("JSON API response:", json);
+
+        if (!json || typeof json !== "object" || !Array.isArray(json.data)) {
+          throw new Error("Dữ liệu API không hợp lệ (thiếu `data` hoặc sai định dạng)");
+        }
+
+        const categoryMap: Record<number, any> = {};
+        json.data.forEach((category) => {
+          categoryMap[category.id] = { ...category, children: [] };
+        });
+
+        json.data.forEach((category) => {
+          if (category.parent_id !== null && categoryMap[category.parent_id]) {
+            categoryMap[category.parent_id].children.push(categoryMap[category.id]);
           }
         });
 
-        const rootCategories = Object.values(categoryMap).filter((cat: any) => cat.parent_id === null);
+        const rootCategories = Object.values(categoryMap).filter((cat) => cat.parent_id === null);
         setCategories(rootCategories);
       } catch (error) {
         console.error("Lỗi khi gọi API:", error);
+        setCategories([])
       }
     }
+
     fetchData();
   }, []);
 
-  if (categories.length === 0) {
-    return <p className="text-center py-6">Đang tải dữ liệu...</p>;
-  }
+  const CategoryRow = ({ category, router, level }: any) => {
+    async function deleteCategory(id: number) {
+      const isConfirm = window.confirm("Bạn có chắc chắn muốn xóa mục này");
+
+      if (!isConfirm) return;
+
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/delete/${id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
+        }
+
+        setCategories((prev) => prev.filter((category) => category.id !== id));
+      } catch (error) {
+        console.error("Lỗi khi xóa danh mục:", error);
+      }
+    }
+
+    return (
+        <>
+          <tr className="border hover:bg-gray-50">
+            <td className="p-3 border">{category.id}</td>
+            <td className="p-3 border pl-{level * 10}">
+              {level > 0 && <span className="text-gray-500">{"— ".repeat(level)}</span>}
+              {category.name}
+            </td>
+            <td className="p-3 border">{category.status == 1 ? "Hoạt động" : "Ẩn"}</td>
+            <td className="p-3 border">{category.totalProducts ? category.totalProducts : 0}</td>
+            <td className="p-3 border text-center">
+              <button
+                  onClick={() => router.push(`/admin/categories/edit/${category.id}`)}
+                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+              >
+                <FaEdit /> Sửa
+              </button>
+              <button onClick={() => deleteCategory(category.id) } className="text-red-600 hover:text-red-800 flex items-center gap-1">
+                <FaTrash /> Xóa
+              </button>
+            </td>
+          </tr>
+
+          {/* Hiển thị danh mục con (nếu có) */}
+          {category.children.length > 0 &&
+              category.children.map((child: any) => (
+                  <CategoryRow key={child.id} category={child} router={router} level={level + 1} />
+              ))}
+        </>
+    );
+  };
+
 
   return (
     <AdminLayout>
@@ -80,36 +153,3 @@ export default function CategoriesTable() {
   );
 }
 
-// Component hiển thị danh mục cha-con
-const CategoryRow = ({ category, router, level }: any) => {
-  return (
-    <>
-      <tr className="border hover:bg-gray-50">
-        <td className="p-3 border">{category.id}</td>
-        <td className="p-3 border pl-{level * 10}">
-          {level > 0 && <span className="text-gray-500">{"— ".repeat(level)}</span>}
-          {category.name}
-        </td>
-        <td className="p-3 border">{category.status === 1 ? "Hoạt động" : "Ẩn"}</td>
-        <td className="p-3 border">{category.totalProducts ? category.totalProducts : 0}</td>
-        <td className="p-3 border text-center">
-          <button
-            onClick={() => router.push(`/admin/categories/edit/${category.id}`)}
-            className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
-          >
-            <FaEdit /> Sửa
-          </button>
-          <button className="text-red-600 hover:text-red-800 flex items-center gap-1">
-            <FaTrash /> Xóa
-          </button>
-        </td>
-      </tr>
-
-      {/* Hiển thị danh mục con (nếu có) */}
-      {category.children.length > 0 &&
-        category.children.map((child: any) => (
-          <CategoryRow key={child.id} category={child} router={router} level={level + 1} />
-        ))}
-    </>
-  );
-};

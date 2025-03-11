@@ -2,19 +2,20 @@
 
 import { use, useEffect, useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
-import { Field, Label, Switch } from '@headlessui/react'
+import {useRouter} from 'next/navigation'
 import AdminLayout from '@/app/admin/admin-layout'
 
 export default function CategoryUpdate({params}: {params: Promise<{id: string}>}) {
     const {id} = use(params)
   const [agreed, setAgreed] = useState(false)
   const [categories, setCategories] = useState([])
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchCategories() {
-      const res = await fetch('/api/admin-data')
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`)
         const data = await res.json()
-        setCategories(data.categories)
+        setCategories(data.data)
     }
     fetchCategories()
     }, [])
@@ -35,9 +36,50 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
         return <p className="text-center py-6">Đang tải dữ liệu...</p>;
     }
 
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+      e.preventDefault()
+        const formData = new FormData(e.currentTarget)
+        const name = formData.get('name') as string
+        const description = formData.get('description') as string
+        const status = formData.get('status') as string
+        const parent_id = formData.get('parent_id') || null
+
+      try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/update/${id}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: JSON.stringify({ name, description, status, parent_id })
+          })
+
+        const text = await res.text();
+        console.log('Phản hồi dạng text:', text);
+
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch (error) {
+          console.error('Lỗi parse JSON:', error, 'Dữ liệu nhận được:', text);
+          alert('Lỗi phản hồi từ server, vui lòng thử lại!');
+          return;
+        }
+
+        if (res.ok) {
+          alert('Sửa danh mục thành công!');
+          router.push('/admin/categories');
+        } else {
+          alert('Lỗi: ' + (result.message || 'Lỗi không xác định'));
+        }
+      } catch (error) {
+        throw error;
+      }
+    }
+
   return (
     <AdminLayout>
-    <div className="isolate bg-white px-6 py-12 sm:py-12 lg:px-8">
+    <div className="isolate h-full bg-white px-6 py-12 sm:py-12 lg:px-8">
       <div
         aria-hidden="true"
         className="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]"
@@ -48,7 +90,7 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
         <h2 className="text-4xl font-semibold tracking-tight text-balance text-gray-900 sm:text-5xl">Sửa danh mục</h2>
         <p className="mt-2 text-lg/8 text-gray-600">Các danh mục giúp bạn quản lý các mặt hàng dễ dàng hơn, hãy tạo các danh mục 1 cách rõ ràng.</p>
       </div>
-      <form action="#" method="POST" className="mx-auto mt-16 max-w-xl sm:mt-20">
+      <form action="#" onSubmit={handleSubmit} method="POST" className="mx-auto mt-16 max-w-xl sm:mt-20">
         <div className="grid grid-cols-1 gap-x-8 gap-y-6">
           <div>
             <label htmlFor="name" className="block text-sm/6 font-semibold text-gray-900">
@@ -131,7 +173,7 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
             type="submit"
             className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            Đăng ký danh mục
+            Sửa danh mục
           </button>
         </div>
       </form>

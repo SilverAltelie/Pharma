@@ -5,7 +5,7 @@ export async function createCategoryService(
     parent_id?: number | null
   ) {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category`, {
+      const res = await fetch(`http://localhost:8000/api/admin/category`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -17,7 +17,7 @@ export async function createCategoryService(
       if (res.status === 204) {
         return { message: 'No content' };
       }
-  
+
       const text = await res.text();
       try {
         return JSON.parse(text);

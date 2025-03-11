@@ -3,23 +3,23 @@
 namespace App\Services\Auth;
 
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
 class RegisterService {
     public function handle($data) {
-        $token = Str::random(60);
-        \DB::table('password_resets')->insert([
+
+        $user = User::create([
+            'name' => $data->name,
             'email' => $data->email,
-            'token' => $token,
-            'created_at' => now()
+            'password' => Hash::make($data->password),
         ]);
-        $link = url("/auth/set-pass?token=$token&email=$data->email");
 
-        \Mail::to($data->email)->send(new RegisterMail($link));
+        // Gửi email xác nhận
+        $user->notify(new VerifyEmailNotification($user));
 
-        return response()->json(['message' => 'Đăng ký thành công, vui lòng kiểm tra email để xác nhận'], 200);
+        return response()->json(['message' => 'Đăng ký thành công', 'user' => $user], 201);
     }
 
-    
 }

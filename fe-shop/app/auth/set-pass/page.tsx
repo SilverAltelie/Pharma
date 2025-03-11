@@ -1,42 +1,53 @@
 'use client'
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-export default function SetPassword() {
-    const [password, setPassword] = useState("");
-    const params = useSearchParams();
-    const email = params.get("email");
-    const token = params.get("token");
+export default function ResetPassword() {
+    const searchParams = useSearchParams();
+    const [email, setEmail] = useState(searchParams.get('email') || '');
+    const [token, setToken] = useState(searchParams.get('token') || '');
+    const [password, setPassword] = useState('');
+    const [passwordConfirmation, setPasswordConfirmation] = useState('');
+    const [message, setMessage] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const res = await fetch("/api/set-password", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, token, password })
-        });
 
-        if (res.ok) {
-            alert("Mật khẩu đã được đặt thành công!");
-        } else {
-            alert("Có lỗi xảy ra!");
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/reset-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, token, password, password_confirmation: passwordConfirmation }),
+            });
+
+            const data = await res.json();
+            setMessage(data.message || data.error);
+        } catch (error) {
+            setMessage('Lỗi kết nối đến server!');
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-10">
-            <h2 className="text-2xl font-bold mb-4">Đặt mật khẩu mới</h2>
-            <input
-                type="password"
-                placeholder="Nhập mật khẩu mới"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="border p-2 w-full mb-4"
-                required
-            />
-            <button type="submit" className="bg-green-500 text-white p-2 rounded w-full">
-                Xác nhận
-            </button>
-        </form>
+        <div>
+            <h2>Đặt lại mật khẩu</h2>
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="password"
+                    placeholder="Nhập mật khẩu mới"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Nhập lại mật khẩu"
+                    value={passwordConfirmation}
+                    onChange={(e) => setPasswordConfirmation(e.target.value)}
+                    required
+                />
+                <button type="submit">Cập nhật mật khẩu</button>
+            </form>
+            {message && <p>{message}</p>}
+        </div>
     );
 }

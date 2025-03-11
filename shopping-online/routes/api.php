@@ -26,25 +26,30 @@ use \App\Http\Controllers\User\HomeController;
 /*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });*/
-Route::post('login', [AuthController::class, 'login']);
+Route::prefix('/')->group(function () {
+    Route::post('login', [AuthController::class, 'login']);
 
-Route::post('register', [AuthController::class, 'register']);
+    Route::post('register', [AuthController::class, 'register']);
 
-Route::get('/email/verify/{id}', function (Request $request, $id) {
-    if (!$request->hasValidSignature()) {
-        return response()->json(['error' => 'Liên kết không hợp lệ hoặc đã hết hạn'], 400);
-    }
+    Route::get('/email/verify/{id}', function (Request $request, $id) {
+        if (!$request->hasValidSignature()) {
+            return response()->json(['error' => 'Liên kết không hợp lệ hoặc đã hết hạn'], 400);
+        }
 
-    $user = User::findOrFail($id);
-    if ($user->email_verified_at) {
-        return response()->json(['message' => 'Email đã được xác nhận trước đó.']);
-    }
+        $user = User::findOrFail($id);
+        if ($user->email_verified_at) {
+            return response()->json(['message' => 'Email đã được xác nhận trước đó.']);
+        }
 
-    $user->email_verified_at = now();
-    $user->save();
+        $user->email_verified_at = now();
+        $user->save();
 
-    return response()->json(['message' => 'Email đã được xác nhận thành công!']);
-})->name('auth.verify');
+        return response()->json(['message' => 'Email đã được xác nhận thành công!']);
+    })->name('auth.verify');
+
+    Route::post('/forgot-password', [AuthController::class, 'sendResetLink']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+});
 
 Route::prefix('/')->group(function () {
     Route::middleware('auth:sanctum')->get('home', [HomeController::class, 'index']);

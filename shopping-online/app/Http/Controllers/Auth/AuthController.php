@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Auth\ForgotPasswordService;
 use Illuminate\Http\Request;
 use App\Services\Auth\LoginService;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Services\Auth\RegisterService;
 use App\Http\Requests\Auth\RegisterRequest;
+use Illuminate\Support\Facades\Password;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 
 
 class AuthController extends Controller
@@ -17,10 +20,12 @@ class AuthController extends Controller
     //
     protected $loginService;
     protected $registerService;
+    protected $forgotPasswordService;
 
-    public function __construct(LoginService $loginService, RegisterService $registerService) {
+    public function __construct(LoginService $loginService, RegisterService $registerService, ForgotPasswordService $forgotPasswordService) {
     	$this->registerService = $registerService;
         $this->loginService = $loginService;
+        $this->forgotPasswordService = $forgotPasswordService;
     }
 
     public function login(LoginRequest $data) {
@@ -53,8 +58,16 @@ class AuthController extends Controller
         $user->email_verified_at = now();
         $user->save();
 
-        return redirect('http://localhost:3000/auth/login?message=email-verified-successfully
-');
+        return redirect('http://localhost:3000/auth/login?message=email-verified-successfully');
     }
 
+    public function sendResetLink(ForgotPasswordRequest $request)
+    {
+        return $this->forgotPasswordService->sendResetLink($request);
+    }
+
+    public function resetPassword(ForgotPasswordRequest $request)
+    {
+        return $this->forgotPasswordService->resetPassword($request);
+    }
 }

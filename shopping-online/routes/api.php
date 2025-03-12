@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Address\AddressController;
+use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\MainController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -10,7 +13,7 @@ use App\Http\Controllers\User\Product\ProductController as UserProductController
 
 use \App\Http\Controllers\Admin\Variant\VariantController;
 use App\Http\Controllers\Admin\AdminController;
-use \App\Http\Controllers\User\HomeController;
+use \App\Http\Controllers\User\Cart\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +34,8 @@ Route::prefix('/')->group(function () {
 
     Route::post('register', [AuthController::class, 'register']);
 
+    Route::post('logout', [AuthController::class, 'logout']);
+
     Route::get('/email/verify/{id}', function (Request $request, $id) {
         if (!$request->hasValidSignature()) {
             return response()->json(['error' => 'Liên kết không hợp lệ hoặc đã hết hạn'], 400);
@@ -49,14 +54,37 @@ Route::prefix('/')->group(function () {
 
     Route::post('/forgot-password', [AuthController::class, 'sendResetLink']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
+
 });
 
-Route::prefix('/')->group(function () {
-    Route::middleware('auth:sanctum')->get('home', [HomeController::class, 'index']);
+Route::prefix('')->middleware('optional-auth')->group(function () {
+
+    Route::get('/home', [HomeController::class, 'index']);
+    Route::get('/main', [MainController::class, 'index']);
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/product', [ProductController::class, 'index']);
     Route::get('/products', [UserProductController::class, 'index']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
+
+
+    Route::prefix('/cart')->group(function () {
+        Route::get('/getProduct', [CartController::class, 'getProductCart']);
+        Route::post('/addProduct', [CartController::class, 'addProductCart']);
+    });
+    Route::get('/product/show/{id}', [ProductController::class, 'show']);
+});
+
+Route::prefix('')->middleware('auth:sanctum')->group(function () {
+    Route::get('/user', [AuthController::class, 'user']);
+    Route::prefix('/addresses')->group(function () {
+        Route::get('/', [AddressController::class, 'index']);
+        Route::get('/{id}', [AddressController::class, 'show']);
+        Route::post('/create', [AddressController::class, 'store']);
+        Route::post('/update/{id}', [AddressController::class, 'update']);
+        Route::post('/delete/{id}', [AddressController::class, 'destroy']);
+        Route::post('/setDefault/{id}', [AddressController::class, 'setDefault']);
+    });
 });
 
 Route::prefix('admin')->group(function () {

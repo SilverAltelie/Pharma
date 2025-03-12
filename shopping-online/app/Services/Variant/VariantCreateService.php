@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Variant;
+namespace App\Services\Variant;
 
 use App\Models\Variant;
 

@@ -4,17 +4,20 @@ namespace App\Http\Controllers\Admin\Category;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Category\CategoryRequest;
 use App\Models\Category;
-use App\Services\Admin\Category\CategoryCreateService;
-use App\Services\Admin\Category\CategoryDeleteService;
-use App\Services\Admin\Category\CategoryUpdateService;
+use App\Services\Category\CategoryCreateService;
+use App\Services\Category\CategoryDeleteService;
+use App\Services\Category\CategoryListService;
+use App\Services\Category\CategoryUpdateService;
 
 class CategoryController extends Controller
 {
     protected $categoryCreateService;
     protected $categoryUpdateService;
     protected $categoryDeleteService;
+    protected $categoryListService;
 
-    public function __construct(CategoryCreateService $categoryCreateService, CategoryUpdateService $categoryUpdateService, CategoryDeleteService $categoryDeleteService) {
+    public function __construct(CategoryListService $categoryListService ,CategoryCreateService $categoryCreateService, CategoryUpdateService $categoryUpdateService, CategoryDeleteService $categoryDeleteService) {
+        $this->categoryListService = $categoryListService;
         $this->categoryCreateService = $categoryCreateService;
         $this->categoryUpdateService = $categoryUpdateService;
         $this->categoryDeleteService = $categoryDeleteService;
@@ -26,7 +29,8 @@ class CategoryController extends Controller
     public function index()
     {
         //
-        return Category::paginate(10);
+        return $this->categoryListService->handle();
+
     }
 
     /**

@@ -70,4 +70,22 @@ class AuthController extends Controller
     {
         return $this->forgotPasswordService->resetPassword($request);
     }
+
+    public function logout() {
+        Auth::logout();
+        return response()->json(['message' => 'Đăng xuất thành công!']);
+    }
+
+    public function user() {
+        $user = Auth::user(); // Lấy đối tượng người dùng hiện đang xác thực
+
+        if (!$user) {
+            return response()->json(['message' => 'Người dùng chưa đăng nhập.'], 401);
+        }
+
+        // Lấy danh sách addresses thông qua quan hệ trong model User
+        $user->addresses = $user->addresses()->get();
+
+        return response()->json($user);
+    }
 }

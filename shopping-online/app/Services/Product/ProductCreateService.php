@@ -1,20 +1,14 @@
 <?php
 
-namespace App\Services\Admin\Product;
+namespace App\Services\Product;
 
 use App\Models\Product;
 
-class ProductUpdateService
+class ProductCreateService
 {
-    public function handle($data, $id)
-    {
-        $product = Product::find($id);
+    public function handle($data) {
 
-        if (!$product) {
-            return false;
-        }
-
-        $product->update([
+        $product = Product::create([
             'title' => $data['title'],
             'description' => $data['description'],
             'content' => $data['content'],
@@ -25,6 +19,13 @@ class ProductUpdateService
             'image' => $data['image'],
         ]);
 
+        /*if (isset($data['images'])) {
+            foreach ($data['images'] as $image) {
+                $product->images()->create(['image' => $image]);
+            }
+        }*/
+
         return $product;
+
     }
 }

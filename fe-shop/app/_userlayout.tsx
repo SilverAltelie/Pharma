@@ -7,7 +7,7 @@ import "../public/customer/style.css"
 import "../public/customer/css/image.css"
 import "../public/css/user/homeContent.css"
 import "../public/css/user/productSale.css"
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
+import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
   Popover,
@@ -18,37 +18,94 @@ import {
 
 import { ChevronDownIcon, UserIcon, MapIcon, ShoppingBagIcon, ArrowLeftStartOnRectangleIcon, ArrowRightEndOnRectangleIcon, PencilSquareIcon} from '@heroicons/react/20/solid'
 import FloatingMenu from './floatingMenu';
+import {useRouter} from "next/navigation";
+
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const [data, setData] = useState<any>(null);
-  const [isOpen, setIsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
+  const [isOpen, setIsOpen] = useState(false);
+  const [data, setData] = useState<any>(null);
+  const router = useRouter();
+  const token = localStorage.getItem('token');
+
 
   useEffect(() => {
-
     async function fetchData() {
+      setIsLoading(true); // Start loading
+      setError(null); // Reset error state
+
+      /*if (!token) {
+        setError('User is not authenticated. Token is missing.');
+        setIsLoading(false);
+        return;
+      }*/
 
       try {
-        const token = localStorage.getItem('token');
+        // Lấy token từ localStorage (nếu có)
+        const token = localStorage.getItem("token");
 
-        const res = await fetch(`http://localhost:8000/api/home`,{
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
+        const res = await fetch("http://localhost:8000/api/home", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
-        if (!res.ok) {
-          throw new Error('HTTP status ' + res.status);
-        }
-        const json = await res.json();
-        setData(json);
-      } catch (error) {
-        console.error("Lỗi khi gọi api: ", error);
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message || "Lỗi tải dữ liệu");
+
+        // Cập nhật state dữ liệu tại đây
+        setData(data);
+
+      } catch (err: any) {
+        setError(err.message);
+        console.error("Lỗi API trả về:", err.message);
+      } finally {
+        setIsLoading(false); // End loading
       }
     }
+
     fetchData();
   }, []);
+
+  async function handleLogout() {
+    const res = await fetch(`http://localhost:8000/api/logout`, {
+        method: 'POST',
+        headers: token ? {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        } : {},
+    })
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.message || "Logout failed");
+    }
+
+    localStorage.removeItem('token');
+    router.push('/auth/login');
+  }
+
+  if (isLoading) {
+    return (
+        <div className="loading-screen">
+          {/* Loading UI */}
+          <p>Loading...</p>
+        </div>
+    );
+  }
+
+/*  if (error) {
+    return (
+        <div className="error-screen">
+          {/!* Error UI *!/}
+          <h1>Error</h1>
+          <p>{error}</p>
+        </div>
+    );
+  }*/
+
+
 
   return (
     <div className="wrapper">
@@ -72,31 +129,49 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                           <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
                         </PopoverButton>
 
-                        <PopoverPanel className="absolute top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white ring-1 shadow-lg ring-gray-900/5">
+                        <PopoverPanel className="absolute top-full z-10 mt-3 w-screen max-w-md rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
                           <div className="p-4">
-                            {data?.categories?.map((category: any) => (
-                              <div key={category.id}>
-                                <a href={`/category/${category.id}`} className="block font-semibold text-gray-900">
-                                  {category.name}
-                                </a>
-                                {category.children?.length > 0 && (
-                                  <ul>
-                                    {category.children.map((child: any) => (
-                                      <li key={child.id}>
-                                        <a href={`/category/${child.id}`} className="text-gray-600">{child.name}</a>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                )}
-                              </div>
-                            ))}
+                            {data?.categories.length > 0 ? (
+                                data?.categories.map((category: any) => (
+                                    <div key={category.id} style={{ marginBottom: '16px' }}>
+                                      {/* Parent Category */}
+                                      <a
+                                          href={`/category/${category.id}`}
+                                          className="block font-semibold text-black"
+                                          style={{
+                                            fontWeight: category.parent_id == null ? 'bold' : 'normal', // In đậm nếu không có con
+                                          }}
+                                      >
+                                        {category.name}
+                                      </a>
+
+                                      {category?.children.length > 0 && (
+                                          <ul style={{ paddingLeft: '20px', marginTop: '8px' }}>
+                                            {category.children.map((child: any) => (
+                                                <li key={child.id}>
+                                                  <a
+                                                      href={`/category/${child.id}`}
+                                                      className="text-gray-600 hover:text-gray-800"
+                                                      style={{ display: 'block' }}
+                                                  >
+                                                    {child.name}
+                                                  </a>
+                                                </li>
+                                            ))}
+                                          </ul>
+                                      )}
+                                    </div>
+                                ))
+                            ) : (
+                                <p>Không có danh mục nào.</p>
+                            )}
                           </div>
                         </PopoverPanel>
                       </Popover>
 
                       
                     </PopoverGroup>
-                    <PopoverGroup>
+                    {/*<PopoverGroup>
                     <Popover className="relative">
                         <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
                           Giảm giá
@@ -115,7 +190,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                           </div>
                         </PopoverPanel>
                       </Popover>
-                    </PopoverGroup>
+                    </PopoverGroup>*/}
                     
                   </li>
 
@@ -166,7 +241,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                </a>
             </div>
               </PopoverButton>
-              {data?.user ? (
+              {token ? (
                 <PopoverPanel
                 transition
                 className="absolute left-1/2 z-10 mt-2 flex w-screen max-w-fit -translate-x-1/2 px-4 transition data-closed:translate-y-1 data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in"
@@ -215,10 +290,11 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         <ArrowLeftStartOnRectangleIcon className="size-6 text-gray-600 group-hover:text-green-600" />
                         </div>
                         <div>
-                          <a href='/auth/login' className="font-semibold text-gray-900">
+                          <button onClick={handleLogout} className="font-semibold text-gray-900">
                             Đăng xuất
-                            <span className="absolute inset-0" />
-                          </a>
+                            <span className="absolute inset-0"/>
+                          </button>
+
                         </div>
                       </div>
                     
@@ -272,7 +348,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="cart-area">
             <a onClick={() => setIsOpen(!isOpen)} className="relative">
                 <Image src="/customer/img/core-img/bag.svg" alt="" width={20} height={20} />
-                <span>{data?.cartItems.length}</span>
+                <span>{data?.cartItems?.length}</span>
             </a>
             </div>
           </div>
@@ -311,7 +387,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                   <div className="mt-8">
                     <div className="flow-root">
                       <ul role="list" className="-my-6 divide-y divide-gray-200">
-                        {data?.cartItems.map((product: any, index: number) => (
+                        {data?.cartItems?.map((product: any, index: number) => (
                           <li key={index} className="flex py-6">
                             <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
                               <img alt={product.imageAlt} src={product.imageSrc} className="size-full object-cover" />

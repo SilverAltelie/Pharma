@@ -6,6 +6,12 @@ import { Radio, RadioGroup } from '@headlessui/react'
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
 import AdminLayout from "@/app/admin/admin-layout";
+import {Swiper, SwiperSlide} from "swiper/react";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/autoplay';
+import {Autoplay, Navigation, Pagination} from "swiper/modules";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
@@ -23,7 +29,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
     };
 
     type Product = {
-        image: string;
+        images: Image[];
         title: string;
         price: string;
         quantity: number;
@@ -32,6 +38,11 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
         variants: Variant[];
         reviews: Review[];
     };
+
+    type Image = {
+        id: string;
+        image: string;
+    }
 
     type Review = {
         rate: number;
@@ -131,27 +142,35 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
         <AdminLayout>
             <div className="bg-white">
                 <div className="pt-6">
-                    <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
-                        <img
-                            src={`data:image/png;base64,${product?.image}`}
-                            className="hidden size-full rounded-lg object-cover lg:block"
-                        />
-                        <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
-                            <img
-                                src={`data:image/png;base64,${product?.image}`}
-                                className="aspect-3/2 w-full rounded-lg object-cover"
-                            />
-                            <img src={`data:image/png;base64,${product?.image}`}
-                                 className="aspect-3/2 w-full rounded-lg object-cover"
-                            />
+                    <div className="mx-auto max-w-7xl min-h-fit lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-8">
+                        <div className="max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
+                            <div className="col-span-2">
+                                <Swiper
+                                    modules={[Navigation, Pagination, Autoplay]}
+                                    spaceBetween={20}
+                                    slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
+                                    navigation
+                                    pagination={{clickable: true}}
+                                    autoplay={{
+                                        delay: 3000,
+                                        disableOnInteraction: false,
+                                    }}
+                                    className="w-full rounded-lg overflow-hidden"
+                                >
+                                    {product.images.map((image: any, index: number) => (
+                                        <SwiperSlide key={image.id}>
+                                            <img
+                                                src={'data:image/jpeg;base64,' + image.image}
+                                                alt={`Slide ${index + 1}`}
+                                                className="w-full object-cover rounded-lg" // Đảm bảo class name đúng
+                                            />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
                         </div>
-                        <img
-                            src={`data:image/png;base64,${product?.image}`}
-                            className="aspect-4/5 size-full object-cover sm:rounded-lg lg:aspect-auto"
-                        />
-                    </div>
 
-                    <div className="mx-auto max-w-2xl px-4 pt-10 pb-16 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto_auto_1fr] lg:gap-x-8 lg:px-8 lg:pt-16 lg:pb-24">
+                    <div className="mt-6 lg:mt-0">
                         <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
                             <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">{product?.title}</h1>
                         </div>
@@ -159,6 +178,8 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                         <div className="mt-4 lg:row-span-3 lg:mt-0">
                             <h2 className="sr-only">Product information</h2>
                             <p className="text-3xl tracking-tight text-gray-900">{variants.length > 0 ? selectedVariant?.price : product?.price}</p>
+
+                            <p className="text-base text-gray-900">{product?.description}</p>
 
                             <div className="mt-6">
                                 <h3 className="sr-only">Reviews</h3>
@@ -255,9 +276,9 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                                 setEditingVariant(null);
                                                 setIsEditing(true);
                                             }}
-                                            className="rounded-md content-center align-content-between px-4 py-4 bg-green-800 text-green-300 cursor-pointer"
+                                            className="rounded-md w-fit text-center content-center align-content-between px-4 py-4 bg-green-800 text-green-300 cursor-pointer"
                                         >
-                                            <FaPlus className="w-8 h-8 text-white" />
+                                            <FaPlus className="w-8 h-8 content-center text-white" />
                                         </a>
 
                                     </RadioGroup>
@@ -327,15 +348,10 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
 
                             </form>
                         </div>
+                    </div>
 
                         <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pr-8 lg:pb-16">
-                            <div>
-                                <h3 className="sr-only">Description</h3>
 
-                                <div className="space-y-6">
-                                    <p className="text-base text-gray-900">{product?.description}</p>
-                                </div>
-                            </div>
 
                             <div className="mt-10">
                                 <h2 className="text-sm font-medium text-gray-900">Details</h2>

@@ -5,14 +5,21 @@ import AdminLayout from "../admin-layout";
 import { useRouter } from "next/navigation";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
+
+
 export default function Products() {
-    /*interface Product {
+    interface Product {
         id: number;
-        imageAlt: string;
-        imageSrc: string;
+        images: Image[];
+        description: string;
         title: string;
         price: string;
-    }*/
+    }
+
+    type Image = {
+        id: number;
+        image: string;
+    }
 
     const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
@@ -72,7 +79,7 @@ export default function Products() {
 
           </div>
           <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-            {products.map((product) => (
+            {products?.map((product) => (
               <div key={product.id} className="group relative">
                 <div className="group relative">
                   <button
@@ -87,7 +94,7 @@ export default function Products() {
 
                   <img
                       alt={product.description}
-                      src={`data:image/png;base64,${product.image}`}
+                      src={`data:image/png;base64,${product.images[0]?.image}`}
                       className="aspect-square w-full rounded-md bg-gray-200 lg:aspect-auto lg:h-80"
                   />
 

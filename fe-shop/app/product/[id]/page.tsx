@@ -3,6 +3,14 @@
 import {use, useEffect, useState} from 'react'
 import {Radio, RadioGroup} from '@headlessui/react'
 import MainLayout from '@/app/_userlayout';
+import {Swiper, SwiperSlide} from "swiper/react";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/autoplay';
+import {Autoplay, Navigation, Pagination} from "swiper/modules";
+import {FaPencil} from "react-icons/fa6";
+import {FaTrash} from "react-icons/fa";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
@@ -11,15 +19,25 @@ function classNames(...classes: string[]) {
 export default function Show({params}: { params: Promise<{ id: string }> }) {
     const {id} = use(params);
 
+    type Review = {
+        id?: string;
+        user_name?: string;
+        rate: number;
+        comment?: string;
+        created_at?: string;
+    };
+
+
     interface Product {
         content: string;
         description: string;
         id: string;
         title: string;
-        image: string;
+        images: string[];
         price: string;
         quantity: number;
         variants: Variant[];
+        
     }
 
     const [product, setProduct] = useState<Product | null>(null);
@@ -62,8 +80,10 @@ export default function Show({params}: { params: Promise<{ id: string }> }) {
     }, [id]);
 
     useEffect(() => {
-        if (variants.length > 0) {
+        if (variants.length > 0 && variants[0].quantity > 0) {
             setSelectedVariant(variants[0]);
+        } else {
+            setSelectedVariant(null);
         }
     }, [variants]);
 
@@ -108,39 +128,40 @@ export default function Show({params}: { params: Promise<{ id: string }> }) {
         <MainLayout>
             <div className="bg-white">
                 <div className="pt-6">
-                    <div
-                        className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
-                        <img
-                            src={`data:image/jpeg;base64,${product.image}`}
-                            className="hidden size-full rounded-lg object-cover lg:block"
-                        />
-                        <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
-                            <img
-                                src={`data:image/jpeg;base64,${product.image}`}
-                                className="aspect-3/2 w-full rounded-lg object-cover"
-                            />
-                            <img
-                                src={`data:image/jpeg;base64,${product.image}`}
-                                className="aspect-3/2 w-full rounded-lg object-cover"
-                            />
+                    <div className="mx-auto max-w-7xl min-h-fit lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-8">
+                        <div className="max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
+                            <div className="col-span-2">
+                                <Swiper
+                                    modules={[Navigation, Pagination, Autoplay]}
+                                    spaceBetween={20}
+                                    slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
+                                    navigation
+                                    pagination={{clickable: true}}
+                                    autoplay={{
+                                        delay: 3000,
+                                        disableOnInteraction: false,
+                                    }}
+                                    className="w-full rounded-lg overflow-hidden"
+                                >
+                                    {product.images.map((image: any, index: number) => (
+                                        <SwiperSlide key={image.id}>
+                                            <img
+                                                src={'data:image/jpeg;base64,' + image.image}
+                                                alt={`Slide ${index + 1}`}
+                                                className="w-full object-cover rounded-lg" // Đảm bảo class name đúng
+                                            />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
                         </div>
-                        <img
-                            src={`data:image/jpeg;base64,${product.image}`}
-                            className="aspect-4/5 size-full object-cover sm:rounded-lg lg:aspect-auto"
-                        />
-                    </div>
 
-                    <div
-                        className="mx-auto max-w-2xl px-4 pt-10 pb-16 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto_auto_1fr] lg:gap-x-8 lg:px-8 lg:pt-16 lg:pb-24">
-                        <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
+                        <div className="mt-6 lg:mt-0">
                             <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">{product?.title}</h1>
-                        </div>
-
-                        <div className="mt-4 lg:row-span-3 lg:mt-0">
-                            <h2 className="sr-only">Product information</h2>
-                            <p className="text-3xl tracking-tight text-gray-900">
+                            <p className="text-3xl tracking-tight text-gray-900 mt-2">
                                 {selectedVariant ? selectedVariant.price : product?.price}
                             </p>
+                            <p className="text-base text-gray-900">{product?.description}</p>
 
                             <form
                                 onSubmit={(event) =>
@@ -148,71 +169,65 @@ export default function Show({params}: { params: Promise<{ id: string }> }) {
                                 }
                                 className="mt-10"
                             >
-                                <div className="mt-10">
-                                    <div className="flex items-center justify-between">
-                                        <h3 className="text-sm font-medium text-gray-900">Phân loại</h3>
-                                    </div>
-
+                                <div className="mt-4">
+                                    <h3 className="text-sm font-medium text-gray-900">Phân loại</h3>
                                     {variants.length > 0 ? (
                                         <>
-                                            <div className="mt-10">
-                                                <p className="text-sm text-gray-900">Kho
-                                                    còn: {selectedVariant?.quantity}</p>
-                                            </div>
+                                            <p className="text-sm text-gray-900 mt-2">Kho
+                                                còn: {selectedVariant?.quantity}</p>
+                                            <RadioGroup
+                                                value={selectedVariant}
+                                                onChange={setSelectedVariant}
+                                                className="grid grid-cols-4 gap-4 sm:grid-cols-8 lg:grid-cols-4 mt-4"
+                                            >
+                                                {variants.map((variant: {
+                                                    id: string;
+                                                    name: string;
+                                                    quantity: number;
+                                                    price?: string | undefined
+                                                }) => (
+                                                    <Radio
+                                                        key={variant.id}
+                                                        value={variant}
+                                                        disabled={variant.quantity <= 0}
+                                                        className={classNames(
+                                                            variant.quantity > 0
+                                                                ? 'cursor-pointer bg-white text-gray-900 shadow-xs'
+                                                                : 'cursor-not-allowed bg-gray-50 text-gray-200',
+                                                            'group relative flex items-center justify-center rounded-md border px-4 py-3 text-sm font-medium uppercase hover:bg-gray-50 focus-outline-hidden sm:flex-1 sm:py-6',
+                                                        )}
+                                                    >
+                                                        <span>{variant.name}</span>
+                                                        {variant.quantity > 0 ? (
+                                                            <div>
+                                            <span
+                                                aria-hidden="true"
+                                                className={classNames(
+                                                    selectedVariant == variant ? 'ring-2 ring-green-700 ' : '',
+                                                    'pointer-events-none absolute -inset-px rounded-md border-2 border-transparent'
+                                                )}
+                                            />
+                                                            </div>
 
-                                            <fieldset aria-label="Choose a size" className="mt-4">
-                                                <RadioGroup
-                                                    value={selectedVariant}
-                                                    onChange={setSelectedVariant}
-                                                    className="grid grid-cols-4 gap-4 sm:grid-cols-8 lg:grid-cols-4"
-                                                >
-                                                    {variants.map((variant: {
-                                                        id: string;
-                                                        name: string;
-                                                        quantity: number;
-                                                        price?: string | undefined
-                                                    }) => (
-                                                        <Radio
-                                                            key={variant.id}
-                                                            value={variant}
-                                                            disabled={variant.quantity <= 0}
-                                                            className={classNames(
-                                                                variant.quantity > 0
-                                                                    ? 'cursor-pointer bg-white text-gray-900 shadow-xs'
-                                                                    : 'cursor-not-allowed bg-gray-50 text-gray-200',
-                                                                'group relative flex items-center justify-center rounded-md border px-4 py-3 text-sm font-medium uppercase hover:bg-gray-50 focus:outline-hidden data-focus:ring-2 data-focus:ring-indigo-500 sm:flex-1 sm:py-6',
-                                                            )}
-                                                        >
-                                                            <span>{variant.name}</span>
-                                                            {variant.quantity > 0 ? (
-                                                                <div>
-                                      <span
-                                          aria-hidden="true"
-                                          className={classNames(
-                                              selectedVariant == variant ? 'ring-2 ring-green-700 ' : '',
-                                              'pointer-events-none absolute -inset-px rounded-md border-2 border-transparent'
-                                          )}
-                                      />
-                                                                </div>
-                                                            ) : (
-                                                                <span
-                                                                    aria-hidden="true"
-                                                                    className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
-                                                                >
-                                      <svg
-                                          stroke="currentColor"
-                                          viewBox="0 0 100 100"
-                                          preserveAspectRatio="none"
-                                          className="absolute inset-0 size-full stroke-2 text-gray-200"
-                                      >
-                                        <line x1={0} x2={100} y1={100} y2={0} vectorEffect="non-scaling-stroke"/>
-                                      </svg>
-                                    </span>
-                                                            )}
-                                                        </Radio>
-                                                    ))}
-                                                </RadioGroup>
-                                            </fieldset>
+                                                        ) : (
+                                                            <span
+                                                                aria-hidden="true"
+                                                                className="pointer-events-none absolute -inset-px rounded-md border-2 border-gray-200"
+                                                            >
+                                            <svg
+                                                stroke="currentColor"
+                                                viewBox="0 0 100 100"
+                                                preserveAspectRatio="none"
+                                                className="absolute inset-0 size-full stroke-2 text-gray-200"
+                                            >
+                                                <line x1={0} x2={100} y1={100} y2={0}
+                                                      vectorEffect="non-scaling-stroke"/>
+                                            </svg>
+                                        </span>
+                                                        )}
+                                                    </Radio>
+                                                ))}
+                                            </RadioGroup>
                                         </>
                                     ) : (
                                         <p className="text-sm text-gray-900">Kho còn: {product?.quantity}</p>
@@ -243,23 +258,14 @@ export default function Show({params}: { params: Promise<{ id: string }> }) {
                                 </button>
                             </form>
                         </div>
+                    </div>
 
-                        <div
-                            className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pr-8 lg:pb-16">
-                            <div>
-                                <h3 className="sr-only">Description</h3>
-
-                                <div className="space-y-6">
-                                    <p className="text-base text-gray-900">{product?.description}</p>
-                                </div>
-                            </div>
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 lg:pt-12 lg:pb-16">
+                        <div className="lg:border-t lg:border-gray-200 lg:pt-8">
 
                             <div className="mt-10">
                                 <h2 className="text-sm font-medium text-gray-900">Details</h2>
-
-                                <div className="mt-4 space-y-6">
-                                    <p className="text-sm text-gray-600">{product?.content}</p>
-                                </div>
+                                <p className="text-sm text-gray-600 mt-4">{product?.content}</p>
                             </div>
                         </div>
                     </div>

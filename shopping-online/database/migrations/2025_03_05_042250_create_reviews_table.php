@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('user_id');
+            $table->string('user_id');
             $table->text('comment');
             $table->integer('rate');
             $table->unsignedBigInteger('parent_id')->nullable();

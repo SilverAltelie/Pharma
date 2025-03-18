@@ -27,8 +27,9 @@ class ProductRequest extends FormRequest
             'content' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'status' => 'required|in:0,1',
-            'image' => 'nullable|string',
-            'image.*' => 'nullable|string',
+            'image'       => 'nullable|string', // Ảnh chính
+            'images'      => 'nullable|array',  // Mảng ảnh
+            'images.*'    => 'nullable|string',
             'quantity' => 'required|numeric|min:1',
             'category_id' => 'required|exists:categories,id',
         ];

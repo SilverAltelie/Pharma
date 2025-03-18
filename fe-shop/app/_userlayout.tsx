@@ -95,6 +95,38 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
+
+  async function handleRemoveFromCart(product_id: string, variant_id: string|null, quantity: string) {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/removeProduct/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          product_id,
+          variant_id,
+          quantity,
+        }),
+      });
+
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.message || 'Xóa sản phẩm không thành công');
+        }
+
+        const data = await res.json();
+
+        console.log(data);
+        alert('Xóa sản phẩm thành công');
+        window.location.reload();
+    } catch (error) {
+        console.error("Error:", error);
+    }
+  }
+
 /*  if (error) {
     return (
         <div className="error-screen">
@@ -368,7 +400,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
               transition
               className="pointer-events-auto w-screen max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
             >
-              <div className="absolute top-[70px] min-w-full flex-col max-h-[92vh] overflow-y-scroll bg-white shadow-xl">
+              <div className="absolute top-[70px] min-w-full min-h-full flex-col max-h-[92vh] overflow-y-scroll bg-white shadow-xl">
                 <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
                   <div className="absolute top-[25px] left-[377px] items-start justify-between">
                     <div className="ml-3 flex h-7 items-center">
@@ -387,40 +419,54 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                   <div className="mt-8">
                     <div className="flow-root">
                       <ul role="list" className="-my-6 divide-y divide-gray-200">
-                        {data?.cartItems?.map((product: any, index: number) => (
-                          <li key={index} className="flex py-6">
-                            <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                              <img alt={product.imageAlt} src={product.imageSrc} className="size-full object-cover" />
-                            </div>
-
-                            <div className="ml-4 flex flex-1 flex-col">
-                              <div>
-                                <div className="flex justify-between text-base font-medium text-gray-900">
-                                  <h3>
-                                    <a href={product.href}>{product.product_name}</a>
-                                  </h3>
-                                  <p className="ml-4">{product.price}</p>
-                                </div>
-                                <p className="mt-1 text-sm text-gray-500">{product.variant_name}</p>
+                        {data?.cartItems?.map((item: any, index: number) => (
+                            <li key={index} className="flex py-6">
+                              <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                <img
+                                    alt={item ?? "Product Image"}
+                                    src={`data:image/jpeg;base64,${item['product'].image}`}
+                                    className="size-full object-cover"
+                                />
                               </div>
-                              <div className="flex flex-1 items-end justify-between text-sm">
-                                <p className="text-gray-500">Qty {product.quantity}</p>
 
-                                <div className="flex">
-                                  <button type="button" className="font-medium text-indigo-600 hover:text-indigo-500">
-                                    Remove
-                                  </button>
+                              <div className="ml-4 flex flex-1 flex-col">
+                                <div>
+                                  <div className="flex justify-between text-base font-medium text-gray-900">
+                                    <h3>
+                                      <a href={item.href ?? `/product/${item['product'].id}`}>{item['product'].title ?? "Untitled Product"}</a>
+                                    </h3>
+                                    <p className="ml-4">
+                                      {item['variant']?.price && item.quantity
+                                          ? `${item['variant'].price * item.quantity} VND`
+                                          : item['product'].price && item.quantity
+                                              ? `${item['product'].price * item.quantity} VND`
+                                              : "N/A"}
+                                    </p>
+                                  </div>
+                                  <p className="mt-1 text-sm text-gray-500">{item['variant']?.name ?? "No Variant"}</p>
+                                </div>
+                                <div className="flex flex-1 items-end justify-between text-sm">
+                                  <p className="text-gray-500">Qty {item.quantity ?? 1}</p>
+
+                                  <div className="flex">
+                                    <button
+                                        type="button"
+                                        className="font-medium text-indigo-600 hover:text-indigo-500"
+                                        onClick={() => handleRemoveFromCart(item['product'].id, item['variant']?.id, item.quantity)}
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </li>
+                            </li>
                         ))}
                       </ul>
                     </div>
                   </div>
                 </div>
 
-                <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
+                <div className="border-t border-gray-200 px-4 py-6 sm:px-6 ">
                   <div className="flex justify-between text-base font-medium text-gray-900">
                     <p>Subtotal</p>
                     <p>0</p>

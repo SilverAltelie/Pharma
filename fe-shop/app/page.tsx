@@ -12,6 +12,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { XMarkIcon } from '@heroicons/react/20/solid'
+import {FaCartPlus} from "react-icons/fa";
 
 
 const stats = [
@@ -67,6 +68,29 @@ export default function Home() {
 
     checkAndShowPopup();
   }, []);
+
+  async function handleAddToCart($product_id: string) {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/addProduct`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({product_id: $product_id, quantity: 1}),
+      });
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await res.json();
+      console.log(data);
+      alert('Thêm sản phẩm vào giỏ hàng thành công');
+      window.location.reload();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
 /*
     const token = localStorage.getItem('token');
 */
@@ -310,9 +334,15 @@ export default function Home() {
         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
           {data?.products?.data.map((product: any) => (
             <div key={product.id} className="group relative">
+              {product.variants.length <= 0 ? <button
+                  onClick={() => handleAddToCart(product.id)}
+                  className="absolute top-1 z-50 right-1 p-2 bg-green-700 rounded-md text-white text-lg"
+              >
+                <FaCartPlus/>
+              </button> : ''}
               <img
                   alt={product.title}
-                  src={`data:image/jpeg;base64,${product.image}`}
+                  src={`data:image/jpeg;base64,${product.images[0]?.image}`}
                   className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
               />
               <div className="mt-4 flex justify-between">

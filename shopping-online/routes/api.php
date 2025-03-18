@@ -66,11 +66,15 @@ Route::prefix('')->middleware('optional-auth')->group(function () {
     Route::get('/product', [ProductController::class, 'index']);
     Route::get('/products', [UserProductController::class, 'index']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
-
+    Route::prefix('/category')->group(function () {
+        Route::get('/{id}', [CategoryController::class, 'show']);
+    });
 
     Route::prefix('/cart')->group(function () {
+        Route::get('/', [CartController::class, 'index']);
         Route::get('/getProduct', [CartController::class, 'getProductCart']);
-        Route::post('/addProduct', [CartController::class, 'addProductCart']);
+        Route::post('/addProduct', [CartController::class, 'addProductToCart']);
+        Route::post('/removeProduct', [CartController::class, 'deleteProductFromCart']);
     });
     Route::get('/product/show/{id}', [ProductController::class, 'show']);
 });

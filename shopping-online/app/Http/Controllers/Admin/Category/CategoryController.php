@@ -68,9 +68,18 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(CategoryController $categoryController)
+    public function show($id)
     {
         //
+        $category = Category::findOrFail($id);
+
+        $products = $category->products()->with('variants')->paginate(20);
+
+        return response()->json([
+            'category' => $category,
+            'products' => $products,
+        ]);
+
     }
 
     /**

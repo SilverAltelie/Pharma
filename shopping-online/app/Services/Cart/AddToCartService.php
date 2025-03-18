@@ -6,11 +6,12 @@ use App\Models\Cart;
 
 class AddToCartService {
     public function handle($data, $user, $cart) {
+
         $productId = $data->product_id;
         $quantity = $data->quantity;
         $variantId = $data->variant_id;
 
-        $cartItem = $cart->cartItems()->where('product_id', $productId)->first();
+        $cartItem = $cart->cartItems()->where('product_id', $productId)->where('variant_id', $variantId)->first();
 
         if ($cartItem) {
             $cartItem->quantity += $quantity;
@@ -24,7 +25,7 @@ class AddToCartService {
         }
 
         return response()->json([
-            'cart' => $cart
+            'cart' => $cart->load('cartItems'),
         ]);
     }
 }

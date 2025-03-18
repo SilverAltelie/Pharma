@@ -26,7 +26,7 @@ class CartGetItemsService
             return [];
         }
 
-        $cartItems = $cart->cartItems;
+        $cartItems = $cart->cartItems()->with(['product', 'variant'])->get();
 
         if (!$cartItems) {
             return [];

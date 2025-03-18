@@ -16,14 +16,15 @@ class ProductCreateService
             'quantity' => $data['quantity'],
             'price' => $data['price'],
             'status' => $data['status'],
-            'image' => $data['image'],
         ]);
 
-        /*if (isset($data['images'])) {
+        if (!isset($data['images']) && is_array($data['images'])) {
             foreach ($data['images'] as $image) {
-                $product->images()->create(['image' => $image]);
+                $product->images()->create([
+                    'image' => $image
+                ]);
             }
-        }*/
+        }
 
         return $product;
 

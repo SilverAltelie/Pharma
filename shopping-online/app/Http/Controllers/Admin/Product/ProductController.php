@@ -61,9 +61,13 @@ class ProductController extends Controller
 
         $reviews = $product->reviews;
 
+        $images = $product->images;
+
         $product->variants = $variants;
 
         $product->reviews = $reviews;
+
+        $product->images = $images;
 
         return $product;
 

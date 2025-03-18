@@ -17,7 +17,7 @@ class MainController extends Controller
         $this->categoriesListService = $categoryListService;
     }
     public function index() {
-        $products = Product::paginate(10);
+        $products = Product::with('variants', 'images')->paginate(10);
 
         $categories = $this->categoriesListService->handle();
 

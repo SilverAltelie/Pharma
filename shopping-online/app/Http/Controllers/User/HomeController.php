@@ -26,13 +26,12 @@ class HomeController extends Controller
         // Lấy user từ Auth nếu có
         $user = Auth::user();
 
-        // Lấy danh mục (luôn công khai)
         $categories = $this->categoryListService->handle();
 
-        // Nếu user đã đăng nhập, lấy thêm giỏ hàng
-        $cartItems = [];
         if ($user) {
             $cartItems = $this->cartGetItemsService->getProductCart($user->id);
+        } else {
+            $cartItems = session('cart', []);
         }
 
         return response()->json([

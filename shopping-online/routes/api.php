@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\Promotion\PromotionController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -87,4 +88,5 @@ Route::prefix('admin')->group(function () {
         Route::post('/update/{id}', [VariantController::class, 'update']);
         Route::post('/delete/{id}', [VariantController::class, 'destroy']);
     });
+
 });

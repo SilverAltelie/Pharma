@@ -83,6 +83,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <FaInbox className="text-lg" />
             {!isCollapsed && <span>Đơn hàng</span>}
             </a>
+            <a href="/admin/promotions" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+                <FaFlag className="text-lg" />
+                {!isCollapsed && <span>Khuyến mãi</span>}
+            </a>
             <a href="#" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
             <FaComment className="text-lg" />
             {!isCollapsed && <span>Chat</span>}

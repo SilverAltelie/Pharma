@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\Category\CategoryController;
 use App\Http\Controllers\Admin\Product\ProductController;
 use App\Http\Controllers\User\Product\ProductController as UserProductController;
+use App\Http\Controllers\User\Order\OrderController;
 
 use \App\Http\Controllers\Admin\Variant\VariantController;
 use App\Http\Controllers\Admin\AdminController;
@@ -76,8 +77,14 @@ Route::prefix('')->middleware('optional-auth')->group(function () {
         Route::get('/getProduct', [CartController::class, 'getProductCart']);
         Route::post('/addProduct', [CartController::class, 'addProductToCart']);
         Route::post('/removeProduct', [CartController::class, 'deleteProductFromCart']);
+        Route::post('/updateQuantity', [CartController::class, 'updateQuantity']);
+        Route::post('/checkout', [CartController::class, 'checkout']);
     });
     Route::get('/product/show/{id}', [ProductController::class, 'show']);
+
+    Route::prefix('/order')->group(function () {
+        Route::get('/', [OrderController::class, 'index']);
+    });
 });
 
 Route::prefix('')->middleware('auth:sanctum')->group(function () {

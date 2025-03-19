@@ -5,8 +5,10 @@ namespace App\Http\Controllers\User\Cart;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Cart\CartRequest;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Services\Cart\AddToCartService;
 use App\Services\Cart\CartGetItemsService;
+use App\Services\Cart\CartUpdateService;
 use App\Services\Cart\DeleteProductFromCartService;
 use App\Services\Category\CategoryListService;
 use Illuminate\Http\Request;
@@ -20,12 +22,15 @@ class CartController extends Controller
     private $categoryListService;
     private $cartGetItemsService;
 
-    public function __construct(AddToCartService $addToCartService, DeleteProductFromCartService $deleteFromCartService, CategoryListService $categoryListService, CartGetItemsService $cartGetItemsService)
+    private $cartUpdateService;
+
+    public function __construct(AddToCartService $addToCartService, DeleteProductFromCartService $deleteFromCartService, CategoryListService $categoryListService, CartGetItemsService $cartGetItemsService, CartUpdateService $cartUpdateService)
     {
         $this->addToCartService = $addToCartService;
         $this->deleteFromCartService = $deleteFromCartService;
         $this->categoryListService = $categoryListService;
         $this->cartGetItemsService = $cartGetItemsService;
+        $this->cartUpdateService = $cartUpdateService;
     }
 
     public function index()
@@ -33,13 +38,23 @@ class CartController extends Controller
         $user = Auth::user();
 
         $cartItems = [];
+
         if ($user) {
             $cartItems = $this->cartGetItemsService->getProductCart($user->id);
         }
 
-        return response()->json([
+        foreach ($cartItems as $item) {
+            $product = $item->product;
+            if ($product && $product->images->isNotEmpty()) {
+                $item->image = $product->images->first()->image;
+            } else {
+                $item->image = '';
+            }
+        }
+
+        return response()->json(
             $cartItems
-        ]);
+        );
     }
 
     public function getUserCart($userId)
@@ -85,4 +100,15 @@ class CartController extends Controller
 
         return $this->deleteFromCartService->handle($data, $cart);
     }
+
+    public function updateQuantity(Request $request) {
+
+        $itemId = $request->input('itemId');
+        $quantity = $request->input('quantity');
+
+        $item = CartItem::findOrFail($itemId);
+
+        return $this->cartUpdateService->updateQuantity($item, $quantity);
+    }
+
 }

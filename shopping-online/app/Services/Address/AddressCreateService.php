@@ -8,10 +8,6 @@ class AddressCreateService
 {
     public function handle($data, $user)
     {
-        $address = $user->addresses()->create($data);
-
-        return response()->json([
-            'address' => $address
-        ]);
+        return $user->addresses()->create($data);
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 
 class RegisterRequest extends FormRequest
 {
@@ -22,14 +24,13 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
             'name' => 'required|string',
-            'email' => 'required|string|email',
-            'password' => 'required|string|min:6',
+            'email' => 'required|string|email|unique:users,email',
+            'password' => 'required|string|min:8',
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.required' => 'Tên là bắt buộc.',
@@ -41,4 +42,20 @@ class RegisterRequest extends FormRequest
         ];
     }
 
+    protected function failedValidation(Validator $validator)
+    {
+        throw new ValidationException($validator, response()->json([
+            'status' => 'error',
+            'message' => 'Validation failed, please check your inputs.',
+            'errors' => $validator->errors(),
+        ], 422));
+    }
+
+    public function passedValidation()
+    {
+        response()->json([
+            'status' => 'success',
+            'message' => 'Validation passed successfully.',
+        ])->send();
+    }
 }

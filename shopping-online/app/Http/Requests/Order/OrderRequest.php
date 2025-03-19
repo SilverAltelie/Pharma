@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Order;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 
-class LoginRequest extends FormRequest
+class OrderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,21 +24,20 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|string|email|max:255',
-            'password' => 'required|string|min:8',
+            //
+            'product_id' => 'required|exists:products,id',
+            'variant_id' => 'nullable|exists:variants,id',
+            'quantity' => 'required|integer|min:1',
+            'address' => 'required|string',
+            'phone' => 'required|string',
+            'note' => 'nullable|string',
         ];
     }
 
-    public function messages(): array
-    {
+    public function messages() {
         return [
-            'email.required' => 'The email field is required.',
-            'email.string' => 'The email must be a string.',
-            'email.email' => 'The email must be a valid email address.',
-            'email.max' => 'The email must not exceed 255 characters.',
-            'password.required' => 'The password field is required.',
-            'password.string' => 'The password must be a string.',
-            'password.min' => 'The password must be at least 8 characters.',
+            'product_id.exists' => 'Product not found',
+            'variant_id.exists' => 'Variant not found',
         ];
     }
 

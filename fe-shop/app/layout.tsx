@@ -35,10 +35,6 @@ export default function RootLayout({
 
         {/* Chuyển Script vào đây */}
         <Script src="../public/customer/js/jquery/jquery-2.2.4.min.js" strategy="lazyOnload" />
-        <Script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" strategy="beforeInteractive" />
-        <Script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js" strategy="lazyOnload" />
-        <Script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js" strategy="lazyOnload" />
-        <Script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" strategy="lazyOnload" />
         <Script src="../public/customer/js/popper.min.js" strategy="lazyOnload" />
         <Script src="../public/customer/js/bootstrap.min.js" strategy="lazyOnload" />
         <Script src="../public/customer/js/plugins.js" strategy="lazyOnload" />
@@ -46,7 +42,6 @@ export default function RootLayout({
         <Script src="../public/customer/js/active.js" strategy="lazyOnload" />
         <Script src="../public/js/homeHeader.js" strategy="lazyOnload" />
         <Script src="../public/js/main.js" strategy="lazyOnload" />
-        <Script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" strategy="lazyOnload" />
       </body>
     </html>
   );

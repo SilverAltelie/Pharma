@@ -11,77 +11,78 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
   const router = useRouter();
 
   const [categories, setCategories] = useState([]);
-  const [product, setProduct] = useState<{ title?: string; description?: string ;quantity?: number; price?: number; content?: string; image: string; category_id?: string; active?: number }>({});
+  const [product, setProduct] = useState<{ title?: string; description?: string ;quantity?: number; price?: number; content?: string; image: string; category_id?: string; status?: number }>({});
 
 
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [imageBase64, setImageBase64] = useState<string | null>(null);
-
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]); // Hiển thị ảnh preview
+    const [imageBase64List, setImageBase64List] = useState<string[]>([]); // Danh sách ảnh
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files.length > 0) {
-            const file = event.target.files[0];
-            const reader = new FileReader();
+        if (event.target.files) {
+            const files = Array.from(event.target.files); // Lấy danh sách file
+            const previews: string[] = [];
+            const base64List: string[] = [];
 
-            reader.onloadend = () => {
-                const base64String = reader.result as string;
-                setImagePreview(base64String); // Hiển thị ảnh preview
-                setImageBase64(base64String.split(",")[1]); // Lưu base64 (bỏ phần đầu)
-            };
+            files.forEach((file) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const base64String = reader.result as string;
+                    previews.push(base64String); // Hiển thị preview
+                    base64List.push(base64String.split(",")[1]); // Loại bỏ phần header "data:image/png;base64,"
 
-            reader.readAsDataURL(file);
+                    if (previews.length === files.length) {
+                        setImagePreviews(previews);
+                        setImageBase64List(base64List);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
         }
     };
-
-
-
-    const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const formData = new FormData(event.currentTarget);
         const title = formData.get("title") as string || product.title;
-        const price = Number(formData.get("price") as string) || product.price;
-        const quantity = Number(formData.get("quantity") as string) || product.quantity;
+        const price = Number(formData.get("price") as string) || Number(product.price);
+        const quantity = Number(formData.get("quantity") as string) || Number(product.quantity);
         const description = formData.get("description") as string || product.description;
-        const status = formData.get("status") as string || product.active;
-        const category_id = (formData.get("category_id") as string || product.category_id);
+        const status = Number(formData.get("status") as string) || Number(product.active);
+        const category_id = formData.get("category_id") as string || product.category_id;
         const content = formData.get("content") as string || product.content;
 
-
-        if (!title || isNaN(price as number) || isNaN(quantity as number) || !category_id || !description) {
+        if (!title || isNaN(price) || isNaN(quantity) || !category_id || !description) {
             alert("Vui lòng điền đầy đủ thông tin!");
             return;
         }
 
         const payload = {
-            title: title,
-            price: price,
-            quantity: quantity,
-            content: content,
-            description: description,
-            status: status,
-            category_id: category_id,
-            image: imageBase64 || product.image, // Chỉ lấy một ảnh duy nhất
+            title,
+            price,
+            quantity,
+            description,
+            content,
+            status,
+            category_id,
+            image: imageBase64List[0], // Ảnh chính (nếu có)
+            images: imageBase64List   // Danh sách toàn bộ ảnh
         };
-
 
         console.log(payload);
 
-
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/update/${id}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" ,
-                'Accept': 'application/json',
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
             },
-            body: JSON.stringify(payload), // Gửi mảng ảnh
+            body: JSON.stringify(payload),
         });
 
         if (response.ok) {
-            alert("Ảnh đã được lưu vào database!");
+            alert("Sản phẩm đã được cập nhật thành công!");
             router.push('/admin/products');
-
         } else {
-            alert(`Lỗi khi lưu ảnh.${JSON.stringify(payload)}`);
-
+            alert("Đã xảy ra lỗi khi cập nhật sản phẩm.");
         }
     };
 
@@ -92,7 +93,7 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             const ProductJson = await productRes.json();
             const categoryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`);
             const categoryJson = await categoryRes.json();
-            setCategories(categoryJson.data);
+            setCategories(categoryJson);
             setProduct(ProductJson.data.find((product: any) => product.id == id));
             } catch (error) {
             console.error("Lỗi khi gọi API: ", error);
@@ -189,33 +190,28 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             </div>
           </div>
 
-        <div className="col-span-full">
-            <label htmlFor="photo" className="block text-sm font-medium text-gray-900">
-                Ảnh sản phẩm
-            </label>
-            <div className="mt-2">
-                {imagePreview || product.image ? (
-                    <img
-                        src={imagePreview || `${process.env.NEXT_PUBLIC_API_URL}/${product.image}`}
-                        alt="Ảnh cũ"
-                        className="w-24 h-24 object-cover rounded-md"
-                    />
-                ) : (
-                    <UserCircleIcon aria-hidden="true" className="size-12 text-gray-300" />
-                )}
-            </div>
+        <div className="form-group">
+            <label htmlFor="images">Ảnh sản phẩm:</label>
             <input
                 type="file"
-                id="photo"
+                id="images"
+                multiple
                 accept="image/*"
-                className="hidden"
                 onChange={handleImageChange}
             />
-            <label htmlFor="photo" className="cursor-pointer mt-2 inline-block rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
-                Đăng ảnh
-            </label>
-        </div>
 
+            {/* Hiển thị ảnh preview */}
+            <div className="image-previews">
+                {imagePreviews.map((preview, index) => (
+                    <img
+                        key={index}
+                        src={preview}
+                        alt={`image-preview-${index}`}
+                        className="preview-image"
+                    />
+                ))}
+            </div>
+        </div>
 
         <div className="sm:col-span-2">
             <label htmlFor="status" className="block text-sm/6 font-semibold text-gray-900">
@@ -227,7 +223,7 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
                   <select
                     id="status"
                     name="status"
-                    defaultValue={product?.active || 0}
+                    defaultValue={product?.status || 0}
                     autoComplete="status"
                     aria-label="status"
                     className="col-start-1 border-2 row-start-1 w-full appearance-none rounded-md py-2 pr-7 pl-3.5 text-base text-gray-500 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"

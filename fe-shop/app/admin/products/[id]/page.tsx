@@ -6,9 +6,22 @@ import { Radio, RadioGroup } from '@headlessui/react'
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
 import AdminLayout from "@/app/admin/admin-layout";
+import {Swiper, SwiperSlide} from "swiper/react";
+import 'swiper/css';
+
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/autoplay';
+import ProductReviews from "@/app/Reviews";
+import {Autoplay, Navigation, Pagination} from "swiper/modules";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
+}
+
+class Review {
+    rate: number;
+    comment: string;
 }
 
 export default function Show({ params }: { params: Promise<{ id: string }> }) {
@@ -23,7 +36,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
     };
 
     type Product = {
-        image: string;
+        images: Image[];
         title: string;
         price: string;
         quantity: number;
@@ -33,9 +46,10 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
         reviews: Review[];
     };
 
-    type Review = {
-        rate: number;
-    };
+    type Image = {
+        id: string;
+        image: string;
+    }
 
     const [product, setProduct] = useState<Product | null>(null);
     const [variants, setVariants] = useState<Variant[]>([]);
@@ -43,6 +57,8 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
     const [isEditing, setIsEditing] = useState(false);
+    const [editingReview, setEditingReview] = useState<ReviewType | null>(null);
+    const [isEditingReview, setIsEditingReview] = useState(false);
 
     async function fetchData() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/show/${id}`);
@@ -104,6 +120,70 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
     };
 
 
+    const handleSaveReview = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        if (!editingReview) return;
+
+        const reviewData = {
+            product_id: id,
+            rate: editingReview.rate,
+            comment: editingReview.comment || '',
+        };
+
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/create`;
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {"Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem('token')}`},
+                body: JSON.stringify(reviewData),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || `Lỗi API: ${response.status}`);
+            }
+
+            setIsEditingReview(false);
+            setEditingReview(null);
+            window.location.reload();
+        } catch (error) {
+            console.error("Lỗi khi lưu đánh giá:", error);
+            alert(`Lỗi khi lưu đánh giá: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    };
+
+    const handleDeleteReview = async (id: string) => {
+        const confirm = window.confirm("Bạn có muốn xóa đánh giá này không?");
+
+        if (!confirm) return;
+
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/admin/reviews/delete/${id}`;
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || `Lỗi API: ${response.status}`);
+            }
+
+            fetchData();
+        } catch (error) {
+            console.error("Lỗi khi xóa đánh giá:", error);
+            alert(`Lỗi khi xóa đánh giá: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    };
+
+
 
     const handleDeleteVariant = async (id: string) => {
         const confirm = window.confirm("Bạn có muốn xóa phân loại này không?")
@@ -131,27 +211,35 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
         <AdminLayout>
             <div className="bg-white">
                 <div className="pt-6">
-                    <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:gap-x-8 lg:px-8">
-                        <img
-                            src={`data:image/png;base64,${product?.image}`}
-                            className="hidden size-full rounded-lg object-cover lg:block"
-                        />
-                        <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
-                            <img
-                                src={`data:image/png;base64,${product?.image}`}
-                                className="aspect-3/2 w-full rounded-lg object-cover"
-                            />
-                            <img src={`data:image/png;base64,${product?.image}`}
-                                 className="aspect-3/2 w-full rounded-lg object-cover"
-                            />
+                    <div className="mx-3 max-w-7xl min-h-fit lg:grid lg:grid-cols-2 lg:gap-x-8 lg:px-8">
+                        <div className="max-w-2xl sm:px-6 lg:max-w-none lg:px-0">
+                            <div className="col-span-2">
+                                <Swiper
+                                    modules={[Navigation, Pagination, Autoplay]}
+                                    spaceBetween={20}
+                                    slidesPerView={1} // Hiển thị 1 ảnh mỗi lần
+                                    navigation
+                                    pagination={{clickable: true}}
+                                    autoplay={{
+                                        delay: 3000,
+                                        disableOnInteraction: false,
+                                    }}
+                                    className="w-full rounded-lg overflow-hidden"
+                                >
+                                    {product.images.map((image: any, index: number) => (
+                                        <SwiperSlide key={image.id}>
+                                            <img
+                                                src={'data:image/jpeg;base64,' + image.image}
+                                                alt={`Slide ${index + 1}`}
+                                                className="w-full object-cover rounded-lg" // Đảm bảo class name đúng
+                                            />
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+                            </div>
                         </div>
-                        <img
-                            src={`data:image/png;base64,${product?.image}`}
-                            className="aspect-4/5 size-full object-cover sm:rounded-lg lg:aspect-auto"
-                        />
-                    </div>
 
-                    <div className="mx-auto max-w-2xl px-4 pt-10 pb-16 sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-3 lg:grid-rows-[auto_auto_1fr] lg:gap-x-8 lg:px-8 lg:pt-16 lg:pb-24">
+                    <div className="mt-6 lg:mt-0">
                         <div className="lg:col-span-2 lg:border-r lg:border-gray-200 lg:pr-8">
                             <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">{product?.title}</h1>
                         </div>
@@ -159,6 +247,8 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                         <div className="mt-4 lg:row-span-3 lg:mt-0">
                             <h2 className="sr-only">Product information</h2>
                             <p className="text-3xl tracking-tight text-gray-900">{variants.length > 0 ? selectedVariant?.price : product?.price}</p>
+
+                            <p className="text-base text-gray-900">{product?.description}</p>
 
                             <div className="mt-6">
                                 <h3 className="sr-only">Reviews</h3>
@@ -255,9 +345,9 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                                 setEditingVariant(null);
                                                 setIsEditing(true);
                                             }}
-                                            className="rounded-md content-center align-content-between px-4 py-4 bg-green-800 text-green-300 cursor-pointer"
+                                            className="rounded-md w-fit text-center content-center align-content-between px-4 py-4 bg-green-800 text-green-300 cursor-pointer"
                                         >
-                                            <FaPlus className="w-8 h-8 text-white" />
+                                            <FaPlus className="w-8 h-8 content-center text-white" />
                                         </a>
 
                                     </RadioGroup>
@@ -327,15 +417,10 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
 
                             </form>
                         </div>
+                    </div>
 
                         <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pt-6 lg:pr-8 lg:pb-16">
-                            <div>
-                                <h3 className="sr-only">Description</h3>
 
-                                <div className="space-y-6">
-                                    <p className="text-base text-gray-900">{product?.description}</p>
-                                </div>
-                            </div>
 
                             <div className="mt-10">
                                 <h2 className="text-sm font-medium text-gray-900">Details</h2>
@@ -345,7 +430,94 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                 </div>
                             </div>
                         </div>
+                        <div className="mt-8">
+                            <h2 className="text-2xl font-bold">Đánh giá sản phẩm</h2>
+
+                            {/* Hiển thị danh sách review */}
+                            <ProductReviews
+                                reviews={product.reviews}
+                                isAdmin={true}
+                                onEdit={(review) => {
+                                    setEditingReview(review);
+                                    setIsEditingReview(true);
+                                }}
+                                onDelete={(id) => handleDeleteReview(id)}
+                            />
+
+                            {/* Form thêm/sửa review */}
+                            {isEditingReview && (
+                                <div className="mt-6 border rounded-lg p-4">
+                                    <h3 className="text-lg font-medium mb-4">
+                                        {editingReview?.id ? 'Sửa đánh giá' : 'Thêm đánh giá mới'}
+                                    </h3>
+
+                                    <form onSubmit={handleSaveReview}>
+                                        {/* Đánh giá sao */}
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700">Đánh giá</label>
+                                            <div className="flex items-center mt-1">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <StarIcon
+                                                        key={star}
+                                                        className={classNames(
+                                                            (editingReview?.rate || 0) >= star ? 'text-yellow-400' : 'text-gray-300',
+                                                            'h-6 w-6 cursor-pointer'
+                                                        )}
+                                                        onClick={() => setEditingReview({...editingReview!, rate: star})}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Nội dung đánh giá */}
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700">Nội dung</label>
+                                            <textarea
+                                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                                                rows={4}
+                                                value={editingReview?.comment || ''}
+                                                onChange={(e) => setEditingReview({...editingReview!, comment: e.target.value})}
+                                            ></textarea>
+                                        </div>
+
+                                        <div className="flex space-x-2">
+                                            <button
+                                                type="submit"
+                                                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                                            >
+                                                {editingReview?.id ? 'Cập nhật' : 'Thêm mới'}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"
+                                                onClick={() => {
+                                                    setIsEditingReview(false);
+                                                    setEditingReview(null);
+                                                }}
+                                            >
+                                                Hủy
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            )}
+
+                            {/* Nút thêm review mới */}
+                            {!isEditingReview && (
+                                <button
+                                    className="mt-4 mb-4 flex items-center text-indigo-600 hover:text-indigo-800"
+                                    onClick={() => {
+                                        setEditingReview({rate: 5, comment: ''});
+                                        setIsEditingReview(true);
+                                    }}
+                                >
+                                    <FaPlus className="mr-1" /> Thêm đánh giá mới
+                                </button>
+                            )}
+                        </div>
+
                     </div>
+
                 </div>
             </div>
         </AdminLayout>

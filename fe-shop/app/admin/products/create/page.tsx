@@ -27,25 +27,21 @@ export default function ProductCreate() {
                 reader.onloadend = () => {
                     const base64String = reader.result as string;
                     previews.push(base64String);
-                    base64List.push(base64String.split(",")[1]); // Bỏ phần đầu "data:image/png;base64,"
+                    base64List.push(base64String.split(",")[1]); // Loại bỏ "data:image/png;base64,"
 
-                    // Cập nhật state sau khi xử lý xong tất cả ảnh
-                    if (previews.length === files.length) {
-                        setImagePreviews(previews);
-                        setImageBase64List(base64List);
+                    // Cập nhật state sau khi xử lý tất cả ảnh
+                    if (previews?.length === files?.length) {
+                        setImagePreviews(previews); // Hiển thị preview ảnh
+                        setImageBase64List(base64List); // Danh sách base64 để gửi API
                     }
                 };
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(file); // Đọc file
             });
         }
     };
 
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-/*
-        if (imageBase64List.length === 0) return alert("Vui lòng tải lên ít nhất một ảnh!");
-*/
-
         event.preventDefault();
 
         const formData = new FormData(event.currentTarget);
@@ -54,52 +50,47 @@ export default function ProductCreate() {
         const quantity = Number(formData.get("quantity") as string);
         const description = formData.get("description") as string;
         const status = formData.get("status") as string;
-        const category_id = (formData.get("category_id") as string);
+        const category_id = formData.get("category_id") as string;
         const content = formData.get("content") as string;
-
 
         if (!title || isNaN(price) || isNaN(quantity) || !category_id || !description) {
             alert("Vui lòng điền đầy đủ thông tin!");
             return;
         }
 
-        if (imageBase64List.length === 0) {
+        if (imageBase64List?.length === 0) {
             alert("Vui lòng tải lên ít nhất một ảnh!");
             return;
         }
 
         const payload = {
-            title: title,
-            price: price,
-            quantity: quantity,
-            content: content,
-            description: description,
-            status: status,
-            category_id: category_id,
-            image: imageBase64List[0], // Mảng ảnh base64
+            title,
+            price,
+            quantity,
+            content,
+            description,
+            status,
+            category_id,
+            image: imageBase64List[0], // Ảnh chính
+            images: imageBase64List    // Mảng ảnh base64
         };
-
-        console.log(payload);
-
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/create`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" ,
-                            'Accept': 'application/json',
-    },
-            body: JSON.stringify(payload), // Gửi mảng ảnh
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            body: JSON.stringify(payload),
         });
 
         if (response.ok) {
-            alert("Ảnh đã được lưu vào database!");
+            alert("Sản phẩm và ảnh đã được lưu vào database!");
             router.push('/admin/products');
-
         } else {
-            alert(`Lỗi khi lưu ảnh.${JSON.stringify(payload)}`);
-
+            alert("Đã xảy ra lỗi khi lưu sản phẩm.");
         }
     };
-
 
     useEffect(() => {
         async function fetchData() {
@@ -111,7 +102,7 @@ export default function ProductCreate() {
                 }
             });
             const json = await res.json();
-            setCategories(json.data);
+            setCategories(json);
             } catch (error) {
             console.error("Lỗi khi gọi API: ", error);
             }
@@ -120,7 +111,7 @@ export default function ProductCreate() {
         }, []);
 
 
-        if (categories.length === 0 ) {
+        if (categories?.length === 0 ) {
             return <p className="text-center py-6">Đang tải dữ liệu...</p>;
         }
 
@@ -218,20 +209,24 @@ export default function ProductCreate() {
           </div>
 
         <div className="col-span-full">
-            <label htmlFor="photo" className="block text-sm font-medium text-gray-900">Ảnh sản phẩm</label>
-            <div className="mt-2 flex flex-wrap gap-3">
-                {imagePreviews.length > 0 ? (
-                    imagePreviews.map((preview, index) => (
-                        <img key={index} src={preview} alt={`Preview ${index}`} className="w-24 h-24 object-cover rounded-md" />
-                    ))
-                ) : (
-                    <UserCircleIcon aria-hidden="true" className="size-12 text-gray-300" />
-                )}
-            </div>
-            <input type="file" id="photo" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
-            <label htmlFor="photo" className="cursor-pointer mt-2 inline-block rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
-                Đăng ảnh
+            <label htmlFor="images" className="block text-sm font-medium text-gray-700">
+                Upload Images
             </label>
+            <input
+                type="file"
+                id="images"
+                name="images"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md"
+            />
+            <div className="mt-2 flex space-x-4">
+                {imagePreviews.map((preview, index) => (
+                    <img key={index} src={preview} alt={`Preview ${index}`} className="h-20 w-20 object-cover rounded" />
+                ))}
+            </div>
+
         </div>
 
         <div className="sm:col-span-2">

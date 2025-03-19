@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin\Variant;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Variant\VariantRequest;
-use App\Services\Admin\Variant\VariantCreateService;
-use App\Services\Admin\Variant\VariantUpdateService;
-use App\Services\Admin\Variant\VariantDeleteService;
+use App\Services\Variant\VariantCreateService;
+use App\Services\Variant\VariantUpdateService;
+use App\Services\Variant\VariantDeleteService;
 use Illuminate\Http\Request;
 
 class VariantController extends Controller

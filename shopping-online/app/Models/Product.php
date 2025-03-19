@@ -11,7 +11,7 @@ class Product extends Model
 
     protected $table = 'products';
 
-    protected $fillable = ['title', 'description', 'content', 'price', 'image', 'quantity', 'status', 'category_id'];
+    protected $fillable = ['title', 'description', 'content', 'price', 'quantity', 'status', 'category_id'];
 
     public function category() {
         return $this->belongsTo(Category::class);
@@ -27,5 +27,9 @@ class Product extends Model
 
     public function variants() {
         return $this->hasMany(Variant::class);
+    }
+
+    public function cartItems() {
+        return $this->hasMany(CartItem::class);
     }
 }

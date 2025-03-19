@@ -7,7 +7,7 @@ import "../public/customer/style.css"
 import "../public/customer/css/image.css"
 import "../public/css/user/homeContent.css"
 import "../public/css/user/productSale.css"
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
+import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
   Popover,
@@ -18,37 +18,127 @@ import {
 
 import { ChevronDownIcon, UserIcon, MapIcon, ShoppingBagIcon, ArrowLeftStartOnRectangleIcon, ArrowRightEndOnRectangleIcon, PencilSquareIcon} from '@heroicons/react/20/solid'
 import FloatingMenu from './floatingMenu';
+import {useRouter} from "next/navigation";
+
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const [data, setData] = useState<any>(null);
-  const [isOpen, setIsOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
+  const [isOpen, setIsOpen] = useState(false);
+  const [data, setData] = useState<any>(null);
+  const router = useRouter();
+  const token = localStorage.getItem('token');
+  const [subtotal, setSubtotal] = useState(0);
+
 
   useEffect(() => {
-
     async function fetchData() {
+      setIsLoading(true); // Start loading
+      setError(null); // Reset error state
+
+      /*if (!token) {
+        setError('User is not authenticated. Token is missing.');
+        setIsLoading(false);
+        return;
+      }*/
 
       try {
-        const token = localStorage.getItem('token');
+        // Lấy token từ localStorage (nếu có)
+        const token = localStorage.getItem("token");
 
-        const res = await fetch(`http://localhost:8000/api/home`,{
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
+        const res = await fetch("http://localhost:8000/api/home", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
-        if (!res.ok) {
-          throw new Error('HTTP status ' + res.status);
-        }
-        const json = await res.json();
-        setData(json);
-      } catch (error) {
-        console.error("Lỗi khi gọi api: ", error);
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message || "Lỗi tải dữ liệu");
+
+        // Cập nhật state dữ liệu tại đây
+        setData(data);
+
+      } catch (err: any) {
+        setError(err.message);
+        console.error("Lỗi API trả về:", err.message);
+      } finally {
+        setIsLoading(false); // End loading
       }
     }
+
     fetchData();
   }, []);
+
+  async function handleLogout() {
+    const res = await fetch(`http://localhost:8000/api/logout`, {
+        method: 'POST',
+        headers: token ? {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        } : {},
+    })
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.message || "Logout failed");
+    }
+
+    localStorage.removeItem('token');
+    router.push('/auth/login');
+  }
+
+  if (isLoading) {
+    return (
+        <div className="loading-screen">
+          {/* Loading UI */}
+          <p>Loading...</p>
+        </div>
+    );
+  }
+
+
+  async function handleRemoveFromCart(product_id: string, variant_id: string|null, quantity: string) {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/removeProduct/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          product_id,
+          variant_id,
+          quantity,
+        }),
+      });
+
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.message || 'Xóa sản phẩm không thành công');
+        }
+
+        const data = await res.json();
+
+        console.log(data);
+        alert('Xóa sản phẩm thành công');
+        window.location.reload();
+    } catch (error) {
+        console.error("Error:", error);
+    }
+  }
+
+/*  if (error) {
+    return (
+        <div className="error-screen">
+          {/!* Error UI *!/}
+          <h1>Error</h1>
+          <p>{error}</p>
+        </div>
+    );
+  }*/
+
+
 
   return (
     <div className="wrapper">
@@ -72,31 +162,49 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                           <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
                         </PopoverButton>
 
-                        <PopoverPanel className="absolute top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white ring-1 shadow-lg ring-gray-900/5">
+                        <PopoverPanel className="absolute top-full z-10 mt-3 w-screen max-w-md rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
                           <div className="p-4">
-                            {data?.categories?.map((category: any) => (
-                              <div key={category.id}>
-                                <a href={`/category/${category.id}`} className="block font-semibold text-gray-900">
-                                  {category.name}
-                                </a>
-                                {category.children?.length > 0 && (
-                                  <ul>
-                                    {category.children.map((child: any) => (
-                                      <li key={child.id}>
-                                        <a href={`/category/${child.id}`} className="text-gray-600">{child.name}</a>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                )}
-                              </div>
-                            ))}
+                            {data?.categories.length > 0 ? (
+                                data?.categories.map((category: any) => (
+                                    <div key={category.id} style={{ marginBottom: '16px' }}>
+                                      {/* Parent Category */}
+                                      <a
+                                          href={`/category/${category.id}`}
+                                          className="block font-semibold text-black"
+                                          style={{
+                                            fontWeight: category.parent_id == null ? 'bold' : 'normal', // In đậm nếu không có con
+                                          }}
+                                      >
+                                        {category.name}
+                                      </a>
+
+                                      {category?.children.length > 0 && (
+                                          <ul style={{ paddingLeft: '20px', marginTop: '8px' }}>
+                                            {category.children.map((child: any) => (
+                                                <li key={child.id}>
+                                                  <a
+                                                      href={`/category/${child.id}`}
+                                                      className="text-gray-600 hover:text-gray-800"
+                                                      style={{ display: 'block' }}
+                                                  >
+                                                    {child.name}
+                                                  </a>
+                                                </li>
+                                            ))}
+                                          </ul>
+                                      )}
+                                    </div>
+                                ))
+                            ) : (
+                                <p>Không có danh mục nào.</p>
+                            )}
                           </div>
                         </PopoverPanel>
                       </Popover>
 
                       
                     </PopoverGroup>
-                    <PopoverGroup>
+                    {/*<PopoverGroup>
                     <Popover className="relative">
                         <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
                           Giảm giá
@@ -115,7 +223,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                           </div>
                         </PopoverPanel>
                       </Popover>
-                    </PopoverGroup>
+                    </PopoverGroup>*/}
                     
                   </li>
 
@@ -166,7 +274,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                </a>
             </div>
               </PopoverButton>
-              {data?.user ? (
+              {token ? (
                 <PopoverPanel
                 transition
                 className="absolute left-1/2 z-10 mt-2 flex w-screen max-w-fit -translate-x-1/2 px-4 transition data-closed:translate-y-1 data-closed:opacity-0 data-enter:duration-200 data-enter:ease-out data-leave:duration-150 data-leave:ease-in"
@@ -215,10 +323,11 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         <ArrowLeftStartOnRectangleIcon className="size-6 text-gray-600 group-hover:text-green-600" />
                         </div>
                         <div>
-                          <a href='/auth/login' className="font-semibold text-gray-900">
+                          <button onClick={handleLogout} className="font-semibold text-gray-900">
                             Đăng xuất
-                            <span className="absolute inset-0" />
-                          </a>
+                            <span className="absolute inset-0"/>
+                          </button>
+
                         </div>
                       </div>
                     
@@ -272,7 +381,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             <div className="cart-area">
             <a onClick={() => setIsOpen(!isOpen)} className="relative">
                 <Image src="/customer/img/core-img/bag.svg" alt="" width={20} height={20} />
-                <span>{data?.cartItems.length}</span>
+                <span>{data?.cartItems?.length}</span>
             </a>
             </div>
           </div>
@@ -280,113 +389,138 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
       </header>
 
       <Dialog open={isOpen} onClose={setIsOpen} className="relative z-10">
-      <DialogBackdrop
-        transition
-        className="fixed inset-0 bg-gray-500/75 transition-opacity duration-500 ease-in-out data-closed:opacity-0"
-      />
+        <DialogBackdrop
+            transition
+            className="fixed inset-0 bg-gray-500/75 transition-opacity duration-500 ease-in-out data-closed:opacity-0"
+        />
 
-      <div className="fixed inset-0 overflow-hidden">
-        <div className="absolute top-[80px] inset-0 overflow-hidden">
-          <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-            <DialogPanel
-              transition
-              className="pointer-events-auto w-screen max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
-            >
-              <div className="absolute top-[70px] min-w-full flex-col max-h-[92vh] overflow-y-scroll bg-white shadow-xl">
-                <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-                  <div className="absolute top-[25px] left-[377px] items-start justify-between">
-                    <div className="ml-3 flex h-7 items-center">
-                      <button
-                        type="button"
-                        onClick={() => setIsOpen(false)}
-                        className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
-                      >
-                        <span className="absolute -inset-0.5" />
-                        <span className="sr-only">Close panel</span>
-                        <XMarkIcon aria-hidden="true" className="size-6" />
-                      </button>
+        <div className="fixed inset-0 overflow-hidden">
+          <div className="absolute top-[80px] inset-0 overflow-hidden">
+            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+              <DialogPanel
+                  transition
+                  className="pointer-events-auto w-screen max-w-md transform transition duration-500 ease-in-out data-closed:translate-x-full sm:duration-700"
+              >
+                <div
+                    className="absolute top-[70px] min-w-full min-h-full flex-col max-h-[92vh] overflow-y-scroll bg-white shadow-xl">
+                  <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+                    <div className="absolute top-[25px] left-[377px] items-start justify-between">
+                      <div className="ml-3 flex h-7 items-center">
+                        <button
+                            type="button"
+                            onClick={() => setIsOpen(false)}
+                            className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
+                        >
+                          <span className="absolute -inset-0.5"/>
+                          <span className="sr-only">Close panel</span>
+                          <XMarkIcon aria-hidden="true" className="size-6"/>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="mt-8">
+                      <div className="flow-root">
+                        <ul role="list" className="-my-6 divide-y divide-gray-200">
+                          {data?.cartItems?.map((item: any, index: number) => (
+                              <li key={index} className="flex py-6">
+                                <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                  <img
+                                      alt={item ?? "Product Image"}
+                                      src={`data:image/jpeg;base64,${item['image']}`}
+                                      className="size-full object-cover"
+                                  />
+                                </div>
+
+                                <div className="ml-4 flex flex-1 flex-col">
+                                  <div>
+                                    <div className="flex justify-between text-base font-medium text-gray-900">
+                                      <h3>
+                                        <a href={item.href ?? `/product/${item['product'].id}`}>{item['product'].title ?? "Untitled Product"}</a>
+                                      </h3>
+                                      <p className="ml-4">
+                                        {item['variant']?.price && item.quantity
+                                            ? `${item['variant'].price * item.quantity} VND`
+                                            : item['product'].price && item.quantity
+                                                ? `${item['product'].price * item.quantity} VND`
+                                                : "N/A"}
+                                      </p>
+                                    </div>
+                                    <p className="mt-1 text-sm text-gray-500">{item['variant']?.name ?? "No Variant"}</p>
+                                  </div>
+                                  <div className="flex flex-1 items-end justify-between text-sm">
+                                    <p className="text-gray-500">Qty {item.quantity ?? 1}</p>
+
+                                    <div className="flex">
+                                      <button
+                                          type="button"
+                                          className="font-medium text-indigo-600 hover:text-indigo-500"
+                                          onClick={() => handleRemoveFromCart(item['product'].id, item['variant']?.id, item.quantity)}
+                                      >
+                                        Remove
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="ml-4 flex items-center">
+                                  <input
+                                      type="checkbox"
+                                      onChange={(e) =>
+                                          setSubtotal(
+                                              (prev) => prev + (e.target.checked ? (item['variant']?.price ?? item['product'].price) * item.quantity : -(item['variant']?.price ?? item['product'].price) * item.quantity)
+                                          )
+                                      }
+                                  />
+                                </div>
+                              </li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="mt-8">
-                    <div className="flow-root">
-                      <ul role="list" className="-my-6 divide-y divide-gray-200">
-                        {data?.cartItems.map((product: any, index: number) => (
-                          <li key={index} className="flex py-6">
-                            <div className="size-24 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                              <img alt={product.imageAlt} src={product.imageSrc} className="size-full object-cover" />
-                            </div>
+                  <div className="border-t border-gray-200 px-4 py-6 sm:px-6 ">
+                    <div className="flex justify-between text-base font-medium text-gray-900">
+                      <p>Subtotal</p>
+                      <p>{subtotal} VND</p>
+                    </div>
+                    <p className="mt-0.5 text-sm text-gray-500">Phí ship và thuế ở mục thanh toán.</p>
+                    <div className="mt-6">
+                      <a
+                          href="/user/cart"
+                          className="flex items-center justify-center rounded-md border border-transparent bg-green-700 px-5 py-2 text-base font-medium text-white shadow-xs hover:bg-green-800"
+                      >
+                        Xem giỏ hàng
+                      </a>
+                    </div>
+                    <div className="mt-6">
+                      <a
+                          href="#"
+                          className="flex items-center justify-center rounded-md border border-transparent bg-green-700 px-5 py-2 text-base font-medium text-white shadow-xs hover:bg-green-800"
+                      >
+                        Thanh toán
+                      </a>
+                    </div>
 
-                            <div className="ml-4 flex flex-1 flex-col">
-                              <div>
-                                <div className="flex justify-between text-base font-medium text-gray-900">
-                                  <h3>
-                                    <a href={product.href}>{product.product_name}</a>
-                                  </h3>
-                                  <p className="ml-4">{product.price}</p>
-                                </div>
-                                <p className="mt-1 text-sm text-gray-500">{product.variant_name}</p>
-                              </div>
-                              <div className="flex flex-1 items-end justify-between text-sm">
-                                <p className="text-gray-500">Qty {product.quantity}</p>
-
-                                <div className="flex">
-                                  <button type="button" className="font-medium text-indigo-600 hover:text-indigo-500">
-                                    Remove
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
+                    <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
+                      <p>
+                        hoặc{' '}
+                        <button
+                            type="button"
+                            onClick={() => setIsOpen(false)}
+                            className="font-medium text-green-700 hover:text-green-800"
+                        >
+                          Tiếp tục mua sắm
+                          <span aria-hidden="true"> &rarr;</span>
+                        </button>
+                      </p>
                     </div>
                   </div>
                 </div>
-
-                <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-                  <div className="flex justify-between text-base font-medium text-gray-900">
-                    <p>Subtotal</p>
-                    <p>0</p>
-                  </div>
-                  <p className="mt-0.5 text-sm text-gray-500">Phí ship và thuế ở mục thanh toán.</p>
-                  <div className="mt-6">
-                    <a
-                      href="/user/cart"
-                      className="flex items-center justify-center rounded-md border border-transparent bg-green-700 px-5 py-2 text-base font-medium text-white shadow-xs hover:bg-green-800"
-                    >
-                      Xem giỏ hàng
-                    </a>
-                  </div>
-                  <div className="mt-6">
-                    <a
-                      href="#"
-                      className="flex items-center justify-center rounded-md border border-transparent bg-green-700 px-5 py-2 text-base font-medium text-white shadow-xs hover:bg-green-800"
-                    >
-                      Thanh toán
-                    </a>
-                  </div>
-                  
-                  <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
-                    <p>
-                      hoặc{' '}
-                      <button
-                        type="button"
-                        onClick={() => setIsOpen(false)}
-                        className="font-medium text-green-700 hover:text-green-800"
-                      >
-                        Tiếp tục mua sắm
-                        <span aria-hidden="true"> &rarr;</span>
-                      </button>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </DialogPanel>
+              </DialogPanel>
+            </div>
           </div>
         </div>
-      </div>
-    </Dialog>
+      </Dialog>
       {children}
       <FloatingMenu />
     </div>

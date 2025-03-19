@@ -3,7 +3,9 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const data = {
+/*
     user: { id: 3, name: "Trần Văn C", email: "shopthuoc@gmail.com", number: "0987654321", password: "$2y$12$examplehashedpassword" },
+*/
 
     categories: [
       { id: 1, name: "Thuốc giảm đau", children: [{ id: 11, name: "Paracetamol" }, { id: 12, name: "Ibuprofen" }] },

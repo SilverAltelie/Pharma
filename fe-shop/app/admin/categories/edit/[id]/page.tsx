@@ -15,7 +15,7 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
     async function fetchCategories() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`)
         const data = await res.json()
-        setCategories(data.data)
+        setCategories(data)
     }
     fetchCategories()
     }, [])

@@ -3,14 +3,14 @@
 import MainLayout from "@/app/_userlayout";
 import { useState, useEffect, use } from "react";
 
-export default function categoryPage({ params}: {params: Promise<{id: string}>}) {
+export default function CategoryPage({ params}: {params: Promise<{id: string}>}) {
     const {id} = use(params);
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch("/api/data");
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/`);
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }

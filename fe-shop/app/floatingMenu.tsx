@@ -86,7 +86,7 @@ const FloatingMenu = () => {
             </div>
 
             {/* Danh sách tin nhắn */}
-            <div className="flex-1 overflow-y-auto p-2 space-y-2">
+            <div className="flex-1 z-50 overflow-y-auto p-2 space-y-2">
               {messages.map((msg) => (
                 <div key={msg.id} className={`flex ${msg.from_user_id === currentUserId ? "justify-end" : "justify-start"}`}>
                   <div className={`p-2 rounded-lg max-w-xs text-sm ${msg.from_user_id === currentUserId ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"}`}>

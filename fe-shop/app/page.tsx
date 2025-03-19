@@ -2,8 +2,9 @@
 
 import MainLayout from "./_userlayout";
 import dynamic from "next/dynamic";
-import $ from "jquery";
 import "bootstrap/dist/css/bootstrap.css";
+import { Modal } from "bootstrap";
+import { useRouter } from "next/navigation";
 
 import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -12,11 +13,8 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { XMarkIcon } from '@heroicons/react/20/solid'
+import {FaCartPlus} from "react-icons/fa";
 
-const BootstrapScript = dynamic(
-  () => import("bootstrap/dist/js/bootstrap.bundle.min.js"),
-  { ssr: false }
-);
 
 const stats = [
   { id: 1, name: 'Chi nhánh trên toàn bộ các tỉnh thành', value: '63' },
@@ -40,66 +38,105 @@ const images = [
 ]
 
 export default function Home() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<any>([]);
   const [isVisible, setIsVisible] = useState(true);
+  const token = localStorage.getItem('token');
+  const router = useRouter();
 
   const handleDismiss = () => {
     setIsVisible(false);
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      console.log("jQuery version:", $.fn.jquery); // Kiểm tra phiên bản jQuery
-    }
+    const popupId = "#salePopup";
+    const storageKey = "popupClosedTime";
+    const displayAfterMillis = 3600000;
 
-    import("bootstrap/dist/js/bootstrap.bundle.min.js").then((bootstrap) => {
-      const popupId = "#salePopup";
-      const storageKey = "popupClosedTime";
-      const displayAfterMillis = 3600000;
-
-      function checkAndShowPopup() {
-        const lastClosedTime = localStorage.getItem(storageKey);
-        if (!lastClosedTime || Date.now() - parseInt(lastClosedTime, 10) >= displayAfterMillis) {
-          const popup = document.getElementById("salePopup");
-          if (popup) {
-            new bootstrap.Modal(popup).show();
-          }
+    function checkAndShowPopup() {
+      const lastClosedTime = localStorage.getItem(storageKey);
+      if (!lastClosedTime || Date.now() - parseInt(lastClosedTime, 10) >= displayAfterMillis) {
+        const popup = document.getElementById("salePopup");
+        if (popup) {
+          const modalInstance = new Modal(popup); // Sử dụng module Modal
+          modalInstance.show();
         }
       }
+    }
 
-      document.getElementById("salePopup")?.addEventListener("hidden.bs.modal", () => {
-        localStorage.setItem(storageKey, Date.now().toString());
-      });
-
-      checkAndShowPopup();
+    // Lưu thời gian đóng Popup để tránh hiển thị lại ngay lập tức
+    document.getElementById("salePopup")?.addEventListener("hidden.bs.modal", () => {
+      localStorage.setItem(storageKey, Date.now().toString());
     });
 
+    checkAndShowPopup();
+  }, []);
+
+  async function handleAddToCart($product_id: string) {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/addProduct`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({product_id: $product_id, quantity: 1}),
+      });
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await res.json();
+      console.log(data);
+      alert('Thêm sản phẩm vào giỏ hàng thành công');
+      window.location.reload();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+/*
+    const token = localStorage.getItem('token');
+*/
+
+  useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/data");
-    
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/main`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+/*
+                "Authorization": `Bearer ${token}`,
+*/
+            },
+        });
+
         // Kiểm tra xem API có trả về mã lỗi không
         if (!res.ok) {
           throw new Error(`API trả về lỗi: ${res.statusText}`);
         }
-    
+
         // Kiểm tra xem nội dung có phải là JSON hợp lệ không
         const text = await res.text();
         try {
           const json = JSON.parse(text);  // Parse lại nội dung thành JSON
           setData(json);
-        } catch (error) {
+        } catch {
           throw new Error("Dữ liệu trả về không phải là JSON hợp lệ.");
         }
       } catch (error) {
         console.error("Lỗi khi gọi API hoặc phân tích JSON: ", error);
       }
     }
-    
+
 
     fetchData();
   }, []);
 
+  /*if (!token) {
+    return <MainLayout>Loading...</MainLayout>;
+  }
+*/
   if (!data) {
     return <MainLayout>Loading...</MainLayout>;
   }
@@ -107,7 +144,7 @@ export default function Home() {
   return (
     <MainLayout>
       
-      {isVisible && (
+      {isVisible && !token && (
         <div className="relative isolate flex items-center gap-x-6 overflow-hidden bg-gray-50 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
           <div
             aria-hidden="true"
@@ -152,7 +189,7 @@ export default function Home() {
             <button
               type="button"
               className="-m-3 p-3 focus-visible:outline-offset-[-4px]"
-              onClick={handleDismiss} // Gọi hàm handleDismiss khi nhấn vào nút
+              onClick={handleDismiss}
             >
               <span className="sr-only">Dismiss</span>
               <XMarkIcon aria-hidden="true" className="size-5 text-gray-900" />
@@ -297,12 +334,18 @@ export default function Home() {
 
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-          {data?.products.map((product: any) => (
+          {data?.products?.data.map((product: any) => (
             <div key={product.id} className="group relative">
+              {product.variants.length <= 0 ? <button
+                  onClick={() => handleAddToCart(product.id)}
+                  className="absolute top-1 z-50 right-1 p-2 bg-green-700 rounded-md text-white text-lg"
+              >
+                <FaCartPlus/>
+              </button> : ''}
               <img
-                alt={product.imageAlt}
-                src={product.imageSrc}
-                className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
+                  alt={product.title}
+                  src={`data:image/jpeg;base64,${product.images[0]?.image}`}
+                  className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
               />
               <div className="mt-4 flex justify-between">
                 <div>

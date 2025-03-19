@@ -22,7 +22,7 @@ export default function CategoryCreate() {
         console.log('Phản hồi dạng text:', text);
 
         const data = JSON.parse(text); // Chuyển đổi thành JSON
-        setCategories(data.data);
+        setCategories(data);
       } catch (error) {
         console.error('Lỗi khi lấy danh mục:', error);
         setCategories([]);
@@ -154,7 +154,7 @@ export default function CategoryCreate() {
                   className="block w-full border-2 rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600"
                 >
                   <option value="">Không có</option>
-                  {categories.map((category) => (
+                  {categories?.map((category) => (
                     category.parent_id === null && (
                       <option key={category.id} value={category.id}>
                         {category.name}

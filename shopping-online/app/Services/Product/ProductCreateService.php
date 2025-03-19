@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Product;
+namespace App\Services\Product;
 
 use App\Models\Product;
 
@@ -8,6 +8,7 @@ class ProductCreateService
 {
     public function handle($data) {
 
+        // Tạo sản phẩm
         $product = Product::create([
             'title' => $data['title'],
             'description' => $data['description'],
@@ -16,16 +17,17 @@ class ProductCreateService
             'quantity' => $data['quantity'],
             'price' => $data['price'],
             'status' => $data['status'],
-            'image' => $data['image'],
         ]);
 
-        /*if (isset($data['images'])) {
-            foreach ($data['images'] as $image) {
-                $product->images()->create(['image' => $image]);
-            }
-        }*/
+        // Kiểm tra và lưu nhiều ảnh liên quan
+        if (isset($data['images']) && is_array($data['images'])) {
+            $images = array_map(function ($imageBase64) {
+                return ['image' => $imageBase64];
+            }, $data['images']);
+
+            $product->images()->createMany($images);
+        }
 
         return $product;
-
     }
 }

@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Admin\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Product\ProductRequest;
 use App\Models\Product;
-use App\Services\Admin\Product\ProductCreateService;
-use App\Services\Admin\Product\ProductUpdateService;
-use App\Services\Admin\Product\ProductDeleteService;
+use App\Models\User;
+use App\Services\Product\ProductCreateService;
+use App\Services\Product\ProductUpdateService;
+use App\Services\Product\ProductDeleteService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -27,7 +28,7 @@ class ProductController extends Controller
     public function index()
     {
         //
-        return Product::paginate(10);
+        return Product::with('images')->paginate(10);
     }
 
     /**
@@ -55,19 +56,9 @@ class ProductController extends Controller
     public function show($id)
     {
         //
-        $product = Product::findOrFail($id);
-
-        $variants = $product->variants;
-
-        $reviews = $product->reviews;
-
-        $product->variants = $variants;
-
-        $product->reviews = $reviews;
+        $product = Product::with(['variants', 'reviews.user', 'images'])->findOrFail($id);
 
         return $product;
-
-
     }
 
     /**

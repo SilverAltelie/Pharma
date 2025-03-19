@@ -1,10 +1,10 @@
-// components/ProductReviews.tsx
-'use client';
-
-import { StarIcon } from '@heroicons/react/20/solid';
-import { useState } from 'react';
-import {FaPencil} from "react-icons/fa6";
+import {useState} from "react";
+import {StarIcon} from "@heroicons/react/20/solid";
 import {FaTrash} from "react-icons/fa";
+
+function classNames(...classes: string[]) {
+    return classes.filter(Boolean).join(' ')
+}
 
 export interface ReviewType {
     id?: string;
@@ -17,13 +17,16 @@ export interface ReviewType {
 interface ProductReviewsProps {
     reviews: ReviewType[];
     isAdmin?: boolean;
+    onEdit?: (review: ReviewType) => void;
+    onDelete?: (id: string) => void;
 }
 
-function classNames(...classes: string[]) {
-    return classes.filter(Boolean).join(' ');
-}
-
-export default function ProductReviews({ reviews, isAdmin = false }: ProductReviewsProps) {
+export default function ProductReviews({
+                            reviews,
+                            isAdmin = false,
+                            onEdit,
+                            onDelete
+                        }: ProductReviewsProps) {
     const [expanded, setExpanded] = useState<boolean>(false);
     const averageRating = reviews.length > 0
         ? reviews.reduce((sum, review) => sum + review.rate, 0) / reviews.length
@@ -59,15 +62,15 @@ export default function ProductReviews({ reviews, isAdmin = false }: ProductRevi
                 <div className="mt-6 space-y-6 divide-y divide-gray-200">
                     {displayedReviews.map((review, index) => (
                         <div key={review.id || index} className="pt-6">
-                            <div className="flex items-center">
-                                <div className="flex-shrink-0">
+                            <div className="flex items-left">
+                                <div className="flex items-center">
                                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                        {review.user_name ? review.user_name.charAt(0).toUpperCase() : 'K'}
+                                        {review.user.name ? review.user.name.charAt(0).toUpperCase() : 'K'}
                                     </div>
                                 </div>
                                 <div className="ml-3">
                                     <h3 className="text-sm font-medium text-gray-900">
-                                        {review.user_name || 'Khách hàng ẩn danh'}
+                                        {review.user.name || 'Khách hàng ẩn danh'}
                                     </h3>
                                     <div className="flex items-center mt-1">
                                         {[0, 1, 2, 3, 4].map((rating) => (
@@ -88,22 +91,18 @@ export default function ProductReviews({ reviews, isAdmin = false }: ProductRevi
                                     )}
                                 </div>
 
-                                {isAdmin && (
-                                    <div className="ml-auto flex space-x-2">
+                                {isAdmin && review.id && (
+                                    <div className="flex space-x-2">
                                         <button
-                                            className="p-1 text-blue-500 hover:text-blue-700"
-                                            title="Chỉnh sửa"
-                                        >
-                                            <FaPencil className="h-4 w-4" />
-                                        </button>
-                                        <button
-                                            className="p-1 text-red-500 hover:text-red-700"
+                                            onClick={() => onDelete && onDelete(review.id!)}
+                                            className="text-red-600 hover:text-red-800"
                                             title="Xóa"
                                         >
-                                            <FaTrash className="h-4 w-4" />
+                                            <FaTrash />
                                         </button>
                                     </div>
                                 )}
+
                             </div>
 
                             {review.comment && (
@@ -120,11 +119,10 @@ export default function ProductReviews({ reviews, isAdmin = false }: ProductRevi
 
             {reviews.length > 3 && !expanded && (
                 <button
-                    type="button"
-                    className="mt-6 text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                    className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-500"
                     onClick={() => setExpanded(true)}
                 >
-                    Xem thêm {reviews.length - 3} đánh giá
+                    Xem thêm đánh giá
                 </button>
             )}
 

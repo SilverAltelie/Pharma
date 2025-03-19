@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('user_id');
             $table->text('comment');
             $table->integer('rate');
-            $table->unsignedBigInteger('parent_id')->nullable();
             $table->timestamps();
         });
     }

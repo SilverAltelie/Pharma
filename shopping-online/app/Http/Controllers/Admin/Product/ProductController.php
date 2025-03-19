@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Product\ProductRequest;
 use App\Models\Product;
+use App\Models\User;
 use App\Services\Product\ProductCreateService;
 use App\Services\Product\ProductUpdateService;
 use App\Services\Product\ProductDeleteService;
@@ -55,23 +56,9 @@ class ProductController extends Controller
     public function show($id)
     {
         //
-        $product = Product::findOrFail($id);
-
-        $variants = $product->variants;
-
-        $reviews = $product->reviews;
-
-        $images = $product->images;
-
-        $product->variants = $variants;
-
-        $product->reviews = $reviews;
-
-        $product->images = $images;
+        $product = Product::with(['variants', 'reviews.user', 'images'])->findOrFail($id);
 
         return $product;
-
-
     }
 
     /**

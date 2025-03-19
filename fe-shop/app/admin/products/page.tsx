@@ -57,6 +57,8 @@ export default function Products() {
             if (!res.ok) {
                 throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
             }
+
+            window.location.reload();
         } catch (error) {
             throw new Error();
         }

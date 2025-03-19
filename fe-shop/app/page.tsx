@@ -4,6 +4,7 @@ import MainLayout from "./_userlayout";
 import dynamic from "next/dynamic";
 import "bootstrap/dist/css/bootstrap.css";
 import { Modal } from "bootstrap";
+import { useRouter } from "next/navigation";
 
 import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -40,6 +41,7 @@ export default function Home() {
   const [data, setData] = useState<any>([]);
   const [isVisible, setIsVisible] = useState(true);
   const token = localStorage.getItem('token');
+  const router = useRouter();
 
   const handleDismiss = () => {
     setIsVisible(false);

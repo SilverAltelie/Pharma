@@ -129,19 +129,16 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
             product_id: id,
             rate: editingReview.rate,
             comment: editingReview.comment || '',
-            // Thêm các trường khác nếu cần
         };
 
-        const url = editingReview.id
-            ? `${process.env.NEXT_PUBLIC_API_URL}/api/admin/reviews/update/${editingReview.id}`
-            : `${process.env.NEXT_PUBLIC_API_URL}/api/admin/reviews/create`;
-
-        const method = "POST";
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/create`;
 
         try {
             const response = await fetch(url, {
-                method,
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                method: "POST",
+                headers: {"Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem('token')}`},
                 body: JSON.stringify(reviewData),
             });
 
@@ -151,9 +148,9 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                 throw new Error(result.message || `Lỗi API: ${response.status}`);
             }
 
-            fetchData();
             setIsEditingReview(false);
             setEditingReview(null);
+            window.location.reload();
         } catch (error) {
             console.error("Lỗi khi lưu đánh giá:", error);
             alert(`Lỗi khi lưu đánh giá: ${error instanceof Error ? error.message : 'Unknown error'}`);

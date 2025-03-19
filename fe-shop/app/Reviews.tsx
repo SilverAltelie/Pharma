@@ -63,32 +63,41 @@ export default function ProductReviews({
                     {displayedReviews.map((review, index) => (
                         <div key={review.id || index} className="pt-6">
                             <div className="flex items-left">
-                                <div className="flex items-center">
-                                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                <div className="flex items-top">
+                                    <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-gray-500">
                                         {review.user.name ? review.user.name.charAt(0).toUpperCase() : 'K'}
                                     </div>
                                 </div>
                                 <div className="ml-3">
-                                    <h3 className="text-sm font-medium text-gray-900">
+                                    <h3 className="text-lg font-medium text-green-900">
                                         {review.user.name || 'Khách hàng ẩn danh'}
                                     </h3>
-                                    <div className="flex items-center mt-1">
-                                        {[0, 1, 2, 3, 4].map((rating) => (
-                                            <StarIcon
-                                                key={rating}
-                                                className={classNames(
-                                                    review.rate > rating ? 'text-yellow-400' : 'text-gray-300',
-                                                    'h-4 w-4 flex-shrink-0'
-                                                )}
-                                                aria-hidden="true"
-                                            />
-                                        ))}
+                                    <div className="text-sm ml-2 text-gray-500">
+                                        <div className="flex items-center mt-1">
+                                            {[0, 1, 2, 3, 4].map((rating) => (
+                                                <StarIcon
+                                                    key={rating}
+                                                    className={classNames(
+                                                        review.rate > rating ? 'text-yellow-400' : 'text-gray-300',
+                                                        'h-4 w-4 flex-shrink-0'
+                                                    )}
+                                                    aria-hidden="true"
+                                                />
+                                            ))}
+                                        </div>
+
+                                        {review.comment && (
+                                            <div className="text-sm text-gray-700">
+                                                <p className="whitespace-pre-wrap">{review.comment}</p>
+                                            </div>
+                                        )}
+                                        {review.created_at && (
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {new Date(review.created_at).toLocaleDateString('vi-VN')}
+                                            </p>
+                                        )}
                                     </div>
-                                    {review.created_at && (
-                                        <p className="text-xs text-gray-500 mt-1">
-                                            {new Date(review.created_at).toLocaleDateString('vi-VN')}
-                                        </p>
-                                    )}
+
                                 </div>
 
                                 {isAdmin && review.id && (
@@ -105,11 +114,7 @@ export default function ProductReviews({
 
                             </div>
 
-                            {review.comment && (
-                                <div className="mt-4 text-sm text-gray-700">
-                                    <p className="whitespace-pre-wrap">{review.comment}</p>
-                                </div>
-                            )}
+
                         </div>
                     ))}
                 </div>

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->string('user_id');
-            $table->text('comment');
+            $table->text('comment')->nullable();
             $table->integer('rate');
             $table->timestamps();
         });

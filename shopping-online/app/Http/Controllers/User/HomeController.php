@@ -23,13 +23,21 @@ class HomeController extends Controller
 
     public function index()
     {
-        // Lấy user từ Auth nếu có
         $user = Auth::user();
 
         $categories = $this->categoryListService->handle();
 
         if ($user) {
             $cartItems = $this->cartGetItemsService->getProductCart($user->id);
+
+            foreach ($cartItems as $item) {
+                $product = $item->product;
+                if ($product && $product->images->isNotEmpty()) {
+                    $item->image = $product->images->first()->image;
+                } else {
+                    $item->image = '';
+                }
+            }
         } else {
             $cartItems = session('cart', []);
         }

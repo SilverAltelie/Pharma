@@ -3,6 +3,7 @@
 use App\Http\Controllers\Address\AddressController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\MainController;
+use App\Http\Controllers\User\Review\ReviewController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -89,6 +90,7 @@ Route::prefix('')->middleware('auth:sanctum')->group(function () {
         Route::post('/delete/{id}', [AddressController::class, 'destroy']);
         Route::post('/setDefault/{id}', [AddressController::class, 'setDefault']);
     });
+    Route::post('/reviews/create', [ReviewController::class, 'store']);
 });
 
 Route::prefix('admin')->group(function () {
@@ -119,4 +121,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/update/{id}', [VariantController::class, 'update']);
         Route::post('/delete/{id}', [VariantController::class, 'destroy']);
     });
+
+    Route::post('/reviews/delete/{id}', [ReviewController::class, 'destroy']);
+
 });

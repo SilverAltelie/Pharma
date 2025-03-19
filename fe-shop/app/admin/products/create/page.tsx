@@ -30,7 +30,7 @@ export default function ProductCreate() {
                     base64List.push(base64String.split(",")[1]); // Loại bỏ "data:image/png;base64,"
 
                     // Cập nhật state sau khi xử lý tất cả ảnh
-                    if (previews.length === files.length) {
+                    if (previews?.length === files?.length) {
                         setImagePreviews(previews); // Hiển thị preview ảnh
                         setImageBase64List(base64List); // Danh sách base64 để gửi API
                     }
@@ -58,7 +58,7 @@ export default function ProductCreate() {
             return;
         }
 
-        if (imageBase64List.length === 0) {
+        if (imageBase64List?.length === 0) {
             alert("Vui lòng tải lên ít nhất một ảnh!");
             return;
         }
@@ -79,7 +79,7 @@ export default function ProductCreate() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                'Accept': 'application/json',
+                "Accept": "application/json",
             },
             body: JSON.stringify(payload),
         });
@@ -102,7 +102,7 @@ export default function ProductCreate() {
                 }
             });
             const json = await res.json();
-            setCategories(json.data);
+            setCategories(json);
             } catch (error) {
             console.error("Lỗi khi gọi API: ", error);
             }
@@ -111,7 +111,7 @@ export default function ProductCreate() {
         }, []);
 
 
-        if (categories.length === 0 ) {
+        if (categories?.length === 0 ) {
             return <p className="text-center py-6">Đang tải dữ liệu...</p>;
         }
 

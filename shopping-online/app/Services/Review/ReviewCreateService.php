@@ -6,13 +6,13 @@ use App\Models\Review;
 
 class ReviewCreateService
 {
-    public function handle($data, $user)
+    public function handle($data, $id)
     {
         return Review::create(
             [
-                'user_id' => $user->id,
+                'user_id' => $id,
                 'product_id' => $data['product_id'],
-                'content' => $data['comment'],
+                'comment' => $data['comment'],
                 'rate' => $data['rate'],
             ]
         );

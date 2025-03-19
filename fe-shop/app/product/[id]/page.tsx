@@ -9,8 +9,10 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
 import {Autoplay, Navigation, Pagination} from "swiper/modules";
+import ProductReviews from "@/app/Reviews";
 import {FaPencil} from "react-icons/fa6";
-import {FaTrash} from "react-icons/fa";
+import {FaPlus, FaTrash} from "react-icons/fa";
+import {StarIcon} from "@heroicons/react/20/solid";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
@@ -52,6 +54,10 @@ export default function Show({params}: { params: Promise<{ id: string }> }) {
     const [variants, setVariants] = useState<Variant[]>([]);
     const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [editingReview, setEditingReview] = useState<Review | null>(null);
+    const [isEditingReview, setIsEditingReview] = useState(false);
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
         async function fetchData() {
@@ -71,6 +77,7 @@ export default function Show({params}: { params: Promise<{ id: string }> }) {
                 const data = await res.json();
                 setProduct(data);
                 setVariants(data.variants || []);
+                setReviews(data.reviews || [])
             } catch (error) {
                 console.error("Error fetching product:", error);
             }
@@ -93,8 +100,6 @@ export default function Show({params}: { params: Promise<{ id: string }> }) {
         event.preventDefault();
 
         if (!confirm) return;
-
-        const token = localStorage.getItem('token');
 
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/addProduct`, {
@@ -119,10 +124,48 @@ export default function Show({params}: { params: Promise<{ id: string }> }) {
             const data = await res.json();
             console.log(data);
             alert("Thêm vào giỏ hàng thành công!");
+            window.location.reload();
         } catch (error) {
             console.error("Error:", error);
         }
     }
+
+    const handleSaveReview = async (event: React.FormEvent) => {
+        event.preventDefault();
+
+        if (!editingReview) return;
+
+        const reviewData = {
+            product_id: id,
+            rate: editingReview.rate,
+            comment: editingReview.comment || '',
+        };
+
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/create`;
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {"Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${token}`},
+                body: JSON.stringify(reviewData),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || `Lỗi API: ${response.status}`);
+            }
+
+            setIsEditingReview(false);
+            setEditingReview(null);
+            window.location.reload();
+        } catch (error) {
+            console.error("Lỗi khi lưu đánh giá:", error);
+            alert(`Lỗi khi lưu đánh giá: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    };
 
     return (
         <MainLayout>
@@ -268,6 +311,85 @@ export default function Show({params}: { params: Promise<{ id: string }> }) {
                                 <p className="text-sm text-gray-600 mt-4">{product?.content}</p>
                             </div>
                         </div>
+                    </div>
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 lg:pt-12 lg:pb-16">
+                        <ProductReviews reviews={reviews}
+                                onEdit={(review) => {
+                                    setEditingReview(review);
+                                    setIsEditingReview(true);
+                                }}
+                        />
+
+                        {isEditingReview && (
+                            <div className="mt-6 border rounded-lg p-4">
+                                <h3 className="text-lg font-medium mb-4">
+                                    {editingReview?.id ? 'Sửa đánh giá' : 'Thêm đánh giá mới'}
+                                </h3>
+
+                                <form onSubmit={handleSaveReview}>
+                                    {/* Đánh giá sao */}
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700">Đánh giá</label>
+                                        <div className="flex items-center mt-1">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <StarIcon
+                                                    key={star}
+                                                    className={classNames(
+                                                        (editingReview?.rate || 0) >= star ? 'text-yellow-400' : 'text-gray-300',
+                                                        'h-6 w-6 cursor-pointer'
+                                                    )}
+                                                    onClick={() => setEditingReview({...editingReview!, rate: star})}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Nội dung đánh giá */}
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700">Nội dung</label>
+                                        <textarea
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                                            rows={4}
+                                            value={editingReview?.comment || ''}
+                                            onChange={(e) => setEditingReview({...editingReview!, comment: e.target.value})}
+                                        ></textarea>
+                                    </div>
+
+                                    <div className="flex space-x-2">
+                                        <button
+                                            type="submit"
+                                            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+                                        >
+                                            {editingReview?.id ? 'Cập nhật' : 'Thêm mới'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"
+                                            onClick={() => {
+                                                setIsEditingReview(false);
+                                                setEditingReview(null);
+                                            }}
+                                        >
+                                            Hủy
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
+                        {/* Nút thêm review mới */}
+                        {!isEditingReview && (
+                            <button
+                                className="mt-4 mb-4 flex items-center text-indigo-600 hover:text-indigo-800"
+                                onClick={() => {
+                                    setEditingReview({rate: 5, comment: ''});
+                                    setIsEditingReview(true);
+                                }}
+                            >
+
+                                {token != null && <FaPlus className="mr-1"/>} {token && 'Thêm đánh giá mới'}
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

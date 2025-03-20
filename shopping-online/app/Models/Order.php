@@ -11,7 +11,7 @@ class Order extends Model
 
     protected $table = 'orders';
 
-    protected $fillable = ['user_id', 'total_price', 'status', 'payment_method', 'address_id'];
+    protected $fillable = ['user_id', 'status', 'payment_id', 'note', 'address_id'];
 
     public function user() {
         return $this->belongsTo(User::class);
@@ -23,6 +23,10 @@ class Order extends Model
 
     public function orderItems() {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function payment() {
+        return $this->hasOne(Payment::class);
     }
 
 }

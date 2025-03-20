@@ -11,7 +11,8 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\Category\CategoryController;
 use App\Http\Controllers\Admin\Product\ProductController;
 use App\Http\Controllers\User\Product\ProductController as UserProductController;
-use App\Http\Controllers\User\Order\OrderController;
+use App\Http\Controllers\User\Order\OrderController as UserOrderController;
+use App\Http\Controllers\Admin\Order\OrderController;
 
 use \App\Http\Controllers\Admin\Variant\VariantController;
 use App\Http\Controllers\Admin\AdminController;
@@ -78,13 +79,12 @@ Route::prefix('')->middleware('optional-auth')->group(function () {
         Route::post('/addProduct', [CartController::class, 'addProductToCart']);
         Route::post('/removeProduct', [CartController::class, 'deleteProductFromCart']);
         Route::post('/updateQuantity', [CartController::class, 'updateQuantity']);
+        Route::post('/updateAllQuantity', [CartController::class, 'updateAllQuantity']);
         Route::post('/checkout', [CartController::class, 'checkout']);
     });
     Route::get('/product/show/{id}', [ProductController::class, 'show']);
 
-    Route::prefix('/order')->group(function () {
-        Route::get('/', [OrderController::class, 'index']);
-    });
+
 });
 
 Route::prefix('')->middleware('auth:sanctum')->group(function () {
@@ -98,6 +98,12 @@ Route::prefix('')->middleware('auth:sanctum')->group(function () {
         Route::post('/setDefault/{id}', [AddressController::class, 'setDefault']);
     });
     Route::post('/reviews/create', [ReviewController::class, 'store']);
+    Route::prefix('/orders')->group(function () {
+        Route::get('/', [UserOrderController::class, 'index']);
+        Route::get('/checkout', [UserOrderController::class, 'checkout']);
+        Route::get('/show/{id}', [UserOrderController::class, 'show']);
+        Route::post('/create', [UserOrderController::class, 'store']);
+    });
 });
 
 Route::prefix('admin')->group(function () {
@@ -130,5 +136,10 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::post('/reviews/delete/{id}', [ReviewController::class, 'destroy']);
+
+    Route::prefix('/orders')->group(function () {
+        Route::get('/', [OrderController::class, 'index']);
+        Route::post('/updateStatus/{id}', [OrderController::class, 'updateOrderStatus']);
+    });
 
 });

@@ -25,19 +25,22 @@ class OrderRequest extends FormRequest
     {
         return [
             //
-            'product_id' => 'required|exists:products,id',
-            'variant_id' => 'nullable|exists:variants,id',
-            'quantity' => 'required|integer|min:1',
-            'address' => 'required|string',
-            'phone' => 'required|string',
+            'cartItems' => 'required|array',
+            'address_id' => 'required|integer|exists:addresses,id',
             'note' => 'nullable|string',
+            'payment_id' => 'required|integer|exists:payments,id',
         ];
     }
 
     public function messages() {
         return [
-            'product_id.exists' => 'Product not found',
-            'variant_id.exists' => 'Variant not found',
+            'cartItems.required' => 'Cart items is required.',
+            'address_id.required' => 'Address id is required.',
+            'address_id.integer' => 'Address id must be an integer.',
+            'address_id.exists' => 'Address id does not exist.',
+            'payment_id.required' => 'Payment method is required.',
+            'payment_id.integer' => 'Payment method must be an integer.',
+            'payment_id.exists' => 'Payment method does not exist.',
         ];
     }
 

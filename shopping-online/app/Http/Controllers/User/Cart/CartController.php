@@ -13,6 +13,7 @@ use App\Services\Cart\DeleteProductFromCartService;
 use App\Services\Category\CategoryListService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use function Sodium\add;
 
 class CartController extends Controller
 {
@@ -109,6 +110,25 @@ class CartController extends Controller
         $item = CartItem::findOrFail($itemId);
 
         return $this->cartUpdateService->updateQuantity($item, $quantity);
+    }
+
+    public function updateAllQuantity(Request $request) {
+
+        $cartItems = [];
+
+        foreach ($request->input('itemIds') as $itemId) {
+            $item = CartItem::findOrFail($itemId);
+
+            $this->cartUpdateService->updateQuantity($item, $request->input('quantities')[$itemId] ?? $request->input('quantity'));
+
+            $cartItems[] = $item;
+        }
+
+        return response()->json([
+            'message' => 'success',
+            'cartItems' => $cartItems,
+        ]);
+
     }
 
 }

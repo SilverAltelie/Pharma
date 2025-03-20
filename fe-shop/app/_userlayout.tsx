@@ -494,7 +494,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                     <div className="mt-6">
                       <a
-                          href="#"
+                          href="/checkout"
                           className="flex items-center justify-center rounded-md border border-transparent bg-green-700 px-5 py-2 text-base font-medium text-white shadow-xs hover:bg-green-800"
                       >
                         Thanh toán

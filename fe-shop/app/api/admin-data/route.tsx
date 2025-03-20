@@ -96,8 +96,8 @@ export async function GET() {
     cart: { id: 1, user_id: 1 },
 
     addresses: [
-      { id: 1, first_name: 'Trần', last_name: "Văn B" , user_id: 1, address: "Số 19, Đường ABC, Quận XYZ, Hà Nội" },
-      { id: 2, first_name: 'Trần', last_name: "Văn A" , user_id: 2, address: "Số 19, Đường ABA, Quận TX, Hà Nội" },
+      { id: 1, first_name: 'Trần', last_name: "Văn B" , user_id: 1, address: "Số 19, Đường ABC, Quận XYZ, Hà Nội", number: "0987654321", is_default: 1, email: "<EMAIL>" },
+      { id: 2, first_name: 'Trần', last_name: "Văn A" , user_id: 2, address: "Số 19, Đường ABA, Quận TX, Hà Nội", number: "0987654321", is_default: 0, email: "<EMAIL>" },
 
     ],
 

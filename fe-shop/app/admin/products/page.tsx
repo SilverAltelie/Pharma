@@ -27,7 +27,11 @@ export default function Products() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                    }
+                });
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }

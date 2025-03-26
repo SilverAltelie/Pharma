@@ -61,7 +61,11 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
     const [isEditingReview, setIsEditingReview] = useState(false);
 
     async function fetchData() {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/show/${id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/show/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+            }
+        });
         const data = await res.json();
         setProduct(data);
 

@@ -12,7 +12,11 @@ export default function CategoriesTable() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch("http://localhost:8000/api/admin/category");
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+                    }
+                });
 
                 if (!res.ok) {
                     throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);

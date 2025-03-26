@@ -36,10 +36,6 @@ class HomeController extends Controller
     }
 
     public function layout() {
-        $admin = Auth::user();
-
-        return response()->json([
-            'admin' => $admin,
-        ]);
+        return Auth::guard('admin')->user();
     }
 }

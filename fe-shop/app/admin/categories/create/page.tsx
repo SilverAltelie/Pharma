@@ -12,7 +12,11 @@ export default function CategoryCreate() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          }
+        });
         if (!res.ok) {
           console.error('Lỗi API:', res.status, res.statusText);
           return;

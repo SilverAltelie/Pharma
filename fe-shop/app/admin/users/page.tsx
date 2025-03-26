@@ -14,7 +14,11 @@ export default function UsersTable() {
     setIsClient(true); // Đánh dấu rằng component đang chạy trên Client
     async function fetchData() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          }
+        });
         const json = await res.json();
         setUsers(json || []);
       } catch (error) {
@@ -26,6 +30,34 @@ export default function UsersTable() {
 
   if (!isClient) {
     return <p className="text-center py-6">Đang tải dữ liệu...</p>;
+  }
+
+  const handleDelete = async (id: number) => {
+
+    const confirm = window.confirm("Bạn có chắc chắn muốn xóa người dùng này?");
+
+    if (!confirm) return;
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/delete/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+      });
+
+        if (!res.ok) {
+            throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
+        }
+
+        const json = await res.json();
+
+        alert('Xóa người dùng thành công');
+        setUsers(users.filter((user) => user.id !== id));
+    } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
+    }
   }
 
   return (
@@ -56,7 +88,7 @@ export default function UsersTable() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user, index) => (
+                {users?.map((user, index) => (
                   <tr key={index} className="border hover:bg-gray-50">
                     <td className="p-3 border">{user.name}</td>
                     <td className="p-3 border">{user.role == 'customer' ? user.address?.phone : user.phone}</td>
@@ -69,7 +101,7 @@ export default function UsersTable() {
                       >
                         <FaEdit /> Sửa
                       </button>
-                      <button className="text-red-600 hover:text-red-800 text-center flex items-center gap-1">
+                      <button onClick={() => handleDelete(user.id)} className="text-red-600 hover:text-red-800 text-center flex items-center gap-1">
                         <FaTrash /> Xóa
                       </button>
                     </td>

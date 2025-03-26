@@ -13,7 +13,11 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
 
   useEffect(() => {
     async function fetchCategories() {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        }
+      })
         const data = await res.json()
         setCategories(data)
     }

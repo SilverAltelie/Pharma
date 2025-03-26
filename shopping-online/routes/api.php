@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Address\AddressController;
+use App\Http\Controllers\Admin\Permission\PermissionController;
+use App\Http\Controllers\Admin\Role\RoleController;
 use App\Http\Controllers\User\HomeController as UserHomeController;
 use App\Http\Controllers\User\MainController;
 use App\Http\Controllers\User\Review\ReviewController;
@@ -119,12 +121,28 @@ Route::prefix('/admin/auth')->group(function () {
 Route::prefix('admin')->middleware('admin.auth')->group(function () {
 
     Route::get('/dashboard', [HomeController::class, 'dashboard']);
+    Route::get('/home', [HomeController::class, 'layout']);
+    Route::post('/logout', [AdminController::class, 'logout']);
 
     Route::prefix('/category')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
         Route::post('/create', [CategoryController::class, 'store']);
         Route::post('/update/{id}', [CategoryController::class, 'update']);
         Route::post('/delete/{id}', [CategoryController::class, 'destroy']);
+    });
+
+    Route::prefix('/permissions')->group(function () {
+        Route::get('/', [PermissionController::class, 'index']);
+        Route::post('/create', [PermissionController::class, 'store']);
+        Route::post('/update/{id}', [PermissionController::class, 'update']);
+        Route::post('/delete/{id}', [PermissionController::class, 'destroy']);
+    });
+
+    Route::prefix('/roles')->group(function () {
+        Route::get('/', [RoleController::class, 'index']);
+        Route::post('/create', [RoleController::class, 'store']);
+        Route::post('/update/{id}', [RoleController::class, 'update']);
+        Route::post('/delete/{id}', [RoleController::class, 'destroy']);
     });
 
     Route::prefix('/product')->group(function () {
@@ -151,9 +169,18 @@ Route::prefix('admin')->middleware('admin.auth')->group(function () {
 
     Route::prefix('/users')->group(function () {
         Route::get('/', [UserController::class, 'index']);
-        Route::get('/show/{id}', [AdminController::class, 'show']);
-        Route::post('/update/{id}', [AdminController::class, 'update']);
-        Route::post('/delete/{id}', [AdminController::class, 'destroy']);
+        Route::post('/create', [UserController::class, 'store']);
+        Route::get('/edit/{id}', [UserController::class, 'edit']);
+        Route::post('/update/{id}', [UserController::class, 'update']);
+        Route::post('/delete/{id}', [UserController::class, 'destroy']);
+    });
+
+    Route::prefix('permissions')->group(function () {
+        Route::get('/', [PermissionController::class, 'index']);
+        Route::post('/create', [PermissionController::class, 'store']);
+        Route::get('/edit/{id}', [PermissionController::class, 'edit']);
+        Route::post('/update/{id}', [PermissionController::class, 'update']);
+        Route::post('/delete/{id}', [PermissionController::class, 'destroy']);
     });
 
 });

@@ -93,7 +93,7 @@ const ProductsOrderTable = () => {
                             <div className="mt-4 space-y-4">
                                 {order.order_items.map((item, idx) => (
                                     <div key={idx} className="flex gap-4">
-                                        <img src={'data:image/jpeg;base64,' + item.product.images[0].image}
+                                        <img src={'data:image/jpeg;base64,' + item.product.images[0]?.image}
                                              alt={item.product_name} className="w-24 h-24 object-cover rounded"/>
                                         <div className="flex-1">
                                             <div className="flex justify-between items-center">

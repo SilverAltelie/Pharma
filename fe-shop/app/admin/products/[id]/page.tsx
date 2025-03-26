@@ -226,7 +226,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                     }}
                                     className="w-full rounded-lg overflow-hidden"
                                 >
-                                    {product.images.map((image: any, index: number) => (
+                                    {product.images?.map((image: any, index: number) => (
                                         <SwiperSlide key={image.id}>
                                             <img
                                                 src={'data:image/jpeg;base64,' + image.image}
@@ -259,17 +259,17 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                                 key={rating}
                                                 aria-hidden="true"
                                                 className={classNames(
-                                                    reviews.length > 0 && reviews[0].rate > rating ? 'text-gray-900' : 'text-gray-200',
+                                                    reviews?.length > 0 && reviews[0]?.rate > rating ? 'text-gray-900' : 'text-gray-200',
                                                     'size-5 shrink-0 text-yellow-400',
                                                 )}
                                             />
                                         ))}
                                     </div>
                                     <p className="sr-only text-yellow-400">
-                                        {reviews.length > 0 ? reviews[0].rate : 0} out of 5 stars
+                                        {reviews?.length > 0 ? reviews[0]?.rate : 0} out of 5 stars
                                     </p>
                                     <span className="ml-3 text-sm font-medium text-indigo-600">
-                                        {reviews.length} reviews
+                                        {reviews?.length} reviews
                                     </span>
                                 </div>
                             </div>

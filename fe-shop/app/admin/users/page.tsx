@@ -14,9 +14,9 @@ export default function UsersTable() {
     setIsClient(true); // Đánh dấu rằng component đang chạy trên Client
     async function fetchData() {
       try {
-        const res = await fetch("/api/admin-data");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`);
         const json = await res.json();
-        setUsers(json.users || []);
+        setUsers(json || []);
       } catch (error) {
         console.error("Lỗi khi gọi API:", error);
       }
@@ -59,7 +59,7 @@ export default function UsersTable() {
                 {users.map((user, index) => (
                   <tr key={index} className="border hover:bg-gray-50">
                     <td className="p-3 border">{user.name}</td>
-                    <td className="p-3 border">{user.number}</td>
+                    <td className="p-3 border">{user.role == 'customer' ? user.address?.phone : user.phone}</td>
                     <td className="p-3 border">{user.email}</td>
                     <td className="p-3 border">{user.role}</td>
                     <td className="p-3 border text-center">

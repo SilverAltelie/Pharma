@@ -42,20 +42,4 @@ class RegisterRequest extends FormRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator)
-    {
-        throw new ValidationException($validator, response()->json([
-            'status' => 'error',
-            'message' => 'Validation failed, please check your inputs.',
-            'errors' => $validator->errors(),
-        ], 422));
-    }
-
-    public function passedValidation()
-    {
-        response()->json([
-            'status' => 'success',
-            'message' => 'Validation passed successfully.',
-        ])->send();
-    }
 }

@@ -56,21 +56,4 @@ class AddressRequest extends FormRequest
             'is_default.max' => 'The is_default field must not exceed 255 characters.',
         ];
     }
-
-    protected function failedValidation(Validator $validator)
-    {
-        throw new ValidationException($validator, response()->json([
-            'status' => 'error',
-            'message' => 'Validation failed, please check your inputs.',
-            'errors' => $validator->errors(),
-        ], 422));
-    }
-
-    public function passedValidation()
-    {
-        response()->json([
-            'status' => 'success',
-            'message' => 'Validation passed successfully.',
-        ])->send();
-    }
 }

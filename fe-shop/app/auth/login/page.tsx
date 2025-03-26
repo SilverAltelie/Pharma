@@ -1,6 +1,5 @@
 'use client';
 
-import { loginService } from '@/app/api/auth/login/route';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -20,7 +19,7 @@ export default function Login() {
         method: 'POST',
         headers: {
           'Content-Type':'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
         },
         body: JSON.stringify({email, password}),
       });

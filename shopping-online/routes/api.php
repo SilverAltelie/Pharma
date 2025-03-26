@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Address\AddressController;
-use App\Http\Controllers\User\HomeController;
+use App\Http\Controllers\User\HomeController as UserHomeController;
 use App\Http\Controllers\User\MainController;
 use App\Http\Controllers\User\Review\ReviewController;
 use App\Models\User;
@@ -17,6 +17,8 @@ use App\Http\Controllers\Admin\Order\OrderController;
 use \App\Http\Controllers\Admin\Variant\VariantController;
 use App\Http\Controllers\Admin\AdminController;
 use \App\Http\Controllers\User\Cart\CartController;
+use \App\Http\Controllers\Admin\User\UserController;
+use \App\Http\Controllers\Admin\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +35,7 @@ use \App\Http\Controllers\User\Cart\CartController;
     return $request->user();
 });*/
 Route::prefix('/')->group(function () {
-    Route::post('login', [AuthController::class, 'login']);
+    Route::post('login', [AuthController::class, 'login'])->name('login');
 
     Route::post('register', [AuthController::class, 'register']);
 
@@ -63,7 +65,7 @@ Route::prefix('/')->group(function () {
 
 Route::prefix('')->middleware('optional-auth')->group(function () {
 
-    Route::get('/home', [HomeController::class, 'index']);
+    Route::get('/home', [UserHomeController::class, 'index']);
     Route::get('/main', [MainController::class, 'index']);
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/product', [ProductController::class, 'index']);
@@ -80,11 +82,14 @@ Route::prefix('')->middleware('optional-auth')->group(function () {
         Route::post('/removeProduct', [CartController::class, 'deleteProductFromCart']);
         Route::post('/updateQuantity', [CartController::class, 'updateQuantity']);
         Route::post('/updateAllQuantity', [CartController::class, 'updateAllQuantity']);
-        Route::post('/checkout', [CartController::class, 'checkout']);
     });
     Route::get('/product/show/{id}', [ProductController::class, 'show']);
 
-
+    Route::prefix('/order')->group(function () {
+        Route::get('/', [UserOrderController::class, 'index']);
+        Route::get('/checkout', [UserOrderController::class, 'checkout']);
+        Route::post('/create', [UserOrderController::class, 'store']);
+    });
 });
 
 Route::prefix('')->middleware('auth:sanctum')->group(function () {
@@ -106,12 +111,14 @@ Route::prefix('')->middleware('auth:sanctum')->group(function () {
     });
 });
 
-Route::prefix('admin')->group(function () {
+Route::prefix('/admin/auth')->group(function () {
+    Route::post('/login', [AdminController::class, 'login']);
+    Route::post('/register', [AdminController::class, 'register']);
+});
 
-    Route::prefix('/auth')->group(function () {
-        Route::post('/login', [AdminController::class, 'login']);
-        Route::post('/register', [AdminController::class, 'register']);
-    });
+Route::prefix('admin')->middleware('admin.auth')->group(function () {
+
+    Route::get('/dashboard', [HomeController::class, 'dashboard']);
 
     Route::prefix('/category')->group(function () {
         Route::get('/', [CategoryController::class, 'index']);
@@ -140,6 +147,13 @@ Route::prefix('admin')->group(function () {
     Route::prefix('/orders')->group(function () {
         Route::get('/', [OrderController::class, 'index']);
         Route::post('/updateStatus/{id}', [OrderController::class, 'updateOrderStatus']);
+    });
+
+    Route::prefix('/users')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+        Route::get('/show/{id}', [AdminController::class, 'show']);
+        Route::post('/update/{id}', [AdminController::class, 'update']);
+        Route::post('/delete/{id}', [AdminController::class, 'destroy']);
     });
 
 });

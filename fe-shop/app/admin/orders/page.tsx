@@ -59,7 +59,7 @@ const ProductsOrderTable = () => {
         }
     }
 
-    const handleStatusChange = async (orderId: number, status: number) => {
+    const handleStatusChange = async (orderId: number, status: string) => {
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/updateStatus/${orderId}`, {
                 method: 'POST',
@@ -113,7 +113,7 @@ const ProductsOrderTable = () => {
                         }, index: number) => (
                             <div key={order.id} className="bg-white p-6 shadow-xl rounded-lg border-2">
                                 {/* Order Header */}
-                                <div className="grid grid-cols-3 gap-4 border-b pb-4 text-sm text-gray-700">
+                                <div className="grid grid-cols-4 gap-4 border-b pb-4 text-sm text-gray-700">
                                     <div>
                                         <p className="font-semibold">Mã đơn hàng</p>
                                         <p>{order.id}</p>
@@ -135,13 +135,17 @@ const ProductsOrderTable = () => {
                                         <p className="font-semibold text-sm">Tổng giá trị đơn hàng</p>
                                         <p className="font-bold text-red-600">{totalAmount} VND</p>
                                     </div>
+                                    <div>
+                                        <p className="font-semibold text-sm">Ghi chú đơn hàng</p>
+                                        <p className="font-bold text-gray-900">{order.note}</p>
+                                    </div>
                                 </div>
 
                                 {/* Order Items */}
                                 <div className="mt-4 space-y-4">
                                     {order.order_items.map((item: any, index: number) => (
                                         <div key={index} className="flex gap-4">
-                                            <img src={'data:image/jpeg;base64,' + item.product.images[0].image}
+                                            <img src={'data:image/jpeg;base64,' + item.product.images[0]?.image}
                                                  alt={item.product_name}
                                                  className="w-24 h-24 object-cover rounded"/>
                                             <div className="flex-1">
@@ -272,14 +276,14 @@ const ProductsOrderTable = () => {
                                                 <div className="mb-1 flex items-center gap-2 text-sm text-gray-700">
                                                 <select
                                                     value={order.status}
-                                                    onChange={(e) => handleStatusChange(order.id, Number(e.target.value))}
+                                                    onChange={(e) => handleStatusChange(order.id, (e.target.value))}
                                                     className={`block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${colorStatus(order.status)}`}
                                                 >
-                                                    <option value={0}>Đã đặt hàng</option>
-                                                    <option value={1}>Đã trả tiền</option>
-                                                    <option value={2}>Đang giao hàng</option>
-                                                    <option value={3}>Đã giao hàng</option>
-                                                    <option value={4}>Đã hủy</option>
+                                                    <option value={'0'}>Đã đặt hàng</option>
+                                                    <option value={'1'}>Đã trả tiền</option>
+                                                    <option value={'2'}>Đang giao hàng</option>
+                                                    <option value={'3'}>Đã giao hàng</option>
+                                                    <option value={'4'}>Đã hủy</option>
                                                 </select>
 
                                                     <button onClick={() => setIsEditStatus(!isEditStatus)} className="text-blue-600 font-semibold">

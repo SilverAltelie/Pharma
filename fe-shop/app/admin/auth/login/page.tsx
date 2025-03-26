@@ -34,7 +34,7 @@ export default function Login() {
       const data = await res.json();
       const token = data.token;
 
-      localStorage.setItem('token', token);
+      localStorage.setItem('adminToken', token);
       alert('Đăng nhập thành công');
       router.push('/admin');
     } catch (err: any) {
@@ -45,14 +45,6 @@ export default function Login() {
 
     return (
       <>
-        {/*
-          This example requires updating your template:
-  
-          ```
-          <html class="h-full bg-white">
-          <body class="h-full">
-          ```
-        */}
         <div className="bg-white flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 h-screen">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <img

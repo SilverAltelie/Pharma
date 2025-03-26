@@ -5,37 +5,35 @@ import { FaBox, FaChartLine, FaList, FaUsers } from "react-icons/fa";
 import AdminLayout from "./admin-layout";
 
 export default function Dashboard() {
-  interface Order {
-    id: number;
-    status: number;
-  }
 
-  interface OrderItem {
-    price: number;
-    order_id: number;
-    product_name: string;
-    quantity: number;
-  }
-
-  interface AdminData {
-    recentCustomers: any;
-    orders: Order[];
-    order_items: OrderItem[];
-  }
-
-  const [data, setData] = useState<AdminData | null>(null);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
-        try {
-          const res = await fetch("/api/admin-data");
-          const json = await res.json();
-          setData(json);
-        } catch (error) {
-          console.error("Lỗi khi gọi api: ", error);
+      try {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+          throw new Error('Token không tồn tại');
         }
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/dashboard`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Lỗi khi gọi API');
+        }
+
+        const json = await res.json();
+        setData(json);
+      } catch (error) {
+        console.error("Lỗi khi gọi api: ", error);
       }
-      fetchData();
+    }
+
+    fetchData();
   }, []);
 
   if (!data) return <p>Loading...</p>;
@@ -48,7 +46,7 @@ export default function Dashboard() {
     if (!completedOrdersSet.has(item.order_id)) return total; // Bỏ qua order chưa hoàn thành
     return total + item.price * item.quantity;
   }, 0);
-  
+
   
 //   const totalCompletedOrderValue = completedOrders.reduce((total, order) => {
 //     const orderItems = data.order_items.filter(item => item.order_id === order.id);
@@ -89,14 +87,14 @@ export default function Dashboard() {
               <FaUsers className="text-purple-600 text-4xl" />
               <div>
                 <p className="text-lg font-semibold">Khách hàng gần đây</p>
-                <p className="text-2xl font-bold text-purple-600">{data.recentCustomers.length}</p>
+                <p className="text-2xl font-bold text-purple-600">{data.customers.length}</p>
               </div>
             </div>
             <div className="p-4 bg-white shadow rounded-lg flex items-center space-x-4">
               <FaList className="text-purple-600 text-4xl" />
               <div>
                 <p className="text-lg font-semibold">Danh mục đã tạo</p>
-                <p className="text-2xl font-bold text-purple-600">{data.recentCustomers.length}</p>
+                <p className="text-2xl font-bold text-purple-600">{data.customers.length}</p>
               </div>
             </div>
           </div>
@@ -113,13 +111,16 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map((order) => (
-                  <tr key={order.id} className="border-t">
-                    <td className="p-2">{order.id}</td>
-                    <td className="p-2">{data.order_items.find((item) => item.order_id === order.id)?.product_name}</td>
-                    <td className="p-2">{data.order_items.find((item) => item.order_id === order.id)?.quantity}</td>
-                  </tr>
-                ))}
+              {recentOrders.map((order) => {
+                const orderItems = data.order_items.filter((item) => item.order_id === order.id);
+                return orderItems.map((item) => (
+                    <tr key={`${order.id}-${item.id}`} className="border-t">
+                      <td className="p-2">{order.id}</td>
+                      <td className="p-2">{item.product?.title}</td>
+                      <td className="p-2">{item.quantity}</td>
+                    </tr>
+                ));
+              })}
               </tbody>
             </table>
           </div>
@@ -137,12 +138,12 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {data?.recentCustomers?.map((customer: any, index: number) => (
+                {data?.customers?.map((customer: any, index: number) => (
                   <tr key={index} className="border-t">
-                    <td className="p-2">{customer.id}</td>
+                    <td className="p-2">{index}</td>
                     <td className="p-2">{customer.name}</td>
                     <td className="p-2">{customer.email}</td>
-                    <td className="p-2">{customer.number}</td>
+                    <td className="p-2">{customer.addresses[0]?.phone}</td>
                   </tr>
                 ))}
               </tbody>

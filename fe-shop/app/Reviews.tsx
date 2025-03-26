@@ -28,12 +28,11 @@ export default function ProductReviews({
                             onDelete
                         }: ProductReviewsProps) {
     const [expanded, setExpanded] = useState<boolean>(false);
-    const averageRating = reviews.length > 0
+    const averageRating = reviews?.length > 0
         ? reviews.reduce((sum, review) => sum + review.rate, 0) / reviews.length
         : 0;
 
-    // Hiển thị tối đa 3 đánh giá hoặc tất cả nếu đã nhấn "Xem thêm"
-    const displayedReviews = expanded ? reviews : reviews.slice(0, 3);
+    const displayedReviews = expanded ? reviews ?? [] : reviews?.slice(0, 3) ?? [];
 
     return (
         <div className="mt-8 border-t border-gray-200 pt-8">
@@ -54,11 +53,11 @@ export default function ProductReviews({
                     ))}
                 </div>
                 <p className="ml-3 text-sm font-medium text-gray-900">
-                    {averageRating.toFixed(1)} ({reviews.length} {reviews.length === 1 ? 'đánh giá' : 'đánh giá'})
+                    {averageRating.toFixed(1)} ({reviews?.length} {reviews?.length === 1 ? 'đánh giá' : 'đánh giá'})
                 </p>
             </div>
 
-            {reviews.length > 0 ? (
+            {reviews?.length > 0 ? (
                 <div className="mt-6 space-y-6 divide-y divide-gray-200">
                     {displayedReviews.map((review, index) => (
                         <div key={review.id || index} className="pt-6">
@@ -122,7 +121,7 @@ export default function ProductReviews({
                 <p className="mt-4 text-sm text-gray-500">Sản phẩm này chưa có đánh giá nào.</p>
             )}
 
-            {reviews.length > 3 && !expanded && (
+            {reviews?.length > 3 && !expanded && (
                 <button
                     className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-500"
                     onClick={() => setExpanded(true)}

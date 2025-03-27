@@ -2,7 +2,7 @@
 
 namespace App\Services\Admin\Role;
 
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 
 class RoleDeleteService
 {
@@ -10,8 +10,6 @@ class RoleDeleteService
     {
         $role->delete();
 
-        return response()->json([
-            'message' => 'Role deleted successfully'
-        ]);
+        return response()->json(['message' => 'Role deleted successfully'], 200);
     }
 }

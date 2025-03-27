@@ -24,35 +24,26 @@ class UserController extends Controller
         $this->userCreateService = $userCreateService;
         $this->userUpdateService = $userUpdateService;
         $this->userDeleteService = $userDeleteService;
+
+        $permissions = config('permission.user');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
     public function index()
     {
 
-        $users = User::paginate(10)->each(function ($user) {
-            $user->type = 'user';
-        })->merge(Admin::paginate(10)->each(function ($admin) {
-            $admin->type = 'admin';
-        }));
-
-        $defaultAddresses = Address::whereIn('user_id', $users->pluck('id'))
-            ->where('is_default', 1)
-            ->get()
-            ->keyBy('user_id');
-
-        foreach ($users as $user) {
-
-            if ($user instanceof User) {
-                $user->address = $defaultAddresses->get($user->id);
-            }
-
-
-        }
+        $users = User::paginate(10)->each(fn ($user) => $user->type = 'user')
+            ->merge(Admin::paginate(10)->each(fn ($admin) => $admin->type = 'admin'));
 
         foreach ($users as $user) {
             if ($user instanceof User) {
+                $user->address = Address::where('user_id', $user->id)->where('is_default', 1)->first();
                 $user->role = 'customer';
-            } elseif ($user instanceof Admin) {
-                $user->role = $user->userRoles()->with('role')->get()->pluck('role.name')->first();
+            } else {
+                $user->address = null;
+                $user->role = $user->roles->pluck('name')->first();
             }
         }
 
@@ -67,28 +58,18 @@ class UserController extends Controller
 
         $roles = Role::all();
 
-        if (User::where('id', $id)->exists()) {
-            $user = User::findOrFail($id);
-
+        if ($user = User::find($id)) {
             $user->address = Address::where('user_id', $id)->where('is_default', 1)->first();
-
             $user->phone = $user->address->phone ?? null;
-
             $user->role = '0';
-        } else if (Admin::where('id', $id)->exists()) {
-            $user = Admin::findOrFail($id);
-
+        } else if ($user = Admin::find($id)) {
             $user->address = null;
-
-            $user->role = $user->userRoles()->with('role')->get()->pluck('role.id')->first();
+            $user->role = $user->roles->pluck('id')->first();
         } else {
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        return response()->json([
-            'user' => $user,
-            'roles' => $roles],
-            200);
+        return response()->json(['user' => $user, 'roles' => $roles], 200);
     }
     public function update(UserRequest $request, $id) {
         return $this->userUpdateService->handle($request->validated(), $id);

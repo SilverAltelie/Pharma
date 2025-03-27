@@ -4,6 +4,7 @@ namespace App\Services\Admin\User;
 
 use App\Models\Admin;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class UserCreateService
 {
@@ -16,7 +17,7 @@ class UserCreateService
                 'password' => bcrypt($data['password']),
             ]);
 
-            if ($data['address']) {
+            if (!empty($data['address'])) {
                 $user->addresses()->create([
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'],
@@ -34,11 +35,11 @@ class UserCreateService
                 'phone' => $data['phone'],
             ]);
 
-            $user->userRole()->create([
-                'role_id' => $data['role_id'],
-            ]);
+            $role = Role::findById($data['role_id'], 'admin'); // chỉ rõ guard 'admin' ở đây
+            $user->assignRole($role);
         }
 
         return $user;
     }
+
 }

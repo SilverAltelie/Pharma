@@ -17,7 +17,7 @@ class LoginService {
             throw new \Exception('Mật khẩu không đúng', 401);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token', expiresAt: now()->addDays())->plainTextToken;
 
         return ['token' => $token];
     }

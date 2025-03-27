@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Permission;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Permission\PermissionRequest;
-use App\Models\Permission;
+use Spatie\Permission\Models\Permission;
 use App\Services\Admin\Permission\PermissionCreateService;
 use App\Services\Admin\Permission\PermissionDeleteService;
 use App\Services\Admin\Permission\PermissionUpdateService;
@@ -23,10 +23,16 @@ class PermissionController extends Controller
         $this->permissionCreateService = $permissionCreateService;
         $this->permissionUpdateService = $permissionUpdateService;
         $this->permissionDeleteService = $permissionDeleteService;
+
+        $permissions = config('permission.permission');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
 
     public function index() {
-        return Permission::all();
+        return Permission::withCount('roles')->get();
     }
 
     public function store(PermissionRequest $request)

@@ -21,6 +21,12 @@ class CategoryController extends Controller
         $this->categoryCreateService = $categoryCreateService;
         $this->categoryUpdateService = $categoryUpdateService;
         $this->categoryDeleteService = $categoryDeleteService;
+
+        $permissions = config('permission.category');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
 
     /**

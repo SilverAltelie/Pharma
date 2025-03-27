@@ -2,12 +2,15 @@
 
 namespace App\Services\Admin\Role;
 
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
 
 class RoleCreateService
 {
     public function handle(array $data): Role
     {
-        return Role::create($data);
+        return Role::create([
+            'name' => $data['name'],
+            'guard_name' => 'admin',
+            ]);
     }
 }

@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Admin\Role;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Role\RoleRequest;
-use App\Models\Role;
+use Spatie\Permission\Models\Role;
+use App\Services\Admin\Role\RoleAddPermissionService;
 use App\Services\Admin\Role\RoleCreateService;
 use App\Services\Admin\Role\RoleDeleteService;
 use App\Services\Admin\Role\RoleUpdateService;
@@ -17,15 +18,31 @@ class RoleController extends Controller
     protected $roleDeleteService;
 
     protected $roleUpdateService;
+    protected $roleAddPermissionService;
 
-    public function __construct(RoleCreateService $roleCreateService, RoleUpdateService $roleUpdateService, RoleDeleteService $roleDeleteService) {
+    public function __construct(RoleCreateService $roleCreateService, RoleUpdateService $roleUpdateService, RoleDeleteService $roleDeleteService, RoleAddPermissionService $roleAddPermissionService) {
         $this->roleCreateService = $roleCreateService;
         $this->roleDeleteService = $roleDeleteService;
         $this->roleUpdateService = $roleUpdateService;
+        $this->roleAddPermissionService = $roleAddPermissionService;
+
+        $permissions = config('permission.role');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
 
-    public function index() {
-        return Role::with('userRoles')->get();
+    public function index()
+    {
+        $roles = Role::with('permissions')->get();
+
+        foreach ($roles as $role) {
+            $role->admins_count = $role->users->count();
+            $role->permissions_count = $role->permissions->count();
+        }
+
+        return $roles;
     }
 
     public function store(RoleRequest $request) {
@@ -41,5 +58,10 @@ class RoleController extends Controller
     public function destroy($id) {
         $role = Role::find($id);
         return $this->roleDeleteService->handle($role);
+    }
+
+    public function addPermission(Request $request, $id) {
+        $role = Role::findOrFail($id);
+        return $this->roleAddPermissionService->handle($role, $request);
     }
 }

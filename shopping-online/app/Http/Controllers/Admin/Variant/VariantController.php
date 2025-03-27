@@ -23,6 +23,12 @@ class VariantController extends Controller
         $this->variantCreateService = $variantCreateService;
         $this->variantUpdateService = $variantUpdateService;
         $this->variantDeleteService = $variantDeleteService;
+
+        $permissions = config('permission.variant');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
 
     public function index()

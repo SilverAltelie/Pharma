@@ -4,6 +4,7 @@ namespace App\Services\Admin\User;
 
 use App\Models\Admin;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class UserUpdateService
 {
@@ -24,7 +25,7 @@ class UserUpdateService
                 'password' => bcrypt($data['password']),
             ]);
 
-            if ($data['address']) {
+            if (!empty($data['address'])) {
                 $user->addresses()->update([
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'],
@@ -33,7 +34,6 @@ class UserUpdateService
                     'email' => $data['email'],
                 ]);
             }
-
         } else if ($user instanceof User && $data['role_id'] != 0) {
             $temp = Admin::create([
                 'name' => $data['name'],
@@ -42,15 +42,15 @@ class UserUpdateService
                 'phone' => $data['phone'],
             ]);
 
-            $temp->userRoles()->create([
-                'role_id' => $data['role_id'],
-            ]);
+            $role = Role::findById($data['role_id'], 'admin'); // chỉ rõ guard_name ở đây
+            $temp->assignRole($role);
 
             $user->addresses()->delete();
             $user->delete();
 
             $user = $temp;
         } else if ($user instanceof Admin && $data['role_id'] != 0) {
+            $role = Role::findById($data['role_id'], 'admin'); // chỉ rõ guard_name
             $user->update([
                 'name' => $data['name'],
                 'email' => $data['email'],
@@ -58,16 +58,7 @@ class UserUpdateService
                 'phone' => $data['phone'],
             ]);
 
-            if ($user->userRoles()->exists()) {
-                $user->userRoles()->update([
-                    'role_id' => $data['role_id'],
-                ]);
-            } else {
-                $user->userRoles()->create([
-                    'role_id' => $data['role_id'],
-                ]);
-            }
-
+            $user->syncRoles([$role]);
         } else if ($user instanceof Admin && $data['role_id'] == 0) {
             $temp = User::create([
                 'name' => $data['name'],
@@ -75,8 +66,8 @@ class UserUpdateService
                 'password' => bcrypt($data['password']),
             ]);
 
-            if ($data['address']) {
-                $user->addresses()->update([
+            if (!empty($data['address'])) {
+                $temp->addresses()->update([
                     'first_name' => $data['first_name'],
                     'last_name' => $data['last_name'],
                     'address' => $data['address'],
@@ -85,8 +76,8 @@ class UserUpdateService
                 ]);
             }
 
+            $user->syncRoles([]);
             $user->delete();
-            $user->userRoles()->delete();
 
             $user = $temp;
         } else {

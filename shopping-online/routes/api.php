@@ -143,6 +143,7 @@ Route::prefix('admin')->middleware('admin.auth')->group(function () {
         Route::post('/create', [RoleController::class, 'store']);
         Route::post('/update/{id}', [RoleController::class, 'update']);
         Route::post('/delete/{id}', [RoleController::class, 'destroy']);
+        Route::post('/addPermission/{id}', [RoleController::class, 'addPermission']);
     });
 
     Route::prefix('/product')->group(function () {

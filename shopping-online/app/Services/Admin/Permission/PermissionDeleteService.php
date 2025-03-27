@@ -2,8 +2,7 @@
 
 namespace App\Services\Admin\Permission;
 
-use App\Models\Permission;
-
+use Spatie\Permission\Models\Permission;
 class PermissionDeleteService
 {
     public function handle($id)

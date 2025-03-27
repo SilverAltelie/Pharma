@@ -21,6 +21,12 @@ class ProductController extends Controller
         $this->productCreateService = $productCreateService;
         $this->productUpdateService = $productUpdateService;
         $this->productDeleteService = $productDeleteService;
+
+        $permissions = config('permission.product');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
     /**
      * Display a listing of the resource.

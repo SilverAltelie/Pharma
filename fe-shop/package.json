@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/algoliasearch": "^4.0.4",
     "@types/bootstrap": "^5.2.10",
     "@types/jquery": "^3.5.32",
     "@types/node": "^20",

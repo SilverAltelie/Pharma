@@ -69,7 +69,7 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
 
         console.log(payload);
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/update/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/update/${id}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -79,7 +79,11 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             body: JSON.stringify(payload),
         });
 
-        if (response.ok) {
+        if (res.status == 403) {
+            window.location.href = `/admin/permissions/cannotaccess`;
+        }
+
+        if (res.ok) {
             alert("Sản phẩm đã được cập nhật thành công!");
             router.push('/admin/products');
         } else {
@@ -91,8 +95,14 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
         async function fetchData() {
             try {
             const productRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`);
+                if (productRes.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
             const ProductJson = await productRes.json();
             const categoryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`);
+                if (categoryRes.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
             const categoryJson = await categoryRes.json();
             setCategories(categoryJson);
             setProduct(ProductJson.data.find((product: any) => product.id == id));

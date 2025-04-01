@@ -75,7 +75,7 @@ export default function ProductCreate() {
             images: imageBase64List    // Mảng ảnh base64
         };
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/create`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -85,7 +85,11 @@ export default function ProductCreate() {
             body: JSON.stringify(payload),
         });
 
-        if (response.ok) {
+        if (res.status == 403) {
+            window.location.href = `/admin/permissions/cannotaccess`;
+        }
+
+        if (res.ok) {
             alert("Sản phẩm và ảnh đã được lưu vào database!");
             router.push('/admin/products');
         } else {
@@ -102,6 +106,11 @@ export default function ProductCreate() {
                     'Accept': 'application/json',
                 }
             });
+
+                if (res.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
+
             const json = await res.json();
             setCategories(json);
             } catch (error) {

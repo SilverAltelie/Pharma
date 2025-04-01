@@ -66,6 +66,11 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                 'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
             }
         });
+
+        if (res.status == 403) {
+            window.location.href = `/admin/permissions/cannotaccess`;
+        }
+
         const data = await res.json();
         setProduct(data);
 
@@ -99,20 +104,24 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
         const method = "POST";
 
         try {
-            const response = await fetch(url, {
+            const res = await fetch(url, {
                 method,
                 headers: { "Content-Type": "application/json", "Accept": "application/json" },
                 body: JSON.stringify(variantData),
             });
 
-            console.log("Full response:", response);
+            if (res.status == 403) {
+                window.location.href = `/admin/permissions/cannotaccess`;
+            }
 
-            const result = await response.json();
+            console.log("Full response:", res);
+
+            const result = await res.json();
             console.log("API Response:", result);
 
-            if (!response.ok) {
-                console.error(`Lỗi API - Status Code: ${response.status}`);
-                throw new Error(result.message || `Lỗi API: ${response.status}`);
+            if (!res.ok) {
+                console.error(`Lỗi API - Status Code: ${res.status}`);
+                throw new Error(result.message || `Lỗi API: ${res.status}`);
             }
             fetchData()
 
@@ -138,7 +147,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
         const url = `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/create`;
 
         try {
-            const response = await fetch(url, {
+            const res = await fetch(url, {
                 method: "POST",
                 headers: {"Content-Type": "application/json",
                             "Accept": "application/json",
@@ -146,10 +155,14 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                 body: JSON.stringify(reviewData),
             });
 
-            const result = await response.json();
+            if (res.status == 403) {
+                window.location.href = `/admin/permissions/cannotaccess`;
+            }
 
-            if (!response.ok) {
-                throw new Error(result.message || `Lỗi API: ${response.status}`);
+            const result = await res.json();
+
+            if (!res.ok) {
+                throw new Error(result.message || `Lỗi API: ${res.status}`);
             }
 
             setIsEditingReview(false);

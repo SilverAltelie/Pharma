@@ -4,6 +4,7 @@ import {FaCheckCircle, FaEdit, FaTrash} from "react-icons/fa";
 import AdminLayout from "../admin-layout";
 import {useState, useEffect} from "react";
 import {useRouter} from "next/navigation";
+import {FaWebAwesome} from "react-icons/fa6";
 
 export default function UsersTable() {
     const [roles, setRoles] = useState<any[]>([]);
@@ -24,6 +25,11 @@ export default function UsersTable() {
                         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
                     }
                 });
+
+                if (res.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
+
                 const json = await res.json();
                 setRoles(json || []);
             } catch (error) {
@@ -44,6 +50,10 @@ export default function UsersTable() {
                 },
                 body: JSON.stringify({name}),
             });
+
+            if (res.status == 403) {
+                window.location.href = `/admin/permissions/cannotaccess`;
+            }
 
             if (!res.ok) {
                 throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
@@ -71,6 +81,10 @@ export default function UsersTable() {
                     "Authorization": `Bearer ${localStorage.getItem('adminToken')}`,
                 },
             });
+
+            if (res.status == 403) {
+                window.location.href = `/admin/permissions/cannotaccess`;
+            }
 
             if (!res.ok) {
                 throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
@@ -105,7 +119,7 @@ export default function UsersTable() {
 
             const json = await res.json();
 
-            setRoles(roles.map(role => role.id === roleId ? {...role, name: editedRoleName} : role));
+            setRoles(roles?.map(role => role.id === roleId ? {...role, name: editedRoleName} : role));
             setEditingRoleId(null);
         } catch (error) {
             console.error("Lỗi khi gọi API:", error);
@@ -129,12 +143,7 @@ export default function UsersTable() {
                             Thêm vai trò
                         </button>
 
-                        <button
-                            onClick={() => router.push('/admin/roles')}
-                            className="bg-yellow-600 text-white px-2 py-2 rounded-md hover:bg-yellow-700 transition"
-                        >
-                            Chỉnh sửa quyền
-                        </button>
+
                     </div>
                 </div>
 
@@ -157,7 +166,7 @@ export default function UsersTable() {
                 )}
 
                 <div className="flex-1 overflow-auto p-6">
-                    {roles.length === 0 ? (
+                    {roles?.length === 0 ? (
                         <p className="text-center py-6">Không có phân quyền nào được đưa vào</p>
                     ) : (
                         <table className="w-full border border-gray-200 bg-white rounded-lg shadow-md">
@@ -165,11 +174,12 @@ export default function UsersTable() {
                             <tr>
                                 <th className="p-3 border text-left">Tên vai trò</th>
                                 <th className="p-3 border text-left">Số người dùng</th>
+                                <th className="p-3 border text-left">Số quyền sở hữu</th>
                                 <th className="p-1 border text-center">Hành động</th>
                             </tr>
                             </thead>
                             <tbody>
-                            {roles.map((role, index) => (
+                            {roles?.map((role, index) => (
                                 <tr key={index} className="border hover:bg-gray-50">
                                     <td className="p-3 border">
                                         {editingRoleId === role.id ? (
@@ -183,7 +193,8 @@ export default function UsersTable() {
                                             role.name
                                         )}
                                     </td>
-                                    <td className="p-3 border">{role.user_roles ? role.user_roles.length : 0}</td>
+                                    <td className="p-3 border">{role.admins_count ?? 0}</td>
+                                    <td className="p-3 border">{role.permissions_count ?? 0}</td>
                                     <td className="p-3 border text-center">
                                         {editingRoleId === role.id ? (
                                             <button
@@ -204,6 +215,12 @@ export default function UsersTable() {
                                             onClick={() => handleDeleteRole(role.id)}
                                             className="text-red-600 hover:text-red-800 text-center flex items-center gap-1">
                                             <FaTrash/> Xóa
+                                        </button>
+                                        <button
+                                            onClick={() => router.push(`/admin/roles/${role.id}`)}
+                                            className="text-yellow-600 hover:text-yellow-800 text-center flex items-center gap-1n"
+                                        >
+                                            <FaWebAwesome /> Chỉnh sửa quyền
                                         </button>
                                     </td>
                                 </tr>

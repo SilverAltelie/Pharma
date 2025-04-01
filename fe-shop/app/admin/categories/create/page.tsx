@@ -17,6 +17,11 @@ export default function CategoryCreate() {
             'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
           }
         });
+
+        if (res.status == 403) {
+          window.location.href = `/admin/permissions/cannotaccess`;
+        }
+
         if (!res.ok) {
           console.error('Lỗi API:', res.status, res.statusText);
           return;
@@ -59,6 +64,10 @@ export default function CategoryCreate() {
         },
         body: JSON.stringify({ name, description, status, parent_id }),
       });
+
+      if (res.status == 403) {
+        window.location.href = `/admin/permissions/cannotaccess`;
+      }
 
       const text = await res.text();
       console.log("Phản hồi dạng text:", text);

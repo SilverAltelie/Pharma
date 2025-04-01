@@ -15,6 +15,10 @@ export default function UserCreate() {
                     }
                 });
 
+                if (res.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
+
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
                 }
@@ -57,6 +61,10 @@ export default function UserCreate() {
                 },
                 body: JSON.stringify({name, password, email, role_id, phone, last_name, first_name, address})
             });
+
+            if (res.status == 403) {
+                window.location.href = `/admin/permissions/cannotaccess`;
+            }
 
             if (!res.ok) {
                 throw new Error(`HTTP error! status: ${res.status}`);

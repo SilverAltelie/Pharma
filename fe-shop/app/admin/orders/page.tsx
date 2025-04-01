@@ -25,6 +25,11 @@ const ProductsOrderTable = () => {
                         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
                     }
                 });
+
+                if (res.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
+
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }
@@ -70,12 +75,16 @@ const ProductsOrderTable = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
                 },
                 body: JSON.stringify({
                     status: status
                 })
             })
+
+            if (res.status == 403) {
+                window.location.href = `/admin/permissions/cannotaccess`;
+            }
 
             if (!res.ok) {
                 throw new Error("Network response was not ok");
@@ -272,30 +281,39 @@ const ProductsOrderTable = () => {
                                                         </div>
 
                                                     )}
-                                                    <button onClick={() => setIsEditStatus(!isEditStatus)} className="text-blue-600 font-semibold">
+                                                    <button onClick={() => setIsEditStatus(!isEditStatus)}
+                                                            className="text-blue-600 font-semibold">
                                                         <FaSquarePen className="mr-2 size-4"/>
                                                     </button>
                                                 </div>
                                                 :
                                                 <div className="mb-1 flex items-center gap-2 text-sm text-gray-700">
-                                                <select
-                                                    value={order.status}
-                                                    onChange={(e) => handleStatusChange(order.id, (e.target.value))}
-                                                    className={`block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${colorStatus(order.status)}`}
-                                                >
-                                                    <option value={'0'}>Đã đặt hàng</option>
-                                                    <option value={'1'}>Đã trả tiền</option>
-                                                    <option value={'2'}>Đang giao hàng</option>
-                                                    <option value={'3'}>Đã giao hàng</option>
-                                                    <option value={'4'}>Đã hủy</option>
-                                                </select>
+                                                    <select
+                                                        value={order.status}
+                                                        onChange={(e) => {
+                                                            const newStatus = parseInt(e.target.value);
+                                                            if (newStatus <= order.status) {
+                                                                alert("Bạn không thể trở về trạng thái trước đó.");
+                                                                return;
+                                                            }
+                                                            handleStatusChange(order.id, e.target.value);
+                                                        }}
+                                                        className={`block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${colorStatus(order.status)}`}
+                                                    >
+                                                        <option value={'0'}>Đã đặt hàng</option>
+                                                        <option value={'1'}>Đã trả tiền</option>
+                                                        <option value={'2'}>Đang giao hàng</option>
+                                                        <option value={'3'}>Đã giao hàng</option>
+                                                        <option value={'4'}>Đã hủy</option>
+                                                    </select>
 
-                                                    <button onClick={() => setIsEditStatus(!isEditStatus)} className="text-blue-600 font-semibold">
+                                                    <button onClick={() => setIsEditStatus(!isEditStatus)}
+                                                            className="text-blue-600 font-semibold">
                                                         <FaXmark className="flex text-red-500 size-6 mb-1 mr-2"/>
                                                     </button>
 
                                                 </div>
-                                                    }
+                                            }
                                         </div>
                                     </div>
                                 </div>

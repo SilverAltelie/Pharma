@@ -47,6 +47,10 @@ export default function UsersTable() {
         },
       });
 
+      if (res.status == 403) {
+        window.location.href = `/admin/permissions/cannotaccess`;
+      }
+
         if (!res.ok) {
             throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
         }

@@ -162,7 +162,7 @@ export default function CheckOut() {
                                                     </p>
                                                     <p className="text-sm text-gray-700 mb-2">
                                                         <strong className="text-gray-900">Số điện
-                                                            thoại:</strong> {addr.number}
+                                                            thoại:</strong> {addr.phone}
                                                     </p>
                                                     <p className="text-sm text-gray-700">
                                                         <strong className="text-gray-900">Email:</strong> {addr.email}

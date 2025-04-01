@@ -18,6 +18,10 @@ export default function UserCreate({params}: { params: Promise<{ id: string }> }
                     }
                 });
 
+                if (res.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
+
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
                 }
@@ -62,6 +66,10 @@ export default function UserCreate({params}: { params: Promise<{ id: string }> }
                     name, password, email, role_id, phone, first_name, last_name, address
                 }),
             });
+
+            if (res.status == 403) {
+                window.location.href = `/admin/permissions/cannotaccess`;
+            }
 
             if (!res.ok) {
                 throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);

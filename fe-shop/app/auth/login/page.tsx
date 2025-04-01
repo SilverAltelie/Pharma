@@ -15,27 +15,26 @@ export default function Login() {
     setError('');
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`,{
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
         method: 'POST',
         headers: {
-          'Content-Type':'application/json',
+          'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         body: JSON.stringify({email, password}),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || 'Đăng nhập thất bại');
-      }
-
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Đăng nhập thất bại');
+      }
 
       localStorage.setItem('token', data.token);
       alert('Đăng nhập thành công');
       router.push('/');
     } catch (err: any) {
-      setError(err.message || 'Đăng nhập không thành công');
+      setError(err.error || 'Đăng nhập không thành công');
     }
   };
 

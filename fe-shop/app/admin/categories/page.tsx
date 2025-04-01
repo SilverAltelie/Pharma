@@ -18,6 +18,10 @@ export default function CategoriesTable() {
                     }
                 });
 
+                if (res.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
+
                 if (!res.ok) {
                     throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
                 }
@@ -53,6 +57,10 @@ export default function CategoriesTable() {
                         "Content-Type": "application/json",
                     },
                 });
+
+                if (res.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
 
                 if (!res.ok) {
                     throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);

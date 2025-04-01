@@ -29,6 +29,11 @@ export default function AdminLayout({children}: { children: React.ReactNode }) {
                         'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
                     }
                 });
+
+                if (res.status == 403) {
+                    window.location.href = `/admin/permissions/cannotaccess`;
+                }
+
                 if (res.ok) {
                     const json = await res.json();
                     setData(json);

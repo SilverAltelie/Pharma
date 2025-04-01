@@ -22,6 +22,10 @@ export default function Dashboard() {
           }
         });
 
+        if (res.status == 403) {
+          window.location.href = `/admin/permissions/cannotaccess`;
+        }
+
         if (!res.ok) {
           throw new Error('Lỗi khi gọi API');
         }

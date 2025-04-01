@@ -18,6 +18,9 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
           'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         }
       })
+      if (res.status == 403) {
+        window.location.href = `/admin/permissions/cannotaccess`;
+      }
         const data = await res.json()
         setCategories(data)
     }
@@ -57,6 +60,10 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
             },
             body: JSON.stringify({ name, description, status, parent_id })
           })
+
+        if (res.status == 403) {
+          window.location.href = `/admin/permissions/cannotaccess`;
+        }
 
         const text = await res.text();
         console.log('Phản hồi dạng text:', text);

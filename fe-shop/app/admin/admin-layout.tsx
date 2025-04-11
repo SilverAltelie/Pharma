@@ -1,12 +1,22 @@
 'use client'
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaBox, FaChartLine, FaUsers, FaBars, FaChevronDown, FaComment, FaList, FaInbox, FaUser, FaFlag, FaArrowRightFromBracket} from "react-icons/fa6";
+import Link from "next/link";
+import type {User, Order, OrderItem, Customer} from "@/app/type";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+
+    type Data = {
+        user: User;
+        orders: Order[];
+        customers: Customer[];
+        order_items: OrderItem[];
+    }
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Data>();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -40,10 +50,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Sidebar Menu */}
         <nav className="flex flex-col flex-grow gap-4 mt-5">
-            <a href="/admin/" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+            <Link href="/admin/" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
             <FaChartLine className="text-lg" />
             {!isCollapsed && <span>Bảng điều khiển</span>}
-            </a>
+            </Link>
 
             <div>
             <button
@@ -71,29 +81,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             )}
             </div>
 
-            <a href="/admin/categories" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+            <Link href="/admin/categories" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
             <FaList className="text-lg" />
             {!isCollapsed && <span>Danh mục</span>}
-            </a>
-            <a href="/admin/products" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+            </Link>
+            <Link href="/admin/products" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
             <FaBox className="text-lg" />
             {!isCollapsed && <span>Sản phẩm</span>}
-            </a>
-            <a href="/admin/orders" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+            </Link>
+            <Link href="/admin/orders" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
             <FaInbox className="text-lg" />
             {!isCollapsed && <span>Đơn hàng</span>}
-            </a>
-            <a href="#" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+            </Link>
+            <Link href="#" className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
             <FaComment className="text-lg" />
             {!isCollapsed && <span>Chat</span>}
-            </a>
+            </Link>
         </nav>
 
         {/* Đăng xuất */}
-        <a href="#" className="mt-auto flex items-center font-semibold gap-3 p-2 hover:bg-red-100 rounded text-red-500 text-base no-underline">
+        <Link href="#" className="mt-auto flex items-center font-semibold gap-3 p-2 hover:bg-red-100 rounded text-red-500 text-base no-underline">
             <FaArrowRightFromBracket className="text-lg" />
             {!isCollapsed && <span>Đăng xuất</span>}
-        </a>
+        </Link>
 
         </aside>
 
@@ -123,19 +133,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {/* Dropdown menu */}
                 {isOpen && (
                     <div className="absolute left-0 z-50 mt-2 w-[250px] bg-white shadow-lg rounded-lg border border-gray-200">
-                    <a
+                    <Link
                         href="#"
                         className="block no-underline px-4 py-2 text-center text-gray-500 hover:bg-gray-100"
                     >
                         Contact us: 0123456789
-                    </a>
+                    </Link>
                     </div>
                 )}
                 </div>
             </div>
 
             <div className="flex items-center space-x-4 pr-4 flex-shrink-0"> 
-                <a className="flex flex-col items-center justify-center no-underline" href="#">
+                <Link className="flex flex-col items-center justify-center no-underline" href="#">
                     <img
                     alt="User"
                     src="/UserCircle.svg"
@@ -144,7 +154,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <p className="text-black font-semibold no-underline mb-0">
                     {data?.user?.name ?? "Người lạ"}
                     </p>
-                </a>
+                </Link>
             </div>
 
             </header>

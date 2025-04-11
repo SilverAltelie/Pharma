@@ -1,5 +1,4 @@
 'use client'
-import MainLayout from "@/app/_userlayout";
 import React, {useState, useEffect} from "react";
 import {
     FaCartShopping,
@@ -8,13 +7,40 @@ import {
     FaCircleXmark,
     FaMoneyCheck,
     FaSquarePen,
-    FaCrossedSquares,
     FaXmark
 } from "react-icons/fa6";
 import AdminLayout from "../admin-layout";
+import Link from "next/link";
+
+type OrderItem = {
+    order_id: number;
+    product_name: string;
+    product: {
+        id: number;
+        title: string;
+        description: string;
+        price: number;
+        images: Array<{ image: string }>;
+    };
+    variant?: {
+        name: string;
+        price: number;
+    };
+    quantity: number;
+};
+
+type Order = {
+    id: number;
+    status: number;
+    note?: string;
+    created_at: string;
+    updated_at: string;
+    order_items: OrderItem[];
+};
+
 
 const ProductsOrderTable = () => {
-    const [groupedOrders, setGroupedOrders] = useState<any>([]);
+    const [groupedOrders, setGroupedOrders] = useState<Order[]>([]);
     const [isEditStatus, setIsEditStatus] = useState<boolean>(false);
 
     useEffect(() => {
@@ -30,9 +56,9 @@ const ProductsOrderTable = () => {
                 const orders = data?.data || [];
                 const orderItems = data?.data?.order_items || [];
 
-                const grouped = orders.map((order: { id: any; }) => ({
+                const grouped = orders.map((order: { id: number; }) => ({
                     ...order,
-                    items: orderItems.filter((item: { order_id: any; }) => item.order_id === order.id)
+                    items: orderItems.filter((item: { order_id: number; }) => item.order_id === order.id)
                 }));
 
                 setGroupedOrders(grouped);
@@ -59,7 +85,7 @@ const ProductsOrderTable = () => {
         }
     }
 
-    const handleStatusChange = async (orderId: number, status: number) => {
+    const handleStatusChange = async (orderId: number, status: string) => {
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/updateStatus/${orderId}`, {
                 method: 'POST',
@@ -85,8 +111,8 @@ const ProductsOrderTable = () => {
         }
     }
 
-    const totalAmount = groupedOrders.reduce((acc: number, order: any) => {
-        const orderTotal = order.order_items.reduce((orderAcc: number, item: any) => {
+    const totalAmount = groupedOrders.reduce((acc: number, order: Order) => {
+        const orderTotal = order.order_items.reduce((orderAcc: number, item: OrderItem) => {
             const price = item.variant ? item.variant.price : item.product.price;
             return orderAcc + (price * item.quantity);
         }, 0);
@@ -103,17 +129,10 @@ const ProductsOrderTable = () => {
 
                 {groupedOrders.length > 0 ?
                     <div className="space-y-6 ml-20 mr-40">
-                        {groupedOrders.map((order: {
-                            id: number;
-                            status: number;
-                            items: any[],
-                            created_at: string,
-                            updated_at: string,
-                            totalAmount: number
-                        }, index: number) => (
-                            <div key={order.id} className="bg-white p-6 shadow-xl rounded-lg border-2">
+                        {groupedOrders.map((order: Order, index: number) => (
+                            <div key={index} className="bg-white p-6 shadow-xl rounded-lg border-2">
                                 {/* Order Header */}
-                                <div className="grid grid-cols-3 gap-4 border-b pb-4 text-sm text-gray-700">
+                                <div className="grid grid-cols-4 gap-4 border-b pb-4 text-sm text-gray-700">
                                     <div>
                                         <p className="font-semibold">Mã đơn hàng</p>
                                         <p>{order.id}</p>
@@ -135,23 +154,27 @@ const ProductsOrderTable = () => {
                                         <p className="font-semibold text-sm">Tổng giá trị đơn hàng</p>
                                         <p className="font-bold text-red-600">{totalAmount} VND</p>
                                     </div>
+                                    <div>
+                                        <p className="font-semibold text-sm">Ghi chú đơn hàng</p>
+                                        <p className="font-bold text-gray-900">{order.note}</p>
+                                    </div>
                                 </div>
 
                                 {/* Order Items */}
                                 <div className="mt-4 space-y-4">
-                                    {order.order_items.map((item: any, index: number) => (
+                                    {order.order_items.map((item: OrderItem, index: number) => (
                                         <div key={index} className="flex gap-4">
-                                            <img src={'data:image/jpeg;base64,' + item.product.images[0].image}
-                                                 alt={item.product_name}
+                                            <img src={'data:image/jpeg;base64,' + item.product.images[0]?.image}
+                                                 alt={item.product.title}
                                                  className="w-24 h-24 object-cover rounded"/>
                                             <div className="flex-1">
                                                 <div className="flex justify-between items-center">
-                                                    <a href={`/admin/products/${item.product.id}`}
-                                                       className="font-semibold no-underline text-green-700">{item.product.title} - {item.variant?.name ?? "Không có phân loại"}</a>
+                                                    <Link href={`/admin/products/${item.product.id}`}
+                                                       className="font-semibold no-underline text-green-700">{item.product.title} - {item.variant?.name ?? "Không có phân loại"}</Link>
 
                                                     <p className="text-sm text-gray-600">Số lượng: {item.quantity}</p>
                                                 </div>
-                                                <p className="text-gray-600 text-sm">{item.product.desciption}</p>
+                                                <p className="text-gray-600 text-sm">{item.product.description}</p>
                                                 <p className="font-bold text-red-600 mt-2">{item.variant ? item.variant.price * item.quantity : item.product.price * item.quantity} VND</p>
                                             </div>
                                         </div>
@@ -272,14 +295,14 @@ const ProductsOrderTable = () => {
                                                 <div className="mb-1 flex items-center gap-2 text-sm text-gray-700">
                                                 <select
                                                     value={order.status}
-                                                    onChange={(e) => handleStatusChange(order.id, Number(e.target.value))}
+                                                    onChange={(e) => handleStatusChange(order.id, (e.target.value))}
                                                     className={`block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${colorStatus(order.status)}`}
                                                 >
-                                                    <option value={0}>Đã đặt hàng</option>
-                                                    <option value={1}>Đã trả tiền</option>
-                                                    <option value={2}>Đang giao hàng</option>
-                                                    <option value={3}>Đã giao hàng</option>
-                                                    <option value={4}>Đã hủy</option>
+                                                    <option value={'0'}>Đã đặt hàng</option>
+                                                    <option value={'1'}>Đã trả tiền</option>
+                                                    <option value={'2'}>Đang giao hàng</option>
+                                                    <option value={'3'}>Đã giao hàng</option>
+                                                    <option value={'4'}>Đã hủy</option>
                                                 </select>
 
                                                     <button onClick={() => setIsEditStatus(!isEditStatus)} className="text-blue-600 font-semibold">

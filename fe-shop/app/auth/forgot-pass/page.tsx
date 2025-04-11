@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react";
+import Link from "next/link";
 
 export default function ForgotPass() {
     const [email, setEmail] = useState("");
@@ -52,9 +53,9 @@ export default function ForgotPass() {
                 {message && <p className="mt-4 text-sm text-red-600">{message}</p>}
 
                 <p className="mt-6 text-sm text-gray-600">
-                    <a href="/auth/login" className="text-green-700 hover:text-green-800">
+                    <Link href="/auth/login" className="text-green-700 hover:text-green-800">
                         Quay lại đăng nhập
-                    </a>
+                    </Link>
                 </p>
             </div>
         </div>

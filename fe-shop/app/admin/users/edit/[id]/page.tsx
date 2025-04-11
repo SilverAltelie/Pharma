@@ -1,13 +1,29 @@
 'use client'
 
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
-import { ChevronDownIcon } from '@heroicons/react/16/solid'
+import { UserCircleIcon } from '@heroicons/react/24/solid'
 import AdminLayout from '@/app/admin/admin-layout'
 import { use, useEffect, useState } from 'react';
+import type { User } from '@/app/type';
 
 export default function UserCreate( { params}: {params: Promise<{id: string}>} ) {
+
+    type ExtendedUser = User & {
+        address: {
+            first_name: string;
+            last_name: string;
+            address: string;
+            phone: string;
+        };
+    };
+
+    type Data = {
+        users : ExtendedUser[];
+    }
+
+
+
     const {id} = use(params);
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<Data>();
 
     useEffect(() => {
         async function fetchData() {
@@ -22,7 +38,7 @@ export default function UserCreate( { params}: {params: Promise<{id: string}>} )
         fetchData();
     }, []);
 
-    const user = data?.users.find((user: any) => user.id === Number(id));
+    const user = data?.users.find((user: User) => user.id == (id));
 
     if (!user) {
         return <div>Loading...</div>;
@@ -84,7 +100,7 @@ export default function UserCreate( { params}: {params: Promise<{id: string}>} )
               </label>
               <div className="mt-2">
                 <input
-                defaultValue={user?.address.first_name}
+                defaultValue={user?.address?.first_name}
                   id="first-name"
                   name="first-name"
                   type="text"
@@ -116,7 +132,7 @@ export default function UserCreate( { params}: {params: Promise<{id: string}>} )
               </label>
               <div className="mt-2">
                 <input
-                    defaultValue={user?.number}
+                    defaultValue={user?.phone}
                     id="email"
                     name="email"
                     type="email"

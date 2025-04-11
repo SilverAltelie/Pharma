@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class OrderItem extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $table = 'order_items';
     protected $fillable = ['order_id', 'product_id', 'variant_id', 'quantity', 'price'];

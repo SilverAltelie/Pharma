@@ -28,10 +28,25 @@ class AuthController extends Controller
         $this->forgotPasswordService = $forgotPasswordService;
     }
 
-    public function login(LoginRequest $data) {
+    public function login(LoginRequest $request) {
+        try {
+            $data = $request->validated();
 
-        return $this->loginService->handle($data);
+            $responseData = $this->loginService->handle($data);
 
+            return response()
+                ->json($responseData)
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+        } catch (\Exception $e) {
+            return response()
+                ->json(['error' => $e->getMessage()], $e->getCode() ?: 400)
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        }
     }
 
     public function register(RegisterRequest $data) {

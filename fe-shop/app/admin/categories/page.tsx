@@ -4,9 +4,10 @@ import {useEffect, useState} from "react";
 import {FaEdit, FaTrash, FaPlus} from "react-icons/fa";
 import AdminLayout from "../admin-layout";
 import {useRouter} from "next/navigation";
+import type {Category} from "../../type"
 
 export default function CategoriesTable() {
-    const [categories, setCategories] = useState<any[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const router = useRouter();
 
     useEffect(() => {
@@ -36,7 +37,7 @@ export default function CategoriesTable() {
         fetchData();
     }, []);
 
-    const CategoryRow = ({category, router, level}: any) => {
+    const CategoryRow = ({category, router, level}: {category: Category; router: ReturnType<typeof useRouter>; level: number}) => {
         async function deleteCategory(id: number) {
             const isConfirm = window.confirm("Bạn có chắc chắn muốn xóa mục này");
 
@@ -85,8 +86,8 @@ export default function CategoriesTable() {
                 </tr>
 
                 {/* Hiển thị danh mục con (nếu có) */}
-                {category.children?.length > 0 &&
-                    category.children?.map((child: any) => (
+                {Array.isArray(category?.children) && category.children.length > 0 &&
+                    category.children.map((child: Category) => (
                         <CategoryRow key={child.id} category={child} router={router} level={level + 1}/>
                     ))
                 }

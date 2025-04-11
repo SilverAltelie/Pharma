@@ -21,6 +21,6 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        \App\Models\Product::factory(10)->create();
+        $this->call(PaymentSeeder::class);
     }
 }

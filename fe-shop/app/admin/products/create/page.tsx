@@ -1,13 +1,10 @@
 'use client'
 
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
-import { Field, Label, Switch } from '@headlessui/react'
-import { use, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import AdminLayout from '@/app/admin/admin-layout'
-import {ReactFormState} from "react-dom/client";
-import {jsonString} from "next/dist/client/components/react-dev-overlay/server/shared";
 import {useRouter} from "next/navigation";
+import type {Category} from "@/app/type"
 
 export default function ProductCreate() {
 
@@ -201,7 +198,7 @@ export default function ProductCreate() {
                 autoComplete="category_id"
                 className="block border-2 w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
               >
-                {categories.map((category: any) => (
+                {categories.map((category: Category) => (
                     <option key={category.id} value={category.id}>{category.name}</option>
                 ))}
                 </select>

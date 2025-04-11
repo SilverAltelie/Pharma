@@ -1,18 +1,25 @@
 import {useState} from "react";
 import {StarIcon} from "@heroicons/react/20/solid";
 import {FaTrash} from "react-icons/fa";
+import type {ReviewType} from "@/app/type";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-export interface ReviewType {
-    id?: string;
+/*type ReviewType = {
+    id: number; // Change from string | undefined to number
+    user?: User; // Change from string | User to User | undefined
     user_name?: string;
     rate: number;
     comment?: string;
     created_at?: string;
-}
+};
+
+interface User {
+    id: string;
+    name: string;
+}*/
 
 interface ProductReviewsProps {
     reviews: ReviewType[];
@@ -24,16 +31,14 @@ interface ProductReviewsProps {
 export default function ProductReviews({
                             reviews,
                             isAdmin = false,
-                            onEdit,
                             onDelete
                         }: ProductReviewsProps) {
     const [expanded, setExpanded] = useState<boolean>(false);
-    const averageRating = reviews.length > 0
+    const averageRating = reviews?.length > 0
         ? reviews.reduce((sum, review) => sum + review.rate, 0) / reviews.length
         : 0;
 
-    // Hiển thị tối đa 3 đánh giá hoặc tất cả nếu đã nhấn "Xem thêm"
-    const displayedReviews = expanded ? reviews : reviews.slice(0, 3);
+    const displayedReviews = expanded ? reviews ?? [] : reviews?.slice(0, 3) ?? [];
 
     return (
         <div className="mt-8 border-t border-gray-200 pt-8">
@@ -54,23 +59,23 @@ export default function ProductReviews({
                     ))}
                 </div>
                 <p className="ml-3 text-sm font-medium text-gray-900">
-                    {averageRating.toFixed(1)} ({reviews.length} {reviews.length === 1 ? 'đánh giá' : 'đánh giá'})
+                    {averageRating.toFixed(1)} ({reviews?.length} {reviews?.length === 1 ? 'đánh giá' : 'đánh giá'})
                 </p>
             </div>
 
-            {reviews.length > 0 ? (
+            {reviews?.length > 0 ? (
                 <div className="mt-6 space-y-6 divide-y divide-gray-200">
                     {displayedReviews.map((review, index) => (
                         <div key={review.id || index} className="pt-6">
                             <div className="flex items-left">
                                 <div className="flex items-top">
                                     <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-gray-500">
-                                        {review.user.name ? review.user.name.charAt(0).toUpperCase() : 'K'}
+                                        {review.user?.name ? review.user.name.charAt(0).toUpperCase() : 'K'}
                                     </div>
                                 </div>
                                 <div className="ml-3">
                                     <h3 className="text-lg font-medium text-green-900">
-                                        {review.user.name || 'Khách hàng ẩn danh'}
+                                        {review.user?.name || 'Khách hàng ẩn danh'}
                                     </h3>
                                     <div className="text-sm ml-2 text-gray-500">
                                         <div className="flex items-center mt-1">
@@ -103,7 +108,7 @@ export default function ProductReviews({
                                 {isAdmin && review.id && (
                                     <div className="flex space-x-2">
                                         <button
-                                            onClick={() => onDelete && onDelete(review.id!)}
+                                            onClick={() => onDelete && onDelete(String(review.id!))}
                                             className="text-red-600 hover:text-red-800"
                                             title="Xóa"
                                         >
@@ -122,7 +127,7 @@ export default function ProductReviews({
                 <p className="mt-4 text-sm text-gray-500">Sản phẩm này chưa có đánh giá nào.</p>
             )}
 
-            {reviews.length > 3 && !expanded && (
+            {reviews?.length > 3 && !expanded && (
                 <button
                     className="mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-500"
                     onClick={() => setExpanded(true)}

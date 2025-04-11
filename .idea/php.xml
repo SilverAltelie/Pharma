@@ -15,6 +15,11 @@
     <option name="highlightLevel" value="WARNING" />
     <option name="transferred" value="true" />
   </component>
+  <component name="PhpCodeSniffer">
+    <phpcs_settings>
+      <phpcs_by_interpreter asDefaultInterpreter="true" interpreter_id="103774d0-4202-4a9c-ad4c-f232c0fe5e4a" timeout="30000" />
+    </phpcs_settings>
+  </component>
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="$PROJECT_DIR$/shopping-online/vendor/vlucas/phpdotenv" />
@@ -129,9 +134,19 @@
       <path value="$PROJECT_DIR$/shopping-online/vendor/filp/whoops" />
       <path value="$PROJECT_DIR$/shopping-online/vendor/graham-campbell/result-type" />
       <path value="$PROJECT_DIR$/shopping-online/vendor/nunomaduro/collision" />
+      <path value="$PROJECT_DIR$/shopping-online/vendor/laravel/scout" />
+      <path value="$PROJECT_DIR$/shopping-online/vendor/riimu/kit-phpencoder" />
+      <path value="$PROJECT_DIR$/shopping-online/vendor/algolia/algoliasearch-client-php" />
+      <path value="$PROJECT_DIR$/shopping-online/vendor/algolia/scout-extended" />
+      <path value="$PROJECT_DIR$/shopping-online/vendor/predis/predis" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1" />
+  <component name="PhpStan">
+    <PhpStan_settings>
+      <phpstan_by_interpreter asDefaultInterpreter="true" interpreter_id="103774d0-4202-4a9c-ad4c-f232c0fe5e4a" timeout="60000" />
+    </PhpStan_settings>
+  </component>
   <component name="PhpStanOptionsConfiguration">
     <option name="transferred" value="true" />
   </component>
@@ -139,6 +154,11 @@
     <phpunit_settings>
       <PhpUnitSettings configuration_file_path="$PROJECT_DIR$/shopping-online/phpunit.xml" custom_loader_path="$PROJECT_DIR$/shopping-online/vendor/autoload.php" use_configuration_file="true" />
     </phpunit_settings>
+  </component>
+  <component name="Psalm">
+    <Psalm_settings>
+      <psalm_fixer_by_interpreter asDefaultInterpreter="true" interpreter_id="103774d0-4202-4a9c-ad4c-f232c0fe5e4a" timeout="60000" />
+    </Psalm_settings>
   </component>
   <component name="PsalmOptionsConfiguration">
     <option name="transferred" value="true" />

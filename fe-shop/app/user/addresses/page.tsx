@@ -3,9 +3,35 @@
 import MainLayout from '@/app/_userlayout'
 import {BuildingStorefrontIcon} from '@heroicons/react/24/outline'
 import {useState, useEffect} from 'react'
+import Link from "next/link";
+import type {User, Address} from "@/app/type";
 
 export default function Address() {
-    const [data, setData] = useState<any>(null);
+
+    /*type Address = {
+        id: number;
+        first_name: string;
+        last_name: string;
+        address: string;
+        number: string;
+        email: string;
+        phone: string;
+        is_default: number;
+    }
+
+    type User = {
+        id: string;
+        name: string;
+        email: string;
+        addresses: Address[];
+    }*/
+
+    type Data = {
+        user: User;
+        addresses: Address[];
+    }
+
+    const [data, setData] = useState<Data>();
 
     useEffect(() => {
         async function fetchData() {
@@ -100,7 +126,7 @@ export default function Address() {
                     </div>
                     <div className="mx-auto mt-20 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
                         <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
-                            {data?.addresses?.map((address: any) => (
+                            {data?.addresses?.map((address: Address) => (
                                 <div key={address.id} className="relative pl-16">
                                     <div className="absolute top-0 right-0 flex space-x-2">
                                         {!(address.is_default == 1) && (
@@ -123,15 +149,15 @@ export default function Address() {
                                     <dd className="mt-2 text-base/7 text-gray-600">{address?.first_name}</dd>
                                     <dd className="mt-2 text-base/7 text-gray-600">{address?.phone}</dd>
                                     <dd className="mt-2 text-base/7 text-gray-600">{address?.email}</dd>
-                                    <dd className="mt-2 text-base/7 text-gray-600">{address?.number}</dd>
+                                    <dd className="mt-2 text-base/7 text-gray-600">{address?.phone}</dd>
                                     <dd className="mt-3 text-base/7 text-gray-600">
                                         <div className="flex space-x-2">
-                                            <a
+                                            <Link
                                                 href={`/user/addresses/edit/${address.id}`}
                                                 className="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-green-800"
                                             >
                                                 Sửa địa chỉ
-                                            </a>
+                                            </Link>
                                             <button
                                                 className="flex-none rounded-md bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-red-700"
                                                 onClick={() => handleDeleteAddress(address.id)}
@@ -144,7 +170,7 @@ export default function Address() {
                             ))}
 
                             {/* Hiển thị nút Thêm Địa Chỉ nếu có ít hơn 2 địa chỉ */}
-                            {data?.addresses?.length < 2 && (
+                            {(data?.addresses?.length ?? 0) < 2 && (
                                 <div className="relative pl-16">
                                     <dt className="text-base/7 font-semibold text-gray-900">
                                         <div
@@ -154,12 +180,12 @@ export default function Address() {
                                         <span className="text-gray-600">Chưa có địa chỉ</span>
                                     </dt>
                                     <dd className="mt-3 text-base/7 text-gray-600">
-                                        <a
+                                        <Link
                                             href="/user/addresses/create"
                                             className="flex-none rounded-md bg-green-700 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-green-800"
                                         >
                                             Thêm địa chỉ mới
-                                        </a>
+                                        </Link>
                                     </dd>
                                 </div>
                             )}

@@ -1,4 +1,4 @@
-import { CalendarDaysIcon, HandRaisedIcon } from '@heroicons/react/24/outline'
+import Link from "next/link";
 
 export default function FogotPass() {
   return (
@@ -32,16 +32,16 @@ export default function FogotPass() {
             <div>
             <p className="mt-10 text-center text-sm/6 text-gray-500">
               Quay lại{' '}
-              <a href="/admin/auth/login" className="font-semibold text-green-700 hover:text-green-800">
+              <Link href="/admin/auth/login" className="font-semibold text-green-700 hover:text-green-800">
                 Đăng nhập
-              </a> 
+              </Link>
             </p>
             </div>
             <div>
             <p className="mt-10 text-center text-sm/6 text-gray-500">
               Chưa có tài khoản?{' '}
               
-             <a href = "/" className="font-semibold text-green-700 hover:text-green-800">Trở thành khách hàng</a>
+             <Link href = "/" className="font-semibold text-green-700 hover:text-green-800">Trở thành khách hàng</Link>
             </p>
             </div>
           

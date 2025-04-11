@@ -1,8 +1,8 @@
 'use client';
 
-import { loginService } from '@/app/api/auth/login/route';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Link from "next/link";
 
 export default function Login() {
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function Login() {
         method: 'POST',
         headers: {
           'Content-Type':'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
         },
         body: JSON.stringify({email, password}),
       });
@@ -35,8 +35,12 @@ export default function Login() {
       localStorage.setItem('token', data.token);
       alert('Đăng nhập thành công');
       router.push('/');
-    } catch (err: any) {
-      setError(err.message || 'Đăng nhập không thành công');
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message || 'Đăng nhập không thành công');
+      } else {
+        setError('Đăng nhập không thành công');
+      }
     }
   };
 
@@ -101,12 +105,12 @@ export default function Login() {
                   Mật khẩu
                 </label>
                 <div className="text-sm">
-                  <a
+                  <Link
                       href="/auth/forgot-pass"
                       className="font-semibold text-green-700 hover:text-green-800"
                   >
                     Quên mật khẩu?
-                  </a>
+                  </Link>
                 </div>
               </div>
               <div className="mt-2">
@@ -135,19 +139,19 @@ export default function Login() {
 
           <p className="mt-10 text-center text-sm/6 text-gray-500">
             Chưa có tài khoản?{' '}
-            <a
+            <Link
                 href="/auth/register"
                 className="font-semibold text-green-700 hover:text-green-800"
             >
               Đăng ký
-            </a>{' '}
+            </Link>{' '}
             &nbsp; Hoặc &nbsp;
-            <a
+            <Link
                 href="/"
                 className="font-semibold text-green-700 hover:text-green-800"
             >
               Trở thành khách hàng
-            </a>
+            </Link>
           </p>
         </div>
       </div>

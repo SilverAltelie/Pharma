@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { CalendarDaysIcon, HandRaisedIcon } from '@heroicons/react/24/outline'
 import { useRouter } from 'next/navigation'
+import Link from "next/link";
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -39,7 +40,12 @@ export default function Register() {
         setMessage(data.error || 'Đăng ký thất bại, vui lòng thử lại.');
       }
     } catch (error) {
-      setMessage('Không thể kết nối tới server, vui lòng thử lại.');    }
+    if (error instanceof Error) {
+      setMessage(error.message);
+    } else {
+      setMessage('Không thể kết nối tới server, vui lòng thử lại.');
+    }
+  }
   };
 
   return (
@@ -98,13 +104,13 @@ export default function Register() {
 
               <p className="mt-10 text-center text-sm text-gray-500">
                 Đã có tài khoản?{' '}
-                <a href="/auth/login" className="font-semibold text-green-700 hover:text-green-800">
+                <Link href="/auth/login" className="font-semibold text-green-700 hover:text-green-800">
                   Đăng nhập
-                </a>{' '}
+                </Link>{' '}
                 hoặc{' '}
-                <a href="/" className="font-semibold text-green-700 hover:text-green-800">
+                <Link href="/" className="font-semibold text-green-700 hover:text-green-800">
                   Trở thành khách hàng
-                </a>
+                </Link>
               </p>
             </div>
 

@@ -3,52 +3,99 @@
 import { useEffect, useState } from "react";
 import { FaBox, FaChartLine, FaList, FaUsers } from "react-icons/fa";
 import AdminLayout from "./admin-layout";
+import type { Order, Customer, OrderItem } from "../type";
 
 export default function Dashboard() {
-  interface Order {
+
+  /*type Order = {
     id: number;
     status: number;
-  }
+  };
 
-  interface OrderItem {
-    price: number;
-    order_id: number;
-    product_name: string;
-    quantity: number;
-  }
+    type Customer = {
+        id: number;
+        name: string;
+        email: string;
+        addresses: {
+        phone: string;
+        }[];
+    };
 
-  interface AdminData {
-    recentCustomers: any;
-    orders: Order[];
-    order_items: OrderItem[];
-  }
+    type Variant = {
+        id: number;
+        name: string;
+        price: number;
+        quantity: number;
+    }
 
-  const [data, setData] = useState<AdminData | null>(null);
+    type Product = {
+        id: number;
+        title: string;
+        href: string;
+        image: string;
+        price: number;
+        color: string;
+        variants: Variant[];
+    }
+
+    type OrderItem = {
+        id: number;
+        order_id: number;
+        product_id: number;
+        variant_id: number;
+        quantity: number;
+        price: number;
+        product?: Product;
+    }*/
+
+    type Data = {
+        orders: Order[];
+        customers: Customer[];
+        order_items: OrderItem[];
+    }
+
+  const [data, setData] = useState<Data>();
 
   useEffect(() => {
     async function fetchData() {
-        try {
-          const res = await fetch("/api/admin-data");
-          const json = await res.json();
-          setData(json);
-        } catch (error) {
-          console.error("Lỗi khi gọi api: ", error);
+      try {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+          throw new Error('Token không tồn tại');
         }
+
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/dashboard`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Lỗi khi gọi API');
+        }
+
+        const json = await res.json();
+        setData(json);
+      } catch (error) {
+        console.error("Lỗi khi gọi api: ", error);
       }
-      fetchData();
+    }
+
+    fetchData();
   }, []);
 
   if (!data) return <p>Loading...</p>;
 
   const completedOrdersSet = new Set(
-    data.orders.filter(order => order.status === 3).map(order => order.id)
+    data.orders?.filter(order => order.status === 3).map(order => order.id)
   );
-  
+
   const completedOrdersValue = data.order_items.reduce((total, item) => {
-    if (!completedOrdersSet.has(item.order_id)) return total; // Bỏ qua order chưa hoàn thành
-    return total + item.price * item.quantity;
+      if (!completedOrdersSet.has(item.order_id)) return total; // Bỏ qua order chưa hoàn thành
+      const price = item.product?.variants?.find(variant => parseInt(variant.id) === item.variant_id)?.price || item.product?.price;
+      return total + price * item.quantity;
   }, 0);
-  
+
   
 //   const totalCompletedOrderValue = completedOrders.reduce((total, order) => {
 //     const orderItems = data.order_items.filter(item => item.order_id === order.id);
@@ -89,14 +136,14 @@ export default function Dashboard() {
               <FaUsers className="text-purple-600 text-4xl" />
               <div>
                 <p className="text-lg font-semibold">Khách hàng gần đây</p>
-                <p className="text-2xl font-bold text-purple-600">{data.recentCustomers.length}</p>
+                <p className="text-2xl font-bold text-purple-600">{data.customers.length}</p>
               </div>
             </div>
             <div className="p-4 bg-white shadow rounded-lg flex items-center space-x-4">
               <FaList className="text-purple-600 text-4xl" />
               <div>
                 <p className="text-lg font-semibold">Danh mục đã tạo</p>
-                <p className="text-2xl font-bold text-purple-600">{data.recentCustomers.length}</p>
+                <p className="text-2xl font-bold text-purple-600">{data.customers.length}</p>
               </div>
             </div>
           </div>
@@ -113,13 +160,16 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map((order) => (
-                  <tr key={order.id} className="border-t">
-                    <td className="p-2">{order.id}</td>
-                    <td className="p-2">{data.order_items.find((item) => item.order_id === order.id)?.product_name}</td>
-                    <td className="p-2">{data.order_items.find((item) => item.order_id === order.id)?.quantity}</td>
-                  </tr>
-                ))}
+              {recentOrders.map((order) => {
+                const orderItems = data.order_items.filter((item) => item.order_id === order.id);
+                return orderItems.map((item) => (
+                    <tr key={`${order.id}-${item.id}`} className="border-t">
+                      <td className="p-2">{order.id}</td>
+                      <td className="p-2">{item.product?.title}</td>
+                      <td className="p-2">{item.quantity}</td>
+                    </tr>
+                ));
+              })}
               </tbody>
             </table>
           </div>
@@ -137,12 +187,12 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {data?.recentCustomers?.map((customer: any, index: number) => (
+                {data?.customers?.map((customer: Customer, index: number) => (
                   <tr key={index} className="border-t">
-                    <td className="p-2">{customer.id}</td>
+                    <td className="p-2">{index}</td>
                     <td className="p-2">{customer.name}</td>
                     <td className="p-2">{customer.email}</td>
-                    <td className="p-2">{customer.number}</td>
+                    <td className="p-2">{customer.addresses[0]?.phone}</td>
                   </tr>
                 ))}
               </tbody>

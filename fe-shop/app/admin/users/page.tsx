@@ -4,9 +4,16 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import AdminLayout from "../admin-layout";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import type { User } from "../../type";
 
 export default function UsersTable() {
-  const [users, setUsers] = useState<any[]>([]);
+  type extendedUser = User & {
+    role: string;
+    address: {
+      phone: string;
+    };
+  }
+  const [users, setUsers] = useState<extendedUser[]>([]);
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
@@ -14,9 +21,9 @@ export default function UsersTable() {
     setIsClient(true); // Đánh dấu rằng component đang chạy trên Client
     async function fetchData() {
       try {
-        const res = await fetch("/api/admin-data");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`);
         const json = await res.json();
-        setUsers(json.users || []);
+        setUsers(json || []);
       } catch (error) {
         console.error("Lỗi khi gọi API:", error);
       }
@@ -59,7 +66,7 @@ export default function UsersTable() {
                 {users.map((user, index) => (
                   <tr key={index} className="border hover:bg-gray-50">
                     <td className="p-3 border">{user.name}</td>
-                    <td className="p-3 border">{user.number}</td>
+                    <td className="p-3 border">{user.role == 'customer' ? user.address?.phone : user.phone}</td>
                     <td className="p-3 border">{user.email}</td>
                     <td className="p-3 border">{user.role}</td>
                     <td className="p-3 border text-center">

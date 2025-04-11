@@ -9,6 +9,10 @@ class UserRole extends Model
 {
     use HasFactory;
 
+    protected $table = 'user_roles';
+
+    protected $fillable = ['admin_id', 'role_id'];
+
     public function admin() {
         return $this->belongsTo(Admin::class);
     }

@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 export default function CategoryCreate() {
   const router = useRouter();
-  const [categories, setCategories] = useState<any[]>([])
+  const [categories, setCategories] = useState<{ id: number; name: string; parent_id: number | null }[]>([])
 
   useEffect(() => {
     async function fetchCategories() {

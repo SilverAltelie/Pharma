@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Services\Category\CategoryCreateService;
 use App\Services\Category\CategoryDeleteService;
 use App\Services\Category\CategoryListService;
+use App\Services\Category\CategoryShowService;
 use App\Services\Category\CategoryUpdateService;
 
 class CategoryController extends Controller
@@ -16,11 +17,18 @@ class CategoryController extends Controller
     protected $categoryDeleteService;
     protected $categoryListService;
 
-    public function __construct(CategoryListService $categoryListService ,CategoryCreateService $categoryCreateService, CategoryUpdateService $categoryUpdateService, CategoryDeleteService $categoryDeleteService) {
+    protected $categoryShowService;
+
+    public function __construct(CategoryListService $categoryListService ,
+                                CategoryCreateService $categoryCreateService,
+                                CategoryUpdateService $categoryUpdateService,
+                                CategoryDeleteService $categoryDeleteService,
+                                CategoryShowService $categoryShowService){
         $this->categoryListService = $categoryListService;
         $this->categoryCreateService = $categoryCreateService;
         $this->categoryUpdateService = $categoryUpdateService;
         $this->categoryDeleteService = $categoryDeleteService;
+        $this->categoryShowService = $categoryShowService;
     }
 
     /**
@@ -71,14 +79,7 @@ class CategoryController extends Controller
     public function show($id)
     {
         //
-        $category = Category::findOrFail($id);
-
-        $products = $category->products()->with('variants')->paginate(20);
-
-        return response()->json([
-            'category' => $category,
-            'products' => $products,
-        ]);
+        return $this->categoryShowService->handle($id);
 
     }
 

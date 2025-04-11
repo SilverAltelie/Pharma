@@ -26,7 +26,7 @@ class UserController extends Controller
             ->keyBy('user_id');
 
         foreach ($users as $user) {
-            $user->address = $defaultAddresses->get($user->id);
+            $user->addresses = $defaultAddresses->get($user->id);
         }
 
         foreach ($users as $user) {

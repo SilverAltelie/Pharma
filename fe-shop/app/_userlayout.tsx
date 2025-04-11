@@ -17,8 +17,8 @@ import {
 } from '@headlessui/react'
 
 import { ChevronDownIcon, UserIcon, MapIcon, ShoppingBagIcon, ArrowLeftStartOnRectangleIcon, ArrowRightEndOnRectangleIcon, PencilSquareIcon} from '@heroicons/react/20/solid'
-import FloatingMenu from './floatingMenu';
 import {useRouter} from "next/navigation";
+import Link from "next/link";
 
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
@@ -28,55 +28,54 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<any>(null);
   const router = useRouter();
-  const token = localStorage.getItem('token');
+  const [token, setToken] = useState<string | null>(null);
   const [subtotal, setSubtotal] = useState(0);
 
 
   useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true); // Start loading
-      setError(null); // Reset error state
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
 
-      /*if (!token) {
-        setError('User is not authenticated. Token is missing.');
-        setIsLoading(false);
-        return;
-      }*/
+    async function fetchData() {
+      setIsLoading(true);
+      setError(null);
 
       try {
-        // Lấy token từ localStorage (nếu có)
-        const token = localStorage.getItem("token");
-
         const res = await fetch("http://localhost:8000/api/home", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          headers: storedToken ? { Authorization: `Bearer ${storedToken}` } : {},
         });
 
         const data = await res.json();
-
         if (!res.ok) throw new Error(data.message || "Lỗi tải dữ liệu");
 
-        // Cập nhật state dữ liệu tại đây
         setData(data);
-
-      } catch (err: any) {
-        setError(err.message);
-        console.error("Lỗi API trả về:", err.message);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message ?? 'Lỗi không xác định');
+          console.error("Lỗi API trả về:", err.message ?? 'Không xác định');
+        } else {
+          setError('Lỗi không xác định');
+          console.error("Lỗi API trả về:", err);
+        }
       } finally {
-        setIsLoading(false); // End loading
+        setIsLoading(false);
       }
     }
 
     fetchData();
   }, []);
 
+
   async function handleLogout() {
+    if (!token) return;
+
     const res = await fetch(`http://localhost:8000/api/logout`, {
-        method: 'POST',
-        headers: token ? {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        } : {},
-    })
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!res.ok) {
       const data = await res.json();
@@ -86,6 +85,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem('token');
     router.push('/auth/login');
   }
+
 
   if (isLoading) {
     return (
@@ -128,18 +128,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     }
   }
 
-/*  if (error) {
-    return (
-        <div className="error-screen">
-          {/!* Error UI *!/}
-          <h1>Error</h1>
-          <p>{error}</p>
-        </div>
-    );
-  }*/
-
-
-
   return (
     <div className="wrapper">
       <header className="header_area">
@@ -167,8 +155,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                             {data?.categories.length > 0 ? (
                                 data?.categories.map((category: any) => (
                                     <div key={category.id} style={{ marginBottom: '16px' }}>
-                                      {/* Parent Category */}
-                                      <a
+                                      <Link
                                           href={`/category/${category.id}`}
                                           className="block font-semibold text-black"
                                           style={{
@@ -176,19 +163,19 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                                           }}
                                       >
                                         {category.name}
-                                      </a>
+                                      </Link>
 
                                       {category?.children.length > 0 && (
                                           <ul style={{ paddingLeft: '20px', marginTop: '8px' }}>
                                             {category.children.map((child: any) => (
                                                 <li key={child.id}>
-                                                  <a
+                                                  <Link
                                                       href={`/category/${child.id}`}
                                                       className="text-gray-600 hover:text-gray-800"
                                                       style={{ display: 'block' }}
                                                   >
                                                     {child.name}
-                                                  </a>
+                                                  </Link>
                                                 </li>
                                             ))}
                                           </ul>
@@ -204,26 +191,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
                       
                     </PopoverGroup>
-                    {/*<PopoverGroup>
-                    <Popover className="relative">
-                        <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-gray-900">
-                          Giảm giá
-                          <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
-                        </PopoverButton>
-
-                        <PopoverPanel className="absolute top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl bg-white ring-1 shadow-lg ring-gray-900/5">
-                          <div className="p-4">
-                          {data?.promotions?.map((promo: any) => (
-                            <a key={promo.id} href={`/promotion/${promo.id}`} className="block font-semibold text-gray-900">
-                              {promo.name ?? "Không có chương trình nào"}
-                            </a>
-                          ))}
-      
-                            <p></p>
-                          </div>
-                        </PopoverPanel>
-                      </Popover>
-                    </PopoverGroup>*/}
                     
                   </li>
 
@@ -237,12 +204,12 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                   {/* Dropdown menu */}
                   {isMenuOpen && (
                       <div className="relative left-0 mt-2 w-[250px] bg-white shadow-lg rounded-lg border border-gray-200">
-                      <a
+                      <Link
                           href="#"
                           className="relative no-underline px-4 py-2 text-center text-gray-500 hover:bg-gray-100"
                       >
                           Contact us: 0123456789
-                      </a>
+                      </Link>
                       </div>
                   )}
                 </ul>
@@ -287,10 +254,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         <UserIcon className="size-4 text-gray-600 group-hover:text-green-600" />
                         </div>
                         <div>
-                          <a href='/user/profile' className="font-semibold text-gray-900">
+                          <Link href='/user/profile' className="font-semibold text-gray-900">
                             Thông tin
                             <span className="absolute inset-0" />
-                          </a>
+                          </Link>
                         </div>
                       </div>
 
@@ -299,10 +266,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         <MapIcon className="size-6 text-gray-600 group-hover:text-green-600" />
                         </div>
                         <div>
-                          <a href='/user/addresses' className="font-semibold text-gray-900">
+                          <Link href='/user/addresses' className="font-semibold text-gray-900">
                             Địa chỉ
                             <span className="absolute inset-0" />
-                          </a>
+                          </Link>
                         </div>
                       </div>
 
@@ -311,10 +278,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         <ShoppingBagIcon className="size-6 text-gray-600 group-hover:text-green-600" />
                         </div>
                         <div>
-                          <a href='/user/orders' className="font-semibold text-gray-900">
+                          <Link href='/user/orders' className="font-semibold text-gray-900">
                             Đơn hàng
                             <span className="absolute inset-0" />
-                          </a>
+                          </Link>
                         </div>
                       </div>
 
@@ -347,10 +314,10 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                         <ArrowRightEndOnRectangleIcon className="size-6 text-gray-600 group-hover:text-green-600" />
                         </div>
                         <div>
-                          <a href='/auth/login' className="font-semibold text-gray-900">
+                          <Link href='/auth/login' className="font-semibold text-gray-900">
                             Đăng nhập
                             <span className="absolute inset-0" />
-                          </a>
+                          </Link>
                         </div>
                       </div>
 
@@ -378,11 +345,11 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             </Popover>
             
 
-            <div className="cart-area">
-            <a onClick={() => setIsOpen(!isOpen)} className="relative">
-                <Image src="/customer/img/core-img/bag.svg" alt="" width={20} height={20} />
-                <span>{data?.cartItems?.length}</span>
-            </a>
+            <div className="cart-area d-flex align-items-center justify-content-center ml-4 mr-4">
+            <button onClick={() => setIsOpen(!isOpen)} className="relative">
+                <Image src="/customer/img/core-img/bag.svg" alt="" width={40} height={40} />
+                <span className={"font-semibold text-red-400 text-xl"}>{data?.cartItems?.length}</span>
+            </button>
             </div>
           </div>
         </div>
@@ -493,12 +460,12 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
                       </a>
                     </div>
                     <div className="mt-6">
-                      <a
+                      <Link
                           href="/checkout"
                           className="flex items-center justify-center rounded-md border border-transparent bg-green-700 px-5 py-2 text-base font-medium text-white shadow-xs hover:bg-green-800"
                       >
                         Thanh toán
-                      </a>
+                      </Link>
                     </div>
 
                     <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
@@ -522,7 +489,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
       </Dialog>
       {children}
-      <FloatingMenu />
+      {/*<FloatingMenu />*/}
     </div>
   );
 }

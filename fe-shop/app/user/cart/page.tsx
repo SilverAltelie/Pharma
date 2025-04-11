@@ -5,19 +5,60 @@ import {FaTrash} from "react-icons/fa";
 import {FaSort} from "react-icons/fa6";
 
 export default function Cart() {
-    const [data, setData] = useState<any>(null);
+
+    type Variant = {
+        id: string;
+        name: string;
+        price: string;
+        quantity: string;
+    }
+
+    type Image = {
+        id: string;
+        image: string;
+    }
+
+    type Product = {
+        id: string;
+        title: string;
+        href: string;
+        image: Image;
+        price: string;
+        color: string;
+        variants: Variant[];
+    }
+
+    type CartItem = {
+        id: number;
+        product_id: number;
+        quantity: number;
+        image: string;
+        product?: Product;
+        variant?: Variant;
+    }
+
+    type CartData = {
+        id: number;
+        product_id: number;
+        quantity: number;
+        image: string;
+        product?: Product;
+        variant?: Variant;
+    }
+
+    const [data, setData] = useState<CartData[]>();
 
     const updateQuantityLocally = (itemId: number, newQuantity: number) => {
-        setData((prevData: any) => {
-            if (!Array.isArray(prevData)) return prevData; // Handle case where data is not an array
-            return prevData.map((item: any) =>
+        setData((prevData) => {
+            if (!prevData || !Array.isArray(prevData)) return prevData; // Ensure prevData is an array
+             return prevData.map((item: CartItem) =>
                 item.id === itemId ? {...item, quantity: newQuantity} : item
             );
         });
     };
 
     const updateQuantity = async (itemId: number) => {
-        const item = data.find((item: any) => item.id === itemId);
+        const item = data?.find((item: CartItem) => item.id === itemId);
         if (!item) return;
 
         try {
@@ -97,7 +138,7 @@ export default function Cart() {
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6 border-b pb-2">Giỏ hàng</h2>
                 <div className="flow-root">
                     <ul role="list" className="-my-6 divide-y divide-gray-200">
-                        {data.map((item: any, index: number) => (
+                        {data.map((item: CartItem, index: number) => (
                             <li key={index} className="flex py-6 items-center">
                                 <div className="w-24 h-24 overflow-hidden rounded-lg border border-gray-200">
                                     <img alt={item.product?.title} src={`data:image/jpeg;base64,${item.image}`}
@@ -110,8 +151,7 @@ export default function Cart() {
                                             <a href={`/product/${item.product_id}`}
                                                className="hover:underline">{item['product']?.title}</a>
                                         </h3>
-                                        <p className="ml-4 text-lg font-semibold">{((item['variant'] ? item['variant']?.price : item['product']?.price) * item.quantity).toLocaleString()}đ</p>
-                                    </div>
+                                        <p className="ml-4 text-lg font-semibold">{(((item['variant']?.price ? parseFloat(item['variant']?.price) : parseFloat(item['product']?.price || "0")) * item.quantity) || 0).toLocaleString()}đ</p>                                    </div>
                                     <p className="mt-1 text-sm text-gray-500">{item['variant']?.name}</p>
                                     <div className="flex flex-1 items-end justify-between text-sm mt-2">
                                         <div className="flex items-center">
@@ -144,11 +184,13 @@ export default function Cart() {
                 <div className="border-t border-gray-200 mt-6 pt-4">
                     <div className="flex justify-between text-lg font-semibold text-gray-900">
                         <p>Tổng cộng</p>
-                        <p>{data.reduce((total: number, item: any) => total + ((item['variant'] ? item['variant']?.price : item['product']?.price) * item.quantity), 0).toLocaleString()}đ</p>
-                    </div>
+                        <p>{data.reduce((total: number, item: CartItem) => {
+                            const price = item.variant ? parseFloat(item.variant.price || "0") : parseFloat(item.product?.price || "0");
+                            return total + (price * item.quantity);
+                        }, 0).toLocaleString()}đ</p>                    </div>
                     <p className="mt-1 text-sm text-gray-500">Phí ship và thuế sẽ được tính ở bước thanh toán.</p>
                     <button
-                        onClick={() => data.forEach((item: any) => checkout([item.id], item.quantity))}
+                        onClick={() => data.forEach((item: CartItem) => checkout([item.id], item.quantity))}
                         className="mt-4 w-full bg-green-700 text-white py-2 rounded-lg hover:bg-green-800 transition-all">
                         Tiến hành thanh toán
                     </button>

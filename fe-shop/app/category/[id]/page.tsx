@@ -3,19 +3,32 @@
 import MainLayout from "@/app/_userlayout";
 import {useState, useEffect, use} from "react";
 import {FaCartPlus} from "react-icons/fa";
+import type { Product } from "@/app/type";
 
 export default function CategoryPage({params}: { params: Promise<{ id: string }> }) {
     const {id} = use(params);
 
-    interface Product {
+    /*type Variant = {
+        id: string;
+        name: string;
+        price: string;
+        quantity: string;
+    }
+
+    type Image = {
+        id: string;
+        image: string;
+    }
+
+    type Product = {
         id: string;
         title: string;
         href: string;
-        image: string;
+        image: Image;
         price: string;
         color: string;
-        variants: any[];
-    }
+        variants: Variant[];
+    }*/
 
     const [products, setProducts] = useState<Product[]>([]);
 
@@ -72,7 +85,7 @@ export default function CategoryPage({params}: { params: Promise<{ id: string }>
                     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                         {products.map((product: Product) => (
                             <div key={product.id} className="group relative">
-                                {product.variants.length <= 0 ? <button
+                                {!product.variants ? <button
                                     onClick={() => handleAddToCart(product.id)}
                                     className="absolute top-1 z-50 right-1 p-2 bg-green-700 rounded-md text-white text-lg"
                                 >
@@ -80,7 +93,7 @@ export default function CategoryPage({params}: { params: Promise<{ id: string }>
                                 </button> : ''}
                                 <img
                                     alt={product.title}
-                                    src={`data:image/jpeg;base64,${product.image}`}
+                                    src={`data:image/jpeg;base64,${product.image?.image}`}
                                     className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
                                 />
                                 <div className="mt-4 flex justify-between">
@@ -91,7 +104,6 @@ export default function CategoryPage({params}: { params: Promise<{ id: string }>
                                                 {product.title}
                                             </a>
                                         </h3>
-                                        <p className="mt-1 text-sm text-gray-500">{product.color}</p>
                                     </div>
                                     <p className="text-sm font-medium text-gray-900">{product.price}</p>
                                 </div>

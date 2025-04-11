@@ -14,26 +14,31 @@ import 'swiper/css/pagination';
 import 'swiper/css/autoplay';
 import ProductReviews from "@/app/Reviews";
 import {Autoplay, Navigation, Pagination} from "swiper/modules";
+import type {Variant, ReviewType} from "@/app/type";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-class Review {
-    rate: number;
-    comment: string;
-}
-
-export default function Show({ params }: { params: Promise<{ id: string }> }) {
+export default function Show({params}: { params: Promise<{ id: string }>}) {
     const { id } = use(params);
 
-    type Variant = {
+    /*type Variant = {
         id: string;
         name: string;
         price: string;
         quantity: number;
         product_id: string;
-    };
+    };*/
+
+    /*type ReviewType = {
+        id: number;
+        user?: User;
+        user_name?: string;
+        rate: number;
+        comment?: string;
+        created_at?: string;
+    };*/
 
     type Product = {
         images: Image[];
@@ -43,7 +48,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
         description: string;
         content: string;
         variants: Variant[];
-        reviews: Review[];
+        reviews: ReviewType[];
     };
 
     type Image = {
@@ -54,7 +59,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
     const [product, setProduct] = useState<Product | null>(null);
     const [variants, setVariants] = useState<Variant[]>([]);
     const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
-    const [reviews, setReviews] = useState<Review[]>([]);
+    const [reviews, setReviews] = useState<ReviewType[]>([]);
     const [editingVariant, setEditingVariant] = useState<Variant | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editingReview, setEditingReview] = useState<ReviewType | null>(null);
@@ -226,7 +231,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                     }}
                                     className="w-full rounded-lg overflow-hidden"
                                 >
-                                    {product.images?.map((image: any, index: number) => (
+                                    {product.images?.map((image: Image, index: number) => (
                                         <SwiperSlide key={image.id}>
                                             <img
                                                 src={'data:image/jpeg;base64,' + image.image}
@@ -363,7 +368,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                                 value={editingVariant?.name || ""}
                                                 onChange={(e) =>
                                                     setEditingVariant((prev) => ({
-                                                        ...(prev || { id: "", name: "", price: "", quantity: 0, product_id: "" }),
+                                                        ...(prev || { id: '', name: '', price: 0, quantity: 0, product_id: null }),
                                                         name: e.target.value
                                                     }))
                                                 }
@@ -376,7 +381,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                                 value={editingVariant?.quantity || ""}
                                                 onChange={(e) =>
                                                     setEditingVariant((prev) => ({
-                                                        ...(prev || { id: "", name: "", price: "", quantity: 0, product_id: "" }),
+                                                        ...(prev || { id: '', name: '', price: 0, quantity: 0, product_id: null }),
                                                         quantity: parseInt(e.target.value) || 0
                                                     }))
                                                 }
@@ -389,8 +394,8 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                                 value={editingVariant?.price || ""}
                                                 onChange={(e) =>
                                                     setEditingVariant((prev) => ({
-                                                        ...(prev || { id: "", name: "", price: "", quantity: 0, product_id: "" }),
-                                                        price: e.target.value
+                                                        ...(prev || { id: '', name: '', price: 0, quantity: 0, product_id: '' }),
+                                                        price: parseInt(e.target.value)
                                                     }))
                                                 }
                                             />
@@ -435,7 +440,10 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
 
                             {/* Hiển thị danh sách review */}
                             <ProductReviews
-                                reviews={product.reviews}
+                                reviews={product.reviews.map((review) => ({
+                                    ...review,
+                                    user: review.user ? { ...review.user, id: String(review.user.id) } : undefined,
+                                }))}
                                 isAdmin={true}
                                 onEdit={(review) => {
                                     setEditingReview(review);
@@ -443,6 +451,7 @@ export default function Show({ params }: { params: Promise<{ id: string }> }) {
                                 }}
                                 onDelete={(id) => handleDeleteReview(id)}
                             />
+
 
                             {/* Form thêm/sửa review */}
                             {isEditingReview && (

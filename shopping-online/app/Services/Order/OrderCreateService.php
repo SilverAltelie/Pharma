@@ -3,12 +3,12 @@
 namespace App\Services\Order;
 
 use App\Models\CartItem;
+use App\Models\UserBehavior;
 
 class OrderCreateService
 {
     public function handle($data, $user)
     {
-
         $order = $user->orders()->create([
             'user_id' => $user->id,
             'address_id' => $data['address_id'],
@@ -24,7 +24,16 @@ class OrderCreateService
                 'product_id' => $cartItem['product_id'],
             ]);
 
+            $cartItem = CartItem::findOrFail($cartItem['id']);
+
+            if ($cartItem->variant()) {
+                $cartItem->variant()->decrement('quantity', $cartItem['quantity']);
+            } else {
+                $cartItem->product()->decrement('quantity', $cartItem['quantity']);
+            }
+
             CartItem::destroy($cartItem['id']);
+
         }
 
         return [

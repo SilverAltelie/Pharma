@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
 import "normalize.css"
 import "bootstrap/dist/css/bootstrap.css";
 
@@ -33,15 +32,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
 
-        {/* Chuyển Script vào đây */}
-        <Script src="../public/customer/js/jquery/jquery-2.2.4.min.js" strategy="lazyOnload" />
-        <Script src="../public/customer/js/popper.min.js" strategy="lazyOnload" />
-        <Script src="../public/customer/js/bootstrap.min.js" strategy="lazyOnload" />
-        <Script src="../public/customer/js/plugins.js" strategy="lazyOnload" />
-        <Script src="../public/customer/js/classy-nav.min.js" strategy="lazyOnload" />
-        <Script src="../public/customer/js/active.js" strategy="lazyOnload" />
-        <Script src="../public/js/homeHeader.js" strategy="lazyOnload" />
-        <Script src="../public/js/main.js" strategy="lazyOnload" />
+
       </body>
     </html>
   );

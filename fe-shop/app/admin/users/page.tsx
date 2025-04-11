@@ -4,9 +4,16 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import AdminLayout from "../admin-layout";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import type { User } from "../../type";
 
 export default function UsersTable() {
-  const [users, setUsers] = useState<any[]>([]);
+  type extendedUser = User & {
+    role: string;
+    address: {
+      phone: string;
+    };
+  }
+  const [users, setUsers] = useState<extendedUser[]>([]);
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 

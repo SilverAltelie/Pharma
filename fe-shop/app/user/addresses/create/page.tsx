@@ -1,6 +1,5 @@
 'use client'
 
-import {ChevronDownIcon} from '@heroicons/react/16/solid';
 import MainLayout from '@/app/_userlayout';
 import {useState} from 'react';
 import {Field, Label, Switch} from '@headlessui/react';
@@ -41,8 +40,12 @@ export default function AddressCreate() {
 
             alert('Thêm địa chỉ thành công');
             router.push('/user/addresses');
-        } catch (err: any) {
-            setError(err.message || 'Đã có lỗi xảy ra');
+        } catch (error) {
+            if (error instanceof Error) {
+                setError(error.message || 'Đã có lỗi xảy ra');
+            } else {
+                setError('Đã có lỗi xảy ra');
+            }
         } finally {
             setLoading(false);
         }
@@ -147,7 +150,3 @@ export default function AddressCreate() {
         </MainLayout>
     );
 }
-
-const inputField = "w-full mt-2 p-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none";
-const btnCancel = "px-4 py-2 text-gray-700 border rounded-md hover:bg-gray-100 transition";
-const btnSubmit = "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 transition";

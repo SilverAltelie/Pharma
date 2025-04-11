@@ -118,6 +118,7 @@
       <excludeFolder url="file://$MODULE_DIR$/shopping-online/vendor/vlucas/phpdotenv" />
       <excludeFolder url="file://$MODULE_DIR$/shopping-online/vendor/voku/portable-ascii" />
       <excludeFolder url="file://$MODULE_DIR$/shopping-online/vendor/webmozart/assert" />
+      <excludeFolder url="file://$MODULE_DIR$/shopping-online/vendor/predis/predis" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

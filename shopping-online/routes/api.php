@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\Category\CategoryController;
 use App\Http\Controllers\Admin\Product\ProductController;
-use App\Http\Controllers\User\Product\ProductController as UserProductController;
 use App\Http\Controllers\User\Order\OrderController as UserOrderController;
 use App\Http\Controllers\Admin\Order\OrderController;
+use App\Http\Controllers\User\Category\CategoryController as UserCategoryController;
+use App\Http\Controllers\User\Product\ProductController as UserProductController;
 
 use \App\Http\Controllers\Admin\Variant\VariantController;
 use App\Http\Controllers\Admin\AdminController;
@@ -70,9 +71,9 @@ Route::prefix('')->middleware('optional-auth')->group(function () {
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::get('/product', [ProductController::class, 'index']);
     Route::get('/products', [UserProductController::class, 'index']);
-    Route::get('/products/{id}', [ProductController::class, 'show']);
+    Route::get('/products/{id}', [UserProductController::class, 'show']);
     Route::prefix('/category')->group(function () {
-        Route::get('/{id}', [CategoryController::class, 'show']);
+        Route::get('/{id}', [UserCategoryController::class, 'show']);
     });
 
     Route::prefix('/cart')->group(function () {
@@ -83,7 +84,12 @@ Route::prefix('')->middleware('optional-auth')->group(function () {
         Route::post('/updateQuantity', [CartController::class, 'updateQuantity']);
         Route::post('/updateAllQuantity', [CartController::class, 'updateAllQuantity']);
     });
-    Route::get('/product/show/{id}', [ProductController::class, 'show']);
+
+    Route::prefix('/product')->group(function () {
+        Route::get('/show/{id}', [UserProductController::class, 'show']);
+        Route::get('/relateProduct/{id}', [UserProductController::class, 'getRelate']);
+        Route::post('/updateRelate', [UserProductController::class, 'updateRelate']);
+    });
 
     Route::prefix('/order')->group(function () {
         Route::get('/', [UserOrderController::class, 'index']);

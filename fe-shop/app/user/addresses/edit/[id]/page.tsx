@@ -1,21 +1,39 @@
 'use client'
 
-import {ChevronDownIcon} from '@heroicons/react/16/solid';
 import MainLayout from '@/app/_userlayout';
 import {use, useEffect, useState} from 'react';
 import {Field, Label, Switch} from '@headlessui/react';
 import {useRouter} from "next/navigation";
+import type { User, Address } from "@/app/type";
 
 export default function AddressCreate({params}: { params: Promise<{ id: number }> }) {
+
+    /*type Address = {
+        id: string;
+        first_name: string;
+        last_name: string;
+        address: string;
+        phone: string;
+        is_default: string;
+    }
+
+    type User = {
+        id: string;
+        name: string;
+        email: string;
+        addresses: Address[];
+    }*/
+
+    type Data = {
+        user: User;
+        address: Address;
+    }
+
     const {id} = use(params);
     const [agree, setAgree] = useState(false);
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<Data>();
 
     const router = useRouter();
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-
-    const [user, setUser] = useState<{ email: string; number: string } | null>(null);
 
     const [address, setAddress] = useState('');
     const [firstName, setFirstName] = useState('');
@@ -55,10 +73,8 @@ export default function AddressCreate({params}: { params: Promise<{ id: number }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement> | undefined) {
         e?.preventDefault();
-        setError('');
 
         try {
-            setLoading(true);
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/addresses/update/${id}`, {
                 method: 'POST',
                 headers: {
@@ -82,10 +98,14 @@ export default function AddressCreate({params}: { params: Promise<{ id: number }
 
             alert('Cập nhật địa chỉ thành công');
             router.push('/user/addresses');
-        } catch (err: any) {
-            setError(err.message || 'Đã có lỗi xảy ra');
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                console.error(err.message || 'Đã có lỗi xảy ra');
+            } else {
+                console.error('Đã có lỗi xảy ra');
+            }
         } finally {
-            setLoading(false);
+            // Ensure loading state is handled properly
         }
     }
 
@@ -172,8 +192,3 @@ export default function AddressCreate({params}: { params: Promise<{ id: number }
         </MainLayout>
     );
 }
-
-// CSS Utility Classes (Tailwind)
-const inputField = "w-full mt-2 p-2 border rounded-md focus:ring focus:ring-indigo-300 focus:outline-none";
-const btnCancel = "px-4 py-2 text-gray-700 border rounded-md hover:bg-gray-100 transition";
-const btnSubmit = "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 transition";

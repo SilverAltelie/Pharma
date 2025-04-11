@@ -1,12 +1,29 @@
 'use client'
 
 import MainLayout from '@/app/_userlayout'
-import {PaperClipIcon} from '@heroicons/react/20/solid'
 import {useEffect, useState} from 'react'
 import {MapIcon} from '@heroicons/react/20/solid'
+import type {User, Address} from "@/app/type";
 
 export default function Profile() {
-    const [user, setUser] = useState<any>(null);
+
+    /*type Address = {
+        id: string;
+        first_name: string;
+        last_name: string;
+        address: string;
+        phone: string;
+        is_default: string;
+    }
+
+    type User = {
+        id: string;
+        name: string;
+        email: string;
+        addresses: Address[];
+    }*/
+
+    const [user, setUser] = useState<User>();
 
     useEffect(() => {
         async function fetchData() {
@@ -37,7 +54,7 @@ export default function Profile() {
         return <div>Loading...</div>;
     }
 
-    const defaultAddress = user?.addresses?.find((address: any) => address.is_default === "1");
+    const defaultAddress = user?.addresses?.find((address: Address) => address.is_default == 1);
 
     return (
         <MainLayout>
@@ -63,7 +80,7 @@ export default function Profile() {
                         <dd className="sm:col-span-2">
                             {user?.addresses?.length > 0 ? (
                                 <ul className="space-y-2">
-                                    {user?.addresses?.map((address: any, index: number) => (
+                                    {user?.addresses?.map((address: Address, index: number) => (
                                         <li key={index} className="flex items-center space-x-2 text-sm text-gray-700">
                                             <MapIcon className="size-5 text-green-500"/>
                                             <span>{`${address.first_name} ${address.last_name}, ${address.address}`}</span>

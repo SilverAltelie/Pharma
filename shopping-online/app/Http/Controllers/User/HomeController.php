@@ -9,6 +9,8 @@ use App\Services\Category\CategoryListService;
 use App\Services\Cart\CartGetItemsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class HomeController extends Controller
 {
@@ -25,9 +27,17 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
+        if (!$user && !Session::has('user')) {
+            $user = [
+              'id' => 'guest_' . Str::uuid(10),
+                'name' => 'Khách hàng',
+            ];
+            $guest = Session::put('user', $user);
+        }
+
         $categories = $this->categoryListService->handle();
 
-        if ($user) {
+        if (!Session::has('user')) {
             $cartItems = $this->cartGetItemsService->getProductCart($user->id);
 
             foreach ($cartItems as $item) {
@@ -39,7 +49,12 @@ class HomeController extends Controller
                 }
             }
         } else {
-            $cartItems = session('cart', []);
+
+            if (!Session::has('cart')) {
+                Session::put('cart', []);
+            }
+
+            $cartItems = Session::get('cart');
         }
 
         return response()->json([

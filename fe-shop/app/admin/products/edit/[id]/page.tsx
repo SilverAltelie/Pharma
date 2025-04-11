@@ -1,17 +1,44 @@
 'use client'
 
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
 import { use, useEffect, useState } from 'react'
 import AdminLayout from '@/app/admin/admin-layout'
 import {useRouter} from "next/navigation";
+
+type Product = {
+    id?: number;
+    title: string;
+    active: string;
+    description: string;
+    quantity: number;
+    price: number;
+    content: string;
+    image: string;
+    category_id: string;
+    status: number;
+}
+
+type Category = {
+    id: string;
+    name: string;
+}
 
 export default function UpdateProduct( {params}: {params: Promise<{id: number}>}) {
   const {id} = use(params);
   const router = useRouter();
 
   const [categories, setCategories] = useState([]);
-  const [product, setProduct] = useState<{ title?: string; description?: string ;quantity?: number; price?: number; content?: string; image: string; category_id?: string; status?: number }>({});
+  const [product, setProduct] = useState<Product>({
+    title: '',
+    active: '0',
+    description: '',
+    quantity: 0,
+    price: 0,
+    content: '',
+    image: '',
+    category_id: '0',
+    status: 0
+  });
 
 
     const [imagePreviews, setImagePreviews] = useState<string[]>([]); // Hiển thị ảnh preview
@@ -94,7 +121,7 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             const categoryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`);
             const categoryJson = await categoryRes.json();
             setCategories(categoryJson);
-            setProduct(ProductJson.data.find((product: any) => product.id == id));
+            setProduct(ProductJson.data.find((product: Product) => (product.id) == id));
             } catch (error) {
             console.error("Lỗi khi gọi API: ", error);
             }
@@ -183,7 +210,7 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
                 autoComplete="category"
                 className="block border-2 w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
               >
-                {categories.map((category: any) => (
+                {categories.map((category: Category) => (
                   <option key={category.id}>{category.name}</option>
                 ))}
                 </select>

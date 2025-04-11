@@ -1,9 +1,8 @@
 'use client'
 
-import { loginService } from "@/app/api/auth/login/route";
-import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react"
+import Link from "next/link";
 
 export default function Login() {
 
@@ -12,7 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async(e: any) => {
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
@@ -37,8 +36,9 @@ export default function Login() {
       localStorage.setItem('adminToken', token);
       alert('Đăng nhập thành công');
       router.push('/admin');
-    } catch (err: any) {
-      setError(err.message || 'Đăng nhập không thành công');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Đăng nhập không thành công';
+      setError(errorMessage);
     }
   };
 
@@ -84,9 +84,9 @@ export default function Login() {
                     Mật khẩu
                   </label>
                   <div className="text-sm">
-                    <a href="/admin/auth/forgot-pass" className="font-semibold text-green-700 hover:text-green-800">
+                    <Link href="/admin/auth/forgot-pass" className="font-semibold text-green-700 hover:text-green-800">
                       Quên mật khẩu?
-                    </a>
+                    </Link>
                   </div>
                 </div>
                 <div className="mt-2">

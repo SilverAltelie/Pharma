@@ -5,7 +5,35 @@ import { FaMoneyCheck } from "react-icons/fa";
 import { FaCartShopping, FaCircleCheck, FaTruckFast, FaCircleXmark } from "react-icons/fa6";
 
 const ProductsOrderTable = () => {
-    const [groupedOrders, setGroupedOrders] = useState<any>([]);
+
+    type OrderItem = {
+        id: number;
+        order_id: number;
+        product_name: string;
+        product: {
+            id: number;
+            title: string;
+            description: string;
+            images: { image: string }[];
+            price: number;
+        };
+        variant?: {
+            id: number;
+            name: string;
+            price: number;
+        };
+        quantity: number;
+    }
+
+    type Order = {
+        id: number;
+        status: number;
+        order_items: OrderItem[];
+        created_at: string;
+        updated_at: string;
+    }
+
+    const [groupedOrders, setGroupedOrders] = useState<Order[]>([]);
     
     useEffect(() => {
         async function fetchData() {
@@ -26,9 +54,9 @@ const ProductsOrderTable = () => {
                 // Nhóm order_items theo order_id
                 const orderItems = orders?.data?.order_items || [];
                 
-                const grouped = orders.data.map((order: { id: any; }) => ({
+                const grouped = orders.data.map((order: { id: number; }) => ({
                     ...order,
-                    items: orderItems.filter((item: { order_id: any; }) => item.order_id === order.id)
+                    items: orderItems.filter((item: { order_id: number; }) => item.order_id === order.id)
                 }));
                 
                 setGroupedOrders(grouped);
@@ -39,8 +67,8 @@ const ProductsOrderTable = () => {
         fetchData();
     }, []);
 
-    const totalAmount = groupedOrders.reduce((acc: number, order: any) => {
-        const orderTotal = order.order_items.reduce((orderAcc: number, item: any) => {
+    const totalAmount = groupedOrders.reduce((acc: number, order: Order) => {
+        const orderTotal = order.order_items.reduce((orderAcc: number, item: OrderItem) => {
             const price = item.variant ? item.variant.price : item.product.price;
             return orderAcc + (price * item.quantity);
         }, 0);
@@ -57,12 +85,7 @@ const ProductsOrderTable = () => {
 
                 {groupedOrders.length >= 0 ?
                     <div className="space-y-6 mx-80">
-                    {groupedOrders.map((order: {
-                        id: number;
-                        status: number;
-                        order_items: any[];
-                        created_at: string
-                    }, index: number) => (
+                    {groupedOrders.map((order: Order) => (
                         <div key={order.id} className="bg-white p-6 shadow-xl rounded-lg border-2">
                             {/* Order Header */}
                             <div className="grid grid-cols-3 gap-4 border-b pb-4 text-sm text-gray-700">

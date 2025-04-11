@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Scout\Searchable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasUuids, HasApiTokens;
+    use HasFactory, Notifiable, HasUuids, HasApiTokens, Searchable;
 
     protected $keyType = 'string'; // UUID là chuỗi
     public $incrementing = false;  // Tắt tăng tự động cho id
@@ -66,5 +67,9 @@ class User extends Authenticatable
 
     public function orders() {
         return $this->hasMany(Order::class, 'user_id');
+    }
+
+    public function userBehaviors() {
+        return $this->hasMany(UserBehavior::class, 'user_id');
     }
 }

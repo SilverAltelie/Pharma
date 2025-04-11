@@ -7,7 +7,6 @@ import AdminLayout from '@/app/admin/admin-layout'
 
 export default function CategoryUpdate({params}: {params: Promise<{id: string}>}) {
     const {id} = use(params)
-  const [agreed, setAgreed] = useState(false)
   const [categories, setCategories] = useState([])
   const router = useRouter();
 
@@ -160,8 +159,8 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
                   className="block w-full border-2 rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
                 >
                 <option value="">Không có</option>
-                {categories.map((category: any) => (
-                    category.parent_id === null && <option key={category.id} value={category.id}>{category.name}</option>
+              {categories.map((category: { id: string; name: string; description: string; status: number; parent_id: string | null }) => (
+                  category.parent_id === null && <option key={category.id} value={category.id}>{category.name}</option>
                 ))}
             </select>
               </div>    

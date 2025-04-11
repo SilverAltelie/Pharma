@@ -1,18 +1,25 @@
 import {useState} from "react";
 import {StarIcon} from "@heroicons/react/20/solid";
 import {FaTrash} from "react-icons/fa";
+import type {ReviewType} from "@/app/type";
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-export interface ReviewType {
-    id?: string;
+/*type ReviewType = {
+    id: number; // Change from string | undefined to number
+    user?: User; // Change from string | User to User | undefined
     user_name?: string;
     rate: number;
     comment?: string;
     created_at?: string;
-}
+};
+
+interface User {
+    id: string;
+    name: string;
+}*/
 
 interface ProductReviewsProps {
     reviews: ReviewType[];
@@ -24,7 +31,6 @@ interface ProductReviewsProps {
 export default function ProductReviews({
                             reviews,
                             isAdmin = false,
-                            onEdit,
                             onDelete
                         }: ProductReviewsProps) {
     const [expanded, setExpanded] = useState<boolean>(false);
@@ -64,12 +70,12 @@ export default function ProductReviews({
                             <div className="flex items-left">
                                 <div className="flex items-top">
                                     <div className="w-8 h-8 rounded-full bg-green-200 flex items-center justify-center text-gray-500">
-                                        {review.user.name ? review.user.name.charAt(0).toUpperCase() : 'K'}
+                                        {review.user?.name ? review.user.name.charAt(0).toUpperCase() : 'K'}
                                     </div>
                                 </div>
                                 <div className="ml-3">
                                     <h3 className="text-lg font-medium text-green-900">
-                                        {review.user.name || 'Khách hàng ẩn danh'}
+                                        {review.user?.name || 'Khách hàng ẩn danh'}
                                     </h3>
                                     <div className="text-sm ml-2 text-gray-500">
                                         <div className="flex items-center mt-1">
@@ -102,7 +108,7 @@ export default function ProductReviews({
                                 {isAdmin && review.id && (
                                     <div className="flex space-x-2">
                                         <button
-                                            onClick={() => onDelete && onDelete(review.id!)}
+                                            onClick={() => onDelete && onDelete(String(review.id!))}
                                             className="text-red-600 hover:text-red-800"
                                             title="Xóa"
                                         >

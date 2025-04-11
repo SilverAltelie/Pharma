@@ -2,6 +2,8 @@
 
 namespace App\Http;
 
+use App\Jobs\SyncUserBehaviorToAlgolia;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -76,4 +78,14 @@ class Kernel extends HttpKernel
         'rolePermission' => \App\Http\Middleware\CheckRolePermission::class,
         'admin.auth' => \App\Http\Middleware\AdminAuthMiddleware::class,
     ];
+
+    protected function schedule(Schedule $schedule)
+    {
+        $schedule->job(new SyncUserBehaviorToAlgolia([
+            'user_id' => 'guest_' . session()->getId(),
+            'product_id' => null,
+            'action' => 'viewed',
+        ]));
+    }
+
 }

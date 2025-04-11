@@ -29,7 +29,7 @@ const FloatingMenu = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/data");
+        const res = await fetch("");
         const json = await res.json();
         setUser(json.user);
         setMessages(json.messages);

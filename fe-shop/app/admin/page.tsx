@@ -3,10 +3,58 @@
 import { useEffect, useState } from "react";
 import { FaBox, FaChartLine, FaList, FaUsers } from "react-icons/fa";
 import AdminLayout from "./admin-layout";
+import type { Order, Customer, OrderItem } from "../type";
 
 export default function Dashboard() {
 
-  const [data, setData] = useState(null);
+  /*type Order = {
+    id: number;
+    status: number;
+  };
+
+    type Customer = {
+        id: number;
+        name: string;
+        email: string;
+        addresses: {
+        phone: string;
+        }[];
+    };
+
+    type Variant = {
+        id: number;
+        name: string;
+        price: number;
+        quantity: number;
+    }
+
+    type Product = {
+        id: number;
+        title: string;
+        href: string;
+        image: string;
+        price: number;
+        color: string;
+        variants: Variant[];
+    }
+
+    type OrderItem = {
+        id: number;
+        order_id: number;
+        product_id: number;
+        variant_id: number;
+        quantity: number;
+        price: number;
+        product?: Product;
+    }*/
+
+    type Data = {
+        orders: Order[];
+        customers: Customer[];
+        order_items: OrderItem[];
+    }
+
+  const [data, setData] = useState<Data>();
 
   useEffect(() => {
     async function fetchData() {
@@ -39,12 +87,13 @@ export default function Dashboard() {
   if (!data) return <p>Loading...</p>;
 
   const completedOrdersSet = new Set(
-    data.orders.filter(order => order.status === 3).map(order => order.id)
+    data.orders?.filter(order => order.status === 3).map(order => order.id)
   );
-  
+
   const completedOrdersValue = data.order_items.reduce((total, item) => {
-    if (!completedOrdersSet.has(item.order_id)) return total; // Bỏ qua order chưa hoàn thành
-    return total + item.price * item.quantity;
+      if (!completedOrdersSet.has(item.order_id)) return total; // Bỏ qua order chưa hoàn thành
+      const price = item.product?.variants?.find(variant => parseInt(variant.id) === item.variant_id)?.price || item.product?.price;
+      return total + price * item.quantity;
   }, 0);
 
   
@@ -138,7 +187,7 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody>
-                {data?.customers?.map((customer: any, index: number) => (
+                {data?.customers?.map((customer: Customer, index: number) => (
                   <tr key={index} className="border-t">
                     <td className="p-2">{index}</td>
                     <td className="p-2">{customer.name}</td>

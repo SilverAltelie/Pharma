@@ -3,26 +3,32 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@algolia/client-insights": "^5.23.2",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
+    "algoliasearch": "^4.24.0",
     "bootstrap": "^5.3.3",
     "framer-motion": "^12.4.7",
+    "instantsearch.js": "^4.78.1",
     "jquery": "^3.7.1",
     "lodash": "^4.17.21",
     "next": "15.1.7",
     "normalize": "^0.3.1",
     "normalize.css": "^8.0.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
+    "react-instantsearch-dom": "^6.40.4",
+    "react-instantsearch-hooks-web": "^6.47.3",
     "recharts": "^2.15.1",
-    "swiper": "^11.2.4"
+    "swiper": "^11.2.4",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

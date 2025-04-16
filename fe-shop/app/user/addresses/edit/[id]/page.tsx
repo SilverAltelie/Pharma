@@ -49,7 +49,7 @@ export default function AddressCreate({params}: { params: Promise<{ id: number }
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                     }
                 });
                 const json = await res.json();
@@ -80,7 +80,7 @@ export default function AddressCreate({params}: { params: Promise<{ id: number }
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                 },
                 body: JSON.stringify({
                     first_name: firstName,

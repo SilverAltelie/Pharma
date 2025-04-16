@@ -41,7 +41,7 @@ export default function Address() {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                     },
                 });
                 if (!res.ok) {
@@ -69,7 +69,7 @@ export default function Address() {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                 },
             });
             if (!res.ok) {
@@ -96,7 +96,7 @@ export default function Address() {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                 },
             });
             if (!res.ok) {

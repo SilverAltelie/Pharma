@@ -21,6 +21,12 @@ class ProductController extends Controller
         $this->productCreateService = $productCreateService;
         $this->productUpdateService = $productUpdateService;
         $this->productDeleteService = $productDeleteService;
+
+        $permissions = config('permission.product');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
     /**
      * Display a listing of the resource.
@@ -28,7 +34,7 @@ class ProductController extends Controller
     public function index()
     {
         //
-        return Product::with('images')->paginate(10);
+        return Product::with('images')->paginate(12);
     }
 
     /**

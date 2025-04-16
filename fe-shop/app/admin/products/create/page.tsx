@@ -77,6 +77,7 @@ export default function ProductCreate() {
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
+                "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
             },
             body: JSON.stringify(payload),
         });
@@ -96,6 +97,7 @@ export default function ProductCreate() {
                 method: "GET",
                 headers: { "Content-Type": "application/json",
                     'Accept': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`,
                 }
             });
             const json = await res.json();

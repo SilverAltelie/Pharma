@@ -52,7 +52,7 @@ export default function ClientProductPage({ id }: { id: number }) {
     const [reviews, setReviews] = useState<ReviewType[]>([]);
     const [editingReview, setEditingReview] = useState<ReviewType>();
     const [isEditingReview, setIsEditingReview] = useState(false);
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     useEffect(() => {
         async function fetchData() {

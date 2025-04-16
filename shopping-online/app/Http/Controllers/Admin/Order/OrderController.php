@@ -13,6 +13,12 @@ class OrderController extends Controller
     protected $orderUpdateService;
     public function __construct(OrderUpdateService $orderUpdateService) {
         $this->orderUpdateService = $orderUpdateService;
+
+        $permissions = config('permission.order');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
     public function index()
     {

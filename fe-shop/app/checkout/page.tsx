@@ -72,7 +72,7 @@ export default function CheckOut() {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('token') : ''}`,
+                    'Authorization': `Bearer ${typeof window !== 'undefined' ? sessionStorage.getItem('token') : ''}`,
                 },
                 body: JSON.stringify({
                     cartItems,

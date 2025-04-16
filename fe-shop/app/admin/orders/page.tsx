@@ -36,17 +36,29 @@ type Order = {
     created_at: string;
     updated_at: string;
     order_items: OrderItem[];
+    user?: {
+        id: string;
+        name: string;
+    }
 };
 
 
 const ProductsOrderTable = () => {
     const [groupedOrders, setGroupedOrders] = useState<Order[]>([]);
     const [isEditStatus, setIsEditStatus] = useState<boolean>(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`
+                    }
+                });
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }
@@ -62,13 +74,14 @@ const ProductsOrderTable = () => {
                 }));
 
                 setGroupedOrders(grouped);
+                setLastPage(data.last_page)
             } catch (error) {
                 console.error("Error:", error);
             }
         }
 
         fetchData();
-    }, []);
+    }, [currentPage]);
 
     const colorStatus = (status: number) => {
         switch (status) {
@@ -92,7 +105,7 @@ const ProductsOrderTable = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`
                 },
                 body: JSON.stringify({
                     status: status
@@ -132,10 +145,14 @@ const ProductsOrderTable = () => {
                         {groupedOrders.map((order: Order, index: number) => (
                             <div key={index} className="bg-white p-6 shadow-xl rounded-lg border-2">
                                 {/* Order Header */}
-                                <div className="grid grid-cols-4 gap-4 border-b pb-4 text-sm text-gray-700">
+                                <div className="grid grid-cols-5 gap-4 border-b pb-4 text-sm text-gray-700">
                                     <div>
                                         <p className="font-semibold">Mã đơn hàng</p>
                                         <p>{order.id}</p>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold">Người đặt hàng</p>
+                                        <p>{order.user?.name || 'Người lạ'}</p>
                                     </div>
                                     <div>
                                         <p className="font-semibold">Ngày đặt hàng</p>
@@ -320,6 +337,40 @@ const ProductsOrderTable = () => {
                     : <div className="ml-80">
                         <p>Chưa có đơn hàng nào được đặt</p>
                     </div>}
+
+                <div className="flex justify-center items-center mt-8 mb-40">
+                    <div className="flex space-x-2">
+                        <button
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                            className="px-4 py-2 bg-gray-300 text-gray-800 rounded disabled:opacity-50"
+                        >
+                            Trước
+                        </button>
+
+                        {[...Array(lastPage)].map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setCurrentPage(index + 1)}
+                                className={`px-4 py-2 rounded ${
+                                    currentPage === index + 1
+                                        ? "bg-blue-600 text-white"
+                                        : "bg-gray-100 text-gray-800"
+                                }`}
+                            >
+                                {index + 1}
+                            </button>
+                        ))}
+
+                        <button
+                            disabled={currentPage === lastPage}
+                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, lastPage))}
+                            className="px-4 py-2 bg-gray-300 text-gray-800 rounded disabled:opacity-50"
+                        >
+                            Tiếp
+                        </button>
+                    </div>
+                </div>
             </div>
 
 

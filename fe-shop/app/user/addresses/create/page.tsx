@@ -28,7 +28,7 @@ export default function AddressCreate() {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                 },
                 body: JSON.stringify({first_name: firstName, last_name: lastName, email, phone, address, is_default: '0'}),
             });

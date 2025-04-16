@@ -66,7 +66,11 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
     const [isEditingReview, setIsEditingReview] = useState(false);
 
     async function fetchData() {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/show/${id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/show/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+            }
+        });
         const data = await res.json();
         setProduct(data);
 
@@ -102,7 +106,11 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
         try {
             const response = await fetch(url, {
                 method,
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${sessionStorage.getItem('token')}`,
+                },
                 body: JSON.stringify(variantData),
             });
 
@@ -143,7 +151,7 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
                 method: "POST",
                 headers: {"Content-Type": "application/json",
                             "Accept": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem('token')}`},
+                            "Authorization": `Bearer ${sessionStorage.getItem('token')}`},
                 body: JSON.stringify(reviewData),
             });
 
@@ -172,7 +180,11 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
         try {
             const response = await fetch(url, {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": `Bearer ${sessionStorage.getItem('token')}`,
+                },
             });
 
             const result = await response.json();
@@ -199,7 +211,10 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
         const method = "POST";
         await fetch(url, {
             method,
-            headers: { "Content-Type": "application/json", },
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${sessionStorage.getItem('token')}`,
+            },
         });
         fetchData();
     }

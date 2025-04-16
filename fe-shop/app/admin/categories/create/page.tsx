@@ -12,7 +12,13 @@ export default function CategoryCreate() {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
+          }
+        });
         if (!res.ok) {
           console.error('Lỗi API:', res.status, res.statusText);
           return;
@@ -52,6 +58,7 @@ export default function CategoryCreate() {
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
+          "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
         },
         body: JSON.stringify({ name, description, status, parent_id }),
       });

@@ -26,6 +26,7 @@ export default function ProductCard({ product, handleAddToCart, handleViewProduc
                     <FaCartPlus />
                 </button>
             )}
+            <button onClick={() => handleViewProduct(product.id)} className="font-semibold text-gray-900">
             <img
                 alt={product.title}
                 src={`data:image/jpeg;base64,${product.images[0]?.image}`}
@@ -34,13 +35,14 @@ export default function ProductCard({ product, handleAddToCart, handleViewProduc
             <div className="mt-4 flex justify-between">
                 <div>
                     <h3 className="text-sm text-gray-700">
-                        <button onClick={() => handleViewProduct(product.id)} className="font-semibold text-gray-900">
+
                             {product.title}
-                        </button>
+
                     </h3>
                 </div>
                 <p className="text-sm font-medium text-gray-900">{product.price}</p>
             </div>
+            </button>
         </div>
     );
 }

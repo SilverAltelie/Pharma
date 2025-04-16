@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "922d9ad15520946d371407cffd5c6b89",
+    "content-hash": "9b32590609aa49d281deb49a83cd404a",
     "packages": [
         {
             "name": "algolia/algoliasearch-client-php",
@@ -1542,16 +1542,16 @@
         },
         {
             "name": "laravel/scout",
-            "version": "v10.14.0",
+            "version": "v10.14.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/scout.git",
-                "reference": "840d18e3d68b17c59663fc687497c49c0ff0d295"
+                "reference": "6ae3ec83ceacb554f395df9fe15318a14b79bb39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/scout/zipball/840d18e3d68b17c59663fc687497c49c0ff0d295",
-                "reference": "840d18e3d68b17c59663fc687497c49c0ff0d295",
+                "url": "https://api.github.com/repos/laravel/scout/zipball/6ae3ec83ceacb554f395df9fe15318a14b79bb39",
+                "reference": "6ae3ec83ceacb554f395df9fe15318a14b79bb39",
                 "shasum": ""
             },
             "require": {
@@ -1619,7 +1619,7 @@
                 "issues": "https://github.com/laravel/scout/issues",
                 "source": "https://github.com/laravel/scout"
             },
-            "time": "2025-03-18T14:00:31+00:00"
+            "time": "2025-04-01T14:58:03+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -3513,6 +3513,89 @@
                 "source": "https://github.com/Riimu/Kit-PHPEncoder/tree/v2.4.2"
             },
             "time": "2022-12-10T18:12:25+00:00"
+        },
+        {
+            "name": "spatie/laravel-permission",
+            "version": "6.17.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-permission.git",
+                "reference": "02ada8f638b643713fa2fb543384738e27346ddb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/02ada8f638b643713fa2fb543384738e27346ddb",
+                "reference": "02ada8f638b643713fa2fb543384738e27346ddb",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/auth": "^8.12|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/container": "^8.12|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/contracts": "^8.12|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/database": "^8.12|^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "laravel/passport": "^11.0|^12.0",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^6.23|^7.0|^8.0|^9.0|^10.0",
+                "phpunit/phpunit": "^9.4|^10.1|^11.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\Permission\\PermissionServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-main": "6.x-dev",
+                    "dev-master": "6.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Spatie\\Permission\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Permission handling for Laravel 8.0 and up",
+            "homepage": "https://github.com/spatie/laravel-permission",
+            "keywords": [
+                "acl",
+                "laravel",
+                "permission",
+                "permissions",
+                "rbac",
+                "roles",
+                "security",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-permission/issues",
+                "source": "https://github.com/spatie/laravel-permission/tree/6.17.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-04-08T15:06:14+00:00"
         },
         {
             "name": "symfony/console",

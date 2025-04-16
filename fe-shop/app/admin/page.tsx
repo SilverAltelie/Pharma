@@ -59,7 +59,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = sessionStorage.getItem('adminToken');
         if (!token) {
           throw new Error('Token không tồn tại');
         }

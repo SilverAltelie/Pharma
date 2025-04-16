@@ -43,7 +43,7 @@ const ProductsOrderTable = () => {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                     }
                 });
                 if (!res.ok) {

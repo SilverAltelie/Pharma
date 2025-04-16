@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class Admin extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasUuids;
+    use HasApiTokens, HasFactory, Notifiable, HasUuids, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +27,7 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
+        'phone'
     ];
 
     /**
@@ -47,20 +49,5 @@ class Admin extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-    public function userRoles() {
-        return $this->hasMany(UserRole::class);
-    }
-
-    public function roles() {
-        return $this->belongsToMany(Role::class, 'user_roles');
-    }
-
-    public function hasPermission($permission)
-    {
-        return $this->roles()->whereHas('permissions', function ($query) use ($permission) {
-            $query->where('name', $permission);
-        })->exists();
-    }
 
 }

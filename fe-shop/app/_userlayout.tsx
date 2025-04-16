@@ -19,6 +19,7 @@ import {
 import { ChevronDownIcon, UserIcon, MapIcon, ShoppingBagIcon, ArrowLeftStartOnRectangleIcon, ArrowRightEndOnRectangleIcon, PencilSquareIcon} from '@heroicons/react/20/solid'
 import {useRouter} from "next/navigation";
 import Link from "next/link";
+import FloatingMenu from "@/app/floatingMenu";
 
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
@@ -33,7 +34,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
 
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+    const storedToken = sessionStorage.getItem("token");
     setToken(storedToken);
 
     async function fetchData() {
@@ -104,7 +105,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           product_id,
@@ -489,7 +490,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
       </Dialog>
       {children}
-      {/*<FloatingMenu />*/}
+      <FloatingMenu user={data?.user}/>
     </div>
   );
 }

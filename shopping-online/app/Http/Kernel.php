@@ -76,7 +76,7 @@ class Kernel extends HttpKernel
 
     protected $routeMiddleware = [
         'optional-auth' => \App\Http\Middleware\OptionalAuthMiddleware::class,
-        'rolePermission' => \App\Http\Middleware\CheckRolePermission::class,
+        'permission' => \App\Http\Middleware\CheckRolePermission::class,
         'admin.auth' => \App\Http\Middleware\AdminAuthMiddleware::class,
     ];
 

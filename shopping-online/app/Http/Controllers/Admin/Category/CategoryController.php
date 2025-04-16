@@ -16,19 +16,20 @@ class CategoryController extends Controller
     protected $categoryUpdateService;
     protected $categoryDeleteService;
     protected $categoryListService;
-
     protected $categoryShowService;
 
-    public function __construct(CategoryListService $categoryListService ,
-                                CategoryCreateService $categoryCreateService,
-                                CategoryUpdateService $categoryUpdateService,
-                                CategoryDeleteService $categoryDeleteService,
-                                CategoryShowService $categoryShowService){
+    public function __construct(CategoryListService $categoryListService ,CategoryCreateService $categoryCreateService, CategoryUpdateService $categoryUpdateService, CategoryDeleteService $categoryDeleteService, CategoryShowService $categoryShowService) {
         $this->categoryListService = $categoryListService;
         $this->categoryCreateService = $categoryCreateService;
         $this->categoryUpdateService = $categoryUpdateService;
         $this->categoryDeleteService = $categoryDeleteService;
         $this->categoryShowService = $categoryShowService;
+
+        $permissions = config('permission.category');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
 
     /**

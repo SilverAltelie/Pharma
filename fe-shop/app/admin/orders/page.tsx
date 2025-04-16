@@ -1,4 +1,5 @@
 'use client'
+import MainLayout from "@/app/_userlayout";
 import React, {useState, useEffect} from "react";
 import {
     FaCartShopping,
@@ -40,7 +41,7 @@ type Order = {
 
 
 const ProductsOrderTable = () => {
-    const [groupedOrders, setGroupedOrders] = useState<Order[]>([]);
+    const [groupedOrders, setGroupedOrders] = useState<any>([]);
     const [isEditStatus, setIsEditStatus] = useState<boolean>(false);
 
     useEffect(() => {

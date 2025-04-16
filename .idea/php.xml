@@ -139,6 +139,7 @@
       <path value="$PROJECT_DIR$/shopping-online/vendor/algolia/algoliasearch-client-php" />
       <path value="$PROJECT_DIR$/shopping-online/vendor/algolia/scout-extended" />
       <path value="$PROJECT_DIR$/shopping-online/vendor/predis/predis" />
+      <path value="$PROJECT_DIR$/shopping-online/vendor/spatie/laravel-permission" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1" />

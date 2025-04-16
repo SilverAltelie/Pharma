@@ -101,7 +101,6 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
-                "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
             },
             body: JSON.stringify(payload),
         });

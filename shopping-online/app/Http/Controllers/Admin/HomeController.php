@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Auth;
 class HomeController extends Controller
 {
     //
+    public function __construct()
+    {
+        $permissions = config('permission.home');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
+    }
     public function dashboard()
     {
         $orders = Order::with('user')->get();
@@ -36,10 +44,6 @@ class HomeController extends Controller
     }
 
     public function layout() {
-        $admin = Auth::user();
-
-        return response()->json([
-            'admin' => $admin,
-        ]);
+        return Auth::guard('admin')->user();
     }
 }

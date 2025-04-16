@@ -26,9 +26,6 @@ const FloatingMenu = (user: any) => {
     }
   }, []);
 
-  // Giả sử user_id hiện tại là 1
-  const currentUserId = user?.id;
-
   // Cuộn xuống tin nhắn mới nhất
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,50 +35,51 @@ const FloatingMenu = (user: any) => {
   const sendMessage = async () => {
     if (message.trim() === "") return;
 
-      // Gọi API gửi tin nhắn
-      const res = await fetch('https://api.studio.nebius.com/v1/chat/completions', {
-        method: 'POST',
+    // 1. Push tin nhắn người dùng trước
+    const userMessage = {
+      id: Date.now(),
+      role: 'user',
+      content: message,
+    };
+
+    setMessages((prevMessages) => {
+      const updated = [...prevMessages, userMessage];
+      sessionStorage.setItem("messages", JSON.stringify(updated));
+      return updated;
+    });
+
+    const currentMessage = message; // lưu để dùng sau
+    setMessage(""); // Reset input
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.NEBIUS_API_KEY}`,  // Sử dụng API key từ biến môi trường
-          'Accept': '*/*',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          temperature: 0.6,
-          model: 'meta-llama/Meta-Llama-3.1-70B-Instruct',
-          messages: [
-            {
-              role: 'user',
-              content: message,  // Nội dung tin nhắn gửi từ người dùng
-            },
-          ],
-        }),
+        body: JSON.stringify({ message: currentMessage }),
       });
 
       const result = await res.json();
-
-      if (res.ok) {
-        // Kiểm tra phản hồi có chứa choices và message
-        if (result && result.choices && result.choices[0] && result.choices[0].message) {
-          const newMessage = result.choices[0].message;  // Lấy message từ phản hồi API
-          const newMessageContent = newMessage.content;  // Nội dung tin nhắn trả về từ assistant
-
-          // Thêm tin nhắn vào danh sách
-          setMessages((prevMessages) => {
-            const updatedMessages = [...prevMessages, { role: 'assistant', content: newMessageContent }];
-            // Lưu tin nhắn vào sessionStorage
-            sessionStorage.setItem("messages", JSON.stringify(updatedMessages));
-            return updatedMessages;
-          });
-        } else {
-          console.error("Không tìm thấy tin nhắn trong phản hồi từ API:", result);
-        }
+      if (res.ok && result && result.content) {
+        const assistantMessage = {
+          id: Date.now() + 1,
+          role: 'assistant',
+          content: result.content,
+        };
+        setMessages((prevMessages) => {
+          const updated = [...prevMessages, assistantMessage];
+          sessionStorage.setItem("messages", JSON.stringify(updated));
+          return updated;
+        });
       } else {
-        console.error("Lỗi khi gửi tin nhắn:", result);
+        console.error("Lỗi khi nhận phản hồi:", result);
       }
-
-    setMessage("");  // Reset tin nhắn sau khi gửi
+    } catch (error) {
+      console.error("Lỗi khi gửi request:", error);
+    }
   };
+
 
   return (
       <div className="fixed bottom-6 right-6 flex flex-col items-end z-50">
@@ -93,7 +91,7 @@ const FloatingMenu = (user: any) => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-white w-80 h-96 p-4 rounded-lg shadow-lg border border-gray-200 flex flex-col fixed bottom-20 right-20"
+                  className="bg-white w-[500px] h-[700px] p-4 rounded-lg shadow-lg border border-gray-200 flex flex-col fixed bottom-20 right-20"
               >
                 <div className="flex justify-between items-center pb-2 border-b">
                   <h2 className="text-lg font-semibold">Hộp tin nhắn</h2>
@@ -105,7 +103,7 @@ const FloatingMenu = (user: any) => {
                 {/* Danh sách tin nhắn */}
                 <div className="flex-1 z-50 overflow-y-auto p-2 space-y-2">
                   {messages.map((msg) => (
-                      <div key={msg.id} className={`flex ${msg.role === 'assistant' ? "justify-end" : "justify-start"}`}>
+                      <div key={msg.id} className={`flex ${msg.role === 'user' ? "justify-end" : "justify-start"}`}>
                         <div className={`p-2 rounded-lg max-w-xs text-sm ${msg.role === 'assistant' ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"}`}>
                           {msg.content}
                         </div>

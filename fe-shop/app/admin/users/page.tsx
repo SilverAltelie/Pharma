@@ -58,10 +58,10 @@ export default function UsersTable() {
             throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
         }
 
-        const json = await res.json();
+        await res.json();
 
         alert('Xóa người dùng thành công');
-        setUsers(users.filter((user) => user.id !== id));
+        setUsers(users.filter((user) => parseInt(user.id) !== id));
     } catch (error) {
         console.error("Lỗi khi gọi API:", error);
     }
@@ -108,7 +108,7 @@ export default function UsersTable() {
                       >
                         <FaEdit /> Sửa
                       </button>
-                      <button onClick={() => handleDelete(user.id)} className="text-red-600 hover:text-red-800 text-center flex items-center gap-1">
+                      <button onClick={() => handleDelete(parseInt(user.id))} className="text-red-600 hover:text-red-800 text-center flex items-center gap-1">
                         <FaTrash /> Xóa
                       </button>
                     </td>

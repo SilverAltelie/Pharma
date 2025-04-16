@@ -16,10 +16,12 @@ import {
     FaWebAwesome
 } from "react-icons/fa6";
 import type {User, Order, OrderItem, Customer} from "@/app/type";
+import Link from "next/link";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 
     type Data = {
+        name: string;
         user: User;
         orders: Order[];
         customers: Customer[];
@@ -61,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`
                 }
             });
-            const json = await res.json();
+            await res.json();
             localStorage.removeItem('adminToken');
             window.location.href = '/admin/auth/login';
 
@@ -117,9 +119,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                                 <div className="flex items-center gap-3 mt-4">
                                     <FaWebAwesome className="text-base"/>
-                                    <a href="/admin/roles"
+                                    <Link href="/admin/roles"
                                        className="text-black no-underline text-sm font-medium hover:text-green-600">Quản
-                                        lý vai trò</a>
+                                        lý vai trò</Link>
                                 </div>
 
                                 <div className="flex items-center gap-3 mt-4">
@@ -137,11 +139,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         <FaList className="text-lg"/>
                         {!isCollapsed && <span>Danh mục</span>}
                     </a>
-                    <a href="/admin/products"
+                    <Link href="/admin/products"
                        className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
                         <FaBox className="text-lg"/>
                         {!isCollapsed && <span>Sản phẩm</span>}
-                    </a>
+                    </Link>
                     <a href="/admin/orders"
                        className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
                         <FaInbox className="text-lg"/>

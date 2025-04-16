@@ -4,11 +4,12 @@ import {useEffect, useState} from "react";
 import AdminLayout from "@/app/admin/admin-layout";
 import {FaFloppyDisk} from "react-icons/fa6";
 import {useParams, useRouter} from "next/navigation";
+import type {Permission, Role} from "@/app/type";
 
 export default function RolePermissionsPage() {
     const params = useParams<{ id: string }>();
     const router = useRouter();
-    const [permissions, setPermissions] = useState<any[]>([]);
+    const [permissions, setPermissions] = useState<Permission[]>([]);
     const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
 
     useEffect(() => {
@@ -34,8 +35,8 @@ export default function RolePermissionsPage() {
                     }
                 });
                 const rolesData = await roleRes.json();
-                const currentRole = rolesData.find((role: any) => role.id.toString() === params.id);
-                const currentPermissions = currentRole?.permissions.map((perm: any) => perm.id.toString()) || [];
+                const currentRole = rolesData.find((role: Role) => role.id.toString() === params.id);
+                const currentPermissions = currentRole?.permissions.map((perm: Permission) => perm.id.toString()) || [];
                 setSelectedPermissions(currentPermissions);
             } catch (error) {
                 console.error("Lỗi lấy permissions:", error);
@@ -61,7 +62,7 @@ export default function RolePermissionsPage() {
         }
     };
 
-    const handleGroupSelectAll = (groupPermissions: any[]) => {
+    const handleGroupSelectAll = (groupPermissions: Permission[]) => {
         const groupIds = groupPermissions.map(p => p.id.toString());
         const allSelected = groupIds.every(id => selectedPermissions.includes(id));
         if (allSelected) {
@@ -107,7 +108,7 @@ export default function RolePermissionsPage() {
         }
         acc[group].push(permission);
         return acc;
-    }, {} as Record<string, any[]>);
+    }, {} as Record<string, Permission[]>);
 
     return (
         <AdminLayout>

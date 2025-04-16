@@ -1,8 +1,8 @@
-import { UserCircleIcon } from '@heroicons/react/24/solid'
 'use client'
 
 import AdminLayout from '../../admin-layout'
 import {useEffect, useState} from "react";
+import type {OrderItem} from "@/app/type";
 
 export default function UserCreate() {
     const [roles, setRoles] = useState([]);
@@ -30,7 +30,7 @@ export default function UserCreate() {
         fetchData();
     }, []);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!(e.currentTarget instanceof HTMLFormElement)) {
@@ -154,7 +154,7 @@ export default function UserCreate() {
                                         name="role"
                                         className="block w-full border-2 rounded-md bg-white px-3.5 py-2 text-base text-gray-900 focus:outline-2 focus:outline-indigo-600"
                                     >
-                                        {roles?.map((item) => (
+                                        {roles?.map((item: OrderItem) => (
                                             <option key={item.id} value={item.id}>{item.name}</option>
                                         ))}
                                         <option value={'0'}>Khách hàng</option>

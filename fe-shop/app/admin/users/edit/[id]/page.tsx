@@ -1,9 +1,8 @@
 'use client'
 
-import { UserCircleIcon } from '@heroicons/react/24/solid'
 import AdminLayout from '@/app/admin/admin-layout'
 import { use, useEffect, useState } from 'react';
-import type { User } from '@/app/type';
+import type { User, Role } from '@/app/type';
 
 export default function UserCreate( { params}: {params: Promise<{id: string}>} ) {
 
@@ -14,10 +13,12 @@ export default function UserCreate( { params}: {params: Promise<{id: string}>} )
             address: string;
             phone: string;
         };
+        role_id: number;
     };
 
     type Data = {
-        users : ExtendedUser[];
+        user : ExtendedUser;
+        roles: Role[];
     }
 
 

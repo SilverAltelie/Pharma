@@ -25,25 +25,28 @@ export default function Products() {
 */
     const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`, {
-                    headers: {"Authorization": `Bearer ${sessionStorage.getItem('adminToken')}`},
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product?page=${currentPage}`, {
+                    headers: { "Authorization": `Bearer ${sessionStorage.getItem('adminToken')}` },
                 });
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }
                 const data = await res.json();
                 setProducts(data.data);
+                setLastPage(data.last_page);
             } catch (error) {
                 console.error("Error:", error);
             }
         }
         fetchData();
-    }
-    , []);
+    }, [currentPage]);
+
 
     async function handleDelete(id:number) {
         const isConfirmed = window.confirm("Bạn có chắc muốn xóa sản phẩm?")
@@ -117,8 +120,44 @@ export default function Products() {
                 </div>
               </div>
             ))}
+
+
+
           </div>
         </div>
+          <div className="flex justify-center items-center mb-40">
+              <div className="flex space-x-2">
+                  <button
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                      className="px-4 py-2 bg-gray-300 text-gray-800 rounded disabled:opacity-50"
+                  >
+                      Trước
+                  </button>
+
+                  {[...Array(lastPage)].map((_, index) => (
+                      <button
+                          key={index}
+                          onClick={() => setCurrentPage(index + 1)}
+                          className={`px-4 py-2 rounded ${
+                              currentPage === index + 1
+                                  ? "bg-blue-600 text-white"
+                                  : "bg-gray-100 text-gray-800"
+                          }`}
+                      >
+                          {index + 1}
+                      </button>
+                  ))}
+
+                  <button
+                      disabled={currentPage === lastPage}
+                      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, lastPage))}
+                      className="px-4 py-2 bg-gray-300 text-gray-800 rounded disabled:opacity-50"
+                  >
+                      Tiếp
+                  </button>
+              </div>
+          </div>
       </div>
       </AdminLayout>
     )

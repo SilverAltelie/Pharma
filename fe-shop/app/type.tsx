@@ -42,6 +42,21 @@ export type ReviewType = {
     updated_at?: string;
 }
 
+export type Permission = {
+    id: number;
+    name: string;
+    display_name: string;
+    description: string;
+}
+
+export type Role = {
+    name: string;
+    id: number;
+    display_name: string;
+    description: string;
+    permissions?: Permission[];
+}
+
 export type Product = {
     id: string;
     title: string;
@@ -80,6 +95,7 @@ export type OrderItem = {
     quantity: number;
     product: Product;
     variant?: Variant;
+    name?: string;
 }
 
 export type Order = {

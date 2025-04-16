@@ -29,7 +29,9 @@ export default function Products() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`, {
+                    headers: {"Authorization": `Bearer ${sessionStorage.getItem('adminToken')}`},
+                });
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }
@@ -53,6 +55,7 @@ export default function Products() {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
                 },
             });
 

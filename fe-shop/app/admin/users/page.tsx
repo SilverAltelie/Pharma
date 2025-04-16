@@ -21,7 +21,13 @@ export default function UsersTable() {
     setIsClient(true); // Đánh dấu rằng component đang chạy trên Client
     async function fetchData() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users`, {
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
+            },
+        });
         const json = await res.json();
         setUsers(json || []);
       } catch (error) {

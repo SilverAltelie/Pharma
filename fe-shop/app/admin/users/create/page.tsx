@@ -1,5 +1,4 @@
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
-import { ChevronDownIcon } from '@heroicons/react/16/solid'
+import { UserCircleIcon } from '@heroicons/react/24/solid'
 import AdminLayout from '../../admin-layout'
 
 export default function UserCreate() {

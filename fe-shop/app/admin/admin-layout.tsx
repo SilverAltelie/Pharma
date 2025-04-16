@@ -22,7 +22,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/admin-data");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
+            },
+        });
         const json = await res.json();
         setData(json);
       } catch (error) {

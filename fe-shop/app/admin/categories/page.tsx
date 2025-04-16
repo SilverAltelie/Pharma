@@ -13,7 +13,13 @@ export default function CategoriesTable() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch("http://localhost:8000/api/admin/category");
+                const res = await fetch("http://localhost:8000/api/admin/category", {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem("adminToken")}`,
+                    }
+                });
 
                 if (!res.ok) {
                     throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
@@ -48,6 +54,7 @@ export default function CategoriesTable() {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
                     },
                 });
 

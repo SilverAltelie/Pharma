@@ -12,7 +12,13 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
 
   useEffect(() => {
     async function fetchCategories() {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`,
+        }
+      })
         const data = await res.json()
         setCategories(data)
     }
@@ -48,7 +54,8 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json'
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`,
             },
             body: JSON.stringify({ name, description, status, parent_id })
           })

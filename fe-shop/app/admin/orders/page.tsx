@@ -46,7 +46,13 @@ const ProductsOrderTable = () => {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/`);
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/orders/`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    }
+                });
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }
@@ -92,7 +98,7 @@ const ProductsOrderTable = () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
                 },
                 body: JSON.stringify({
                     status: status

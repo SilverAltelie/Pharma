@@ -33,7 +33,7 @@ export default function Login() {
       const data = await res.json();
       const token = data.token;
 
-      localStorage.setItem('adminToken', token);
+      sessionStorage.setItem('adminToken', token);
       alert('Đăng nhập thành công');
       router.push('/admin');
     } catch (err: unknown) {

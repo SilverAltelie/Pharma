@@ -8,7 +8,7 @@ use Laravel\Scout\Searchable;
 
 class ProductImage extends Model
 {
-    use HasFactory, Searchable;
+    use HasFactory;
 
     protected $table = 'product_images';
     protected $fillable = ['product_id', 'image'];

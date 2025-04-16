@@ -12,6 +12,7 @@
   import { XMarkIcon } from '@heroicons/react/20/solid'
   import ProductCard from "@/app/ProductCard";
   import Link from "next/link";
+  import Recommend from "@/app/Recommend";
 
 
   const stats = [
@@ -106,12 +107,29 @@
 
     async function handleViewProduct($product_id: string) {
       try {
+        const viewedProducts = JSON.parse(sessionStorage.getItem('viewed') || '[]');
+
+        // Thêm sản phẩm hiện tại vào danh sách đã xem nếu chưa có
+        if (!viewedProducts.includes($product_id)) {
+          // Nếu số lượng sản phẩm đã xem vượt quá 3, xóa sản phẩm cũ nhất (ở đầu mảng)
+          if (viewedProducts.length >= 3) {
+            viewedProducts.shift(); // Xóa sản phẩm đầu tiên trong mảng
+          }
+
+          // Thêm sản phẩm mới vào cuối mảng
+          viewedProducts.push($product_id);
+
+          // Lưu lại danh sách vào localStorage
+          sessionStorage.setItem('viewed', JSON.stringify(viewedProducts));
+        }
+
+
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${$product_id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
           },
         });
         if (!res.ok) {
@@ -188,10 +206,8 @@
       fetchData();
     }, []);
 
-    /*if (!token) {
-      return <MainLayout>Loading...</MainLayout>;
-    }
-  */
+    const viewedProducts = JSON.parse(sessionStorage.getItem('viewed') || '[]');
+
     if (!data) {
       return <MainLayout>Loading...</MainLayout>;
     }
@@ -283,7 +299,7 @@
           </div>
         </div>
 
-        <section className="bg-blue-100 py-10">
+        <section className="bg-blue-100 py-10 z-0">
           <div className="container mx-auto grid grid-cols-3 gap-4">
             {/* Swiper bên trái */}
             <div className="col-span-2">
@@ -386,6 +402,14 @@
           </div>
         </div>
       </div>
+
+        <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+
+            <Recommend
+                productIds={viewedProducts}
+                handleViewProduct={handleViewProduct}
+            />
+        </div>
 
         <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
           <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">

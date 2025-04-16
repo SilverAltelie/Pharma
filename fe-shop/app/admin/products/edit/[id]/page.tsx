@@ -101,6 +101,7 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json",
+                "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
             },
             body: JSON.stringify(payload),
         });
@@ -116,9 +117,13 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
     useEffect(() => {
         async function fetchData() {
             try {
-            const productRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`);
+            const productRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/`, {
+                headers: {"Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`},
+            });
             const ProductJson = await productRes.json();
-            const categoryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`);
+            const categoryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`, {
+                headers: {"Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`},
+            });
             const categoryJson = await categoryRes.json();
             setCategories(categoryJson);
             setProduct(ProductJson.data.find((product: Product) => (product.id) == id));

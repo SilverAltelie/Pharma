@@ -32,7 +32,7 @@ export default function Login() {
 
       const data = await res.json();
 
-      localStorage.setItem('token', data.token);
+      sessionStorage.setItem('token', data.token);
       alert('Đăng nhập thành công');
       router.push('/');
     } catch (err) {

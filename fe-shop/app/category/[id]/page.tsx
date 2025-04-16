@@ -60,7 +60,7 @@ export default function CategoryPage({params}: { params: Promise<{ id: string }>
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
                 },
                 body: JSON.stringify({product_id: $product_id, quantity: 1}),
             });

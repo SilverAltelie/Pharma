@@ -50,4 +50,8 @@ class Admin extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function blogs() {
+        return $this->hasMany(Blog::class, 'admin_id');
+    }
+
 }

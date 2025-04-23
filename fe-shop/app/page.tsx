@@ -81,14 +81,18 @@
     const [data, setData] = useState<Data>();
     const [isVisible, setIsVisible] = useState(true);
     const [token, setToken] = useState<string>();
+    const [viewedProducts, setViewedProducts] = useState<number[]>([]);
 
     const handleDismiss = () => {
       setIsVisible(false);
     };
 
     useEffect(() => {
+      setViewedProducts(sessionStorage.getItem('viewed') ? JSON.parse(sessionStorage.getItem('viewed') || '[]') : []);
+      setToken(sessionStorage.getItem('token') ?? '');
+
       if (typeof window !== "undefined" && typeof document !== "undefined") {
-        import('bootstrap').then(({ Modal }) => {
+        import('bootstrap').then(({Modal}) => {
           const storageKey = "popupClosedTime";
           const displayAfterMillis = 3600000;
 
@@ -105,31 +109,29 @@
     }, []);
 
 
-    async function handleViewProduct($product_id: string) {
+    async function handleViewProduct(product_id: number) {
       try {
-        const viewedProducts = JSON.parse(sessionStorage.getItem('viewed') || '[]');
-
         // Thêm sản phẩm hiện tại vào danh sách đã xem nếu chưa có
-        if (!viewedProducts.includes($product_id)) {
+        if (!viewedProducts.includes(product_id)) {
           // Nếu số lượng sản phẩm đã xem vượt quá 3, xóa sản phẩm cũ nhất (ở đầu mảng)
           if (viewedProducts.length >= 3) {
             viewedProducts.shift(); // Xóa sản phẩm đầu tiên trong mảng
           }
 
           // Thêm sản phẩm mới vào cuối mảng
-          viewedProducts.push($product_id);
+          viewedProducts.push(product_id);
 
           // Lưu lại danh sách vào localStorage
           sessionStorage.setItem('viewed', JSON.stringify(viewedProducts));
         }
 
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${$product_id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${product_id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+            'Authorization': `Bearer ${token}`,
           },
         });
         if (!res.ok) {
@@ -137,7 +139,7 @@
         }
         const data = await res.json();
         console.log(data);
-        window.location.href = `/product/${$product_id}`;
+        window.location.href = `/product/${product_id}`;
       } catch (error) {
         console.error("Error:", error);
       }
@@ -165,23 +167,24 @@
         console.error("Error:", error);
       }
     }
-  /*
-      const token = localStorage.getItem('token');
-  */
+
+    /*
+        const token = localStorage.getItem('token');
+    */
 
     useEffect(() => {
       async function fetchData() {
         try {
           setToken(localStorage.getItem('token') ?? '');
           const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/main`, {
-              method: "GET",
-              headers: {
-                  "Content-Type": "application/json",
-                  "Accept": "application/json",
-  /*
-                  "Authorization": `Bearer ${token}`,
-  */
-              },
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept": "application/json",
+              /*
+                              "Authorization": `Bearer ${token}`,
+              */
+            },
           });
 
           // Kiểm tra xem API có trả về mã lỗi không
@@ -206,56 +209,55 @@
       fetchData();
     }, []);
 
-    const viewedProducts = JSON.parse(sessionStorage.getItem('viewed') || '[]');
-
     if (!data) {
       return <MainLayout>Loading...</MainLayout>;
     }
 
     return (
-      <MainLayout>
+        <MainLayout>
 
-        {isVisible && !token && (
-          <div className="relative isolate flex items-center gap-x-6 overflow-hidden bg-gray-50 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
-            <div
-              aria-hidden="true"
-              className="absolute top-1/2 left-[max(-7rem,calc(50%-52rem))] -z-10 -translate-y-1/2 transform-gpu blur-2xl"
-            >
+          {isVisible && !token && (
               <div
-                style={{
-                  clipPath:
-                    'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)',
-                }}
-                className="aspect-577/310 w-[36.0625rem] bg-linear-to-r from-[#ff80b5] to-[#9089fc] opacity-30"
-              />
-            </div>
-            <div
-              aria-hidden="true"
-              className="absolute top-1/2 left-[max(45rem,calc(50%+8rem))] -z-10 -translate-y-1/2 transform-gpu blur-2xl"
-            >
-              <div
-                style={{
-                  clipPath:
-                    'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)',
-                }}
-                className="aspect-577/310 w-[36.0625rem] bg-linear-to-r from-[#ff80b5] to-[#9089fc] opacity-30"
-              />
-            </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <p className="text-sm/6 text-gray-900">
-                <strong className="font-semibold">Xin chào</strong>
-                <svg viewBox="0 0 2 2" aria-hidden="true" className="mx-2 inline size-0.5 fill-current">
-                  <circle r={1} cx={1} cy={1} />
-                </svg>
-                Bạn chưa có tài khoản? Hãy đăng ký ngay để nhận ưu đãi hấp dẫn.
-              </p>
-              <Link
-                href="/auth/register"
-                className="flex-none rounded-full bg-gray-900 px-3.5 py-1 text-sm font-semibold text-white shadow-xs hover:bg-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
-              >
-                Đăng ký ngay hôm nay <span aria-hidden="true">&rarr;</span>
-              </Link>
-            </div>
+                  className="relative isolate flex items-center gap-x-6 overflow-hidden bg-gray-50 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
+                <div
+                    aria-hidden="true"
+                    className="absolute top-1/2 left-[max(-7rem,calc(50%-52rem))] -z-10 -translate-y-1/2 transform-gpu blur-2xl"
+                >
+                  <div
+                      style={{
+                        clipPath:
+                            'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)',
+                      }}
+                      className="aspect-577/310 w-[36.0625rem] bg-linear-to-r from-[#ff80b5] to-[#9089fc] opacity-30"
+                  />
+                </div>
+                <div
+                    aria-hidden="true"
+                    className="absolute top-1/2 left-[max(45rem,calc(50%+8rem))] -z-10 -translate-y-1/2 transform-gpu blur-2xl"
+                >
+                  <div
+                      style={{
+                        clipPath:
+                            'polygon(74.8% 41.9%, 97.2% 73.2%, 100% 34.9%, 92.5% 0.4%, 87.5% 0%, 75% 28.6%, 58.5% 54.6%, 50.1% 56.8%, 46.9% 44%, 48.3% 17.4%, 24.7% 53.9%, 0% 27.9%, 11.9% 74.2%, 24.9% 54.1%, 68.6% 100%, 74.8% 41.9%)',
+                      }}
+                      className="aspect-577/310 w-[36.0625rem] bg-linear-to-r from-[#ff80b5] to-[#9089fc] opacity-30"
+                  />
+                </div>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                  <p className="text-sm/6 text-gray-900">
+                    <strong className="font-semibold">Xin chào</strong>
+                    <svg viewBox="0 0 2 2" aria-hidden="true" className="mx-2 inline size-0.5 fill-current">
+                      <circle r={1} cx={1} cy={1}/>
+                    </svg>
+                    Bạn chưa có tài khoản? Hãy đăng ký ngay để nhận ưu đãi hấp dẫn.
+                  </p>
+                  <Link
+                      href="/auth/register"
+                      className="flex-none rounded-full bg-gray-900 px-3.5 py-1 text-sm font-semibold text-white shadow-xs hover:bg-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
+                  >
+                    Đăng ký ngay hôm nay <span aria-hidden="true">&rarr;</span>
+                  </Link>
+                </div>
             <div className="flex flex-1 justify-end">
               <button
                 type="button"

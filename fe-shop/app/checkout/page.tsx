@@ -48,6 +48,7 @@ export default function CheckOut() {
     const [isEdit, setIsEdit] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(data?.paymentMethods[0].id || 1 );
     const [note, setNote] = useState('');
+    const [token, setToken] = useState<string | null>(null);
 
     const updateQuantityLocally = (itemId: number, newQuantity: number) => {
         setData((prevData: Data | null) => {
@@ -72,7 +73,7 @@ export default function CheckOut() {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${typeof window !== 'undefined' ? sessionStorage.getItem('token') : ''}`,
+                    'Authorization': `Bearer ${typeof window !== 'undefined' ? token : ''}`,
                 },
                 body: JSON.stringify({
                     cartItems,
@@ -101,12 +102,17 @@ export default function CheckOut() {
     };
 
     useEffect(() => {
+        setToken(sessionStorage.getItem('token') || '')
+    }, []);
+
+    useEffect(() => {
+        if (!token) return;
         async function fetchData() {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order/checkout`,
                     {
                         headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                            'Authorization': `Bearer ${token}`,
                             'Accept': 'application/json',
                             'Content-Type': 'application/json',
                         },
@@ -121,7 +127,7 @@ export default function CheckOut() {
         }
 
         fetchData();
-    }, []);
+    }, [token]);
 
     if (!data || !Array.isArray(data?.cartItems)) {
         return <div>Loading... </div>;

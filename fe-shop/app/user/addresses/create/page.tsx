@@ -1,7 +1,7 @@
 'use client'
 
 import MainLayout from '@/app/_userlayout';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Field, Label, Switch} from '@headlessui/react';
 import {useRouter} from "next/navigation";
 
@@ -15,6 +15,11 @@ export default function AddressCreate() {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const router = useRouter();
+    const [token, setToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        setToken(sessionStorage.getItem('token'))
+    }, []);
 
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement> | undefined) {
@@ -28,7 +33,7 @@ export default function AddressCreate() {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({first_name: firstName, last_name: lastName, email, phone, address, is_default: '0'}),
             });

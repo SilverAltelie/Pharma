@@ -32,8 +32,15 @@ export default function Address() {
     }
 
     const [data, setData] = useState<Data>();
+    const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
+        const savedToken = sessionStorage.getItem('token');
+        if (savedToken) setToken(savedToken);
+    }, []);
+
+    useEffect(() => {
+        if (!token) return;
         async function fetchData() {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user/`, {
@@ -41,7 +48,7 @@ export default function Address() {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                        'Authorization': `Bearer ${token}`,
                     },
                 });
                 if (!res.ok) {
@@ -55,7 +62,7 @@ export default function Address() {
         }
 
         fetchData();
-    }, []);
+    }, [token]);
 
     async function handleDeleteAddress(id: number) {
 
@@ -69,7 +76,7 @@ export default function Address() {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${token}`,
                 },
             });
             if (!res.ok) {
@@ -96,7 +103,7 @@ export default function Address() {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${token}`,
                 },
             });
             if (!res.ok) {

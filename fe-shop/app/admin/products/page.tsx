@@ -47,7 +47,6 @@ export default function Products() {
         fetchData();
     }, [currentPage]);
 
-
     async function handleDelete(id:number) {
         const isConfirmed = window.confirm("Bạn có chắc muốn xóa sản phẩm?")
 

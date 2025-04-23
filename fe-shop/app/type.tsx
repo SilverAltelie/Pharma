@@ -17,6 +17,40 @@ export type Address = {
     address: string;
 }
 
+export type PromotionItem = {
+    id: number;
+    promotion_id: number;
+    product_id: number;
+}
+
+export type Blog = {
+    id: number;
+    title: string;
+    content: string;
+    thumbnail: string;
+    category_id: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export type BlogCategory = {
+    id: number;
+    name: string;
+    blogs?: Blog[];
+    parent_id?: number;
+}
+
+export type Promotion = {
+    id: number;
+    name: string;
+    code: string;
+    discount: number;
+    type: string;
+    start_date: string;
+    end_date: string;
+    promotion_items?: PromotionItem[];
+}
+
 export type Category = {
     id: number;
     name: string;
@@ -24,6 +58,7 @@ export type Category = {
     totalProducts?: number;
     parent_id: number | null;
     children?: Category[];
+    products?: Product[];
 }
 
 export type Image = {
@@ -79,6 +114,7 @@ export type CartItem = {
     quantity: number;
     product: Product;
     variant?: Variant;
+    image?: string;
 }
 
 export type Cart = {
@@ -122,12 +158,13 @@ export type Customer = {
 }
 
 export type User = {
-    id: string;
-    name: string;
-    email: string;
-    password: string;
-    addresses: Address[];
-    phone?: string;
+    id: string,
+    name: string,
+    email: string,
+    password: string,
+    addresses: Address[],
+    phone?: string,
+    user?: User | undefined
 }
 
 export type Payment = {

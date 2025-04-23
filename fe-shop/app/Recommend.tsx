@@ -5,7 +5,7 @@ import Image from "next/image";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Navigation, Pagination} from "swiper/modules";
 
-function Recommend({ productIds, handleViewProduct }: { productIds: number[], handleViewProduct: (productId: string) => void }) {
+function Recommend({ productIds, handleViewProduct }: { productIds: number[], handleViewProduct: (productId: number) => void }) {
     type Product = {
         objectID: string;
         title: string;
@@ -42,9 +42,9 @@ function Recommend({ productIds, handleViewProduct }: { productIds: number[], ha
                 const result = await response.json();
 
                 // Gom tất cả hits lại và loại bỏ trùng lặp theo objectID
-                const allHits = result.results.flatMap((res: any) => res.hits);
-                const uniqueHits = Array.from(
-                    new Map(allHits.map((item: Product) => [item.objectID, item])).values()
+                const allHits: Product[] = result.results.flatMap((res: { hits: Product[] }) => res.hits);
+                const uniqueHits: Product[] = Array.from(
+                    new Map(allHits.map((item) => [item.objectID, item])).values()
                 );
 
                 setRelatedProducts(uniqueHits);
@@ -83,7 +83,7 @@ function Recommend({ productIds, handleViewProduct }: { productIds: number[], ha
                         <SwiperSlide key={product.objectID}>
                             <button onClick={() => {
                                 const productId = product.objectID.split('::')[1]; // Lấy phần sau '::'
-                                handleViewProduct(productId);
+                                handleViewProduct(parseInt(productId));
                             }} className="rounded size-full">
                                 <Image
                                     src={product.image ? `data:image/jpeg;base64,${product.image}` : '/im-70627482.jpg'}

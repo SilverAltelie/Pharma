@@ -7,47 +7,6 @@ import type { Order, Customer, OrderItem } from "../type";
 
 export default function Dashboard() {
 
-  /*type Order = {
-    id: number;
-    status: number;
-  };
-
-    type Customer = {
-        id: number;
-        name: string;
-        email: string;
-        addresses: {
-        phone: string;
-        }[];
-    };
-
-    type Variant = {
-        id: number;
-        name: string;
-        price: number;
-        quantity: number;
-    }
-
-    type Product = {
-        id: number;
-        title: string;
-        href: string;
-        image: string;
-        price: number;
-        color: string;
-        variants: Variant[];
-    }
-
-    type OrderItem = {
-        id: number;
-        order_id: number;
-        product_id: number;
-        variant_id: number;
-        quantity: number;
-        price: number;
-        product?: Product;
-    }*/
-
     type Data = {
         orders: Order[];
         customers: Customer[];

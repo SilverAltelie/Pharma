@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name');
-            $table->string('code');
+            $table->string('code')->nullable()->unique();
             $table->integer('discount');
+            $table->string('type')->default('percent');
             $table->dateTime('start_date');
             $table->dateTime('end_date');
-            $table->enum('status', ['0', '1'])->default('1');
         });
     }
 

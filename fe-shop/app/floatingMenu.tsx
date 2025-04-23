@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPlus, FaFacebook, FaTwitter, FaInstagram, FaCommentDots, FaTimes, FaPaperPlane } from "react-icons/fa";
+import type {User} from "@/app/type";
 
-const FloatingMenu = (user: any) => {
-
+const FloatingMenu = ({ user }: { user: User | undefined }) => {
   interface Message {
     id: number;
-    from_user_id: number | undefined;
-    to_user_id: number;
+    from_user_id?: number;
+    to_user_id?: number;
     content: string;
-    created_at: string;
+    created_at?: string;
+    role: string;
   }
 
   const [open, setOpen] = useState(false);
@@ -18,38 +19,40 @@ const FloatingMenu = (user: any) => {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
-  // Lấy dữ liệu người dùng và tin nhắn từ sessionStorage khi component mount
   useEffect(() => {
-    const storedMessages = sessionStorage.getItem("messages");
+    const storedMessages = localStorage.getItem("messages");
     if (storedMessages) {
       setMessages(JSON.parse(storedMessages));
     }
   }, []);
 
-  // Cuộn xuống tin nhắn mới nhất
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Gửi tin nhắn mới và lưu vào sessionStorage
   const sendMessage = async () => {
     if (message.trim() === "") return;
 
-    // 1. Push tin nhắn người dùng trước
-    const userMessage = {
+    const userMessage: Message = {
       id: Date.now(),
-      role: 'user',
+      role: "user",
       content: message,
     };
 
     setMessages((prevMessages) => {
+      // Remove the oldest message if the array exceeds 150 messages
       const updated = [...prevMessages, userMessage];
-      sessionStorage.setItem("messages", JSON.stringify(updated));
+      if (updated.length > 150) {
+        updated.shift(); // Remove the first (oldest) message
+      }
+      if (typeof window !== "undefined") {
+        localStorage.setItem("messages", JSON.stringify(updated));
+      }
       return updated;
     });
 
-    const currentMessage = message; // lưu để dùng sau
-    setMessage(""); // Reset input
+    const currentMessage = message;
+    setMessage("");
 
     try {
       const res = await fetch("/api/chat", {
@@ -62,28 +65,31 @@ const FloatingMenu = (user: any) => {
 
       const result = await res.json();
       if (res.ok && result && result.content) {
-        const assistantMessage = {
+        const assistantMessage: Message = {
           id: Date.now() + 1,
-          role: 'assistant',
+          role: "assistant",
           content: result.content,
         };
         setMessages((prevMessages) => {
           const updated = [...prevMessages, assistantMessage];
-          sessionStorage.setItem("messages", JSON.stringify(updated));
+          if (updated.length > 150) {
+            updated.shift(); // Remove the first (oldest) message
+          }
+          if (typeof window !== "undefined") {
+            localStorage.setItem("messages", JSON.stringify(updated));
+          }
           return updated;
         });
       } else {
-        console.error("Lỗi khi nhận phản hồi:", result);
+        console.error("Error receiving response:", result);
       }
     } catch (error) {
-      console.error("Lỗi khi gửi request:", error);
+      console.error("Error sending request:", error);
     }
   };
 
-
   return (
       <div className="fixed bottom-6 right-6 flex flex-col items-end z-50">
-        {/* Hộp tin nhắn */}
         <AnimatePresence>
           {isChatOpen && user && (
               <motion.div
@@ -100,7 +106,6 @@ const FloatingMenu = (user: any) => {
                   </button>
                 </div>
 
-                {/* Danh sách tin nhắn */}
                 <div className="flex-1 z-50 overflow-y-auto p-2 space-y-2">
                   {messages.map((msg) => (
                       <div key={msg.id} className={`flex ${msg.role === 'user' ? "justify-end" : "justify-start"}`}>
@@ -112,7 +117,6 @@ const FloatingMenu = (user: any) => {
                   <div ref={chatEndRef}></div>
                 </div>
 
-                {/* Ô nhập tin nhắn */}
                 <div className="flex items-center border-t pt-2">
                   <input
                       type="text"
@@ -130,7 +134,6 @@ const FloatingMenu = (user: any) => {
           )}
         </AnimatePresence>
 
-        {/* Nút con */}
         <AnimatePresence>
           {open && (
               <motion.div
@@ -164,7 +167,6 @@ const FloatingMenu = (user: any) => {
           )}
         </AnimatePresence>
 
-        {/* Nút chính */}
         <motion.button
             onClick={() => setOpen(!open)}
             initial={false}

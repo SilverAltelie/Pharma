@@ -15,7 +15,7 @@ type Product = {
     variants: Array<{ id: string; name: string; price: string; quantity: string }>;
     images: Image[];
 }
-export default function ProductCard({ product, handleAddToCart, handleViewProduct }: { product: Product; handleAddToCart: (productId: string) => void; handleViewProduct: (productId: string) => void }) {
+export default function ProductCard({ product, handleAddToCart, handleViewProduct }: { product: Product; handleAddToCart: (productId: string) => void; handleViewProduct: (productId: number) => void }) {
     return (
         <div key={product.id} className="group relative">
             {product.variants.length <= 0 && (
@@ -26,7 +26,7 @@ export default function ProductCard({ product, handleAddToCart, handleViewProduc
                     <FaCartPlus />
                 </button>
             )}
-            <button onClick={() => handleViewProduct(product.id)} className="font-semibold text-gray-900">
+            <button onClick={() => handleViewProduct(parseInt(product.id))} className="font-semibold text-gray-900">
             <img
                 alt={product.title}
                 src={`data:image/jpeg;base64,${product.images[0]?.image}`}

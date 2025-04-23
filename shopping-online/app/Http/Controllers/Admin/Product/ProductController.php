@@ -33,8 +33,11 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
-        return Product::with('images')->paginate(12);
+        $products = Product::with('images')->paginate(12);
+        foreach ($products as $product) {
+            $product->discounted_price = $product->getDiscountPrice();
+        }
+        return $products;
     }
 
     /**

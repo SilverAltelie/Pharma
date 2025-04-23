@@ -33,4 +33,26 @@ class Product extends Model
     public function cartItems() {
         return $this->hasMany(CartItem::class);
     }
+
+    public function promotion() {
+        return $this->belongsToMany(Promotion::class, 'promotion_items');
+    }
+
+    public function orders() {
+        return $this->belongsToMany(Order::class, 'order_items')->withPivot('quantity');
+    }
+
+    public function getDiscountPrice() {
+        $discount = 0;
+        if ($this->promotion[0]) {
+            foreach ($this->promotion as $item) {
+                if ($item->promotion->type == 'percent') {
+                    $discount += $this->price * $item->promotion->discount / 100;
+                } else {
+                    $discount += $item->promotion->discount;
+                }
+            }
+        }
+        return $this->price - $discount;
+    }
 }

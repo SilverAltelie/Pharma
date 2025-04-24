@@ -38,6 +38,12 @@ class PromotionController extends Controller
         $this->promotionShowService = $promotionShowService;
         $this->promotionAddItemsService = $promotionAddItemsService;
         $this->promotionRemoveItemsService = $promotionRemoveItemsService;
+
+        $permissions = config('permission.promotion');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
 
     public function index()
@@ -99,14 +105,11 @@ class PromotionController extends Controller
     }
 
 
-    public function removeItems(Request $request) {
-        $validated = $request->validate([
-            'promotion_id' => 'required|exists:promotions,id',
-            'product_id' => 'required|exists:products,id',
-        ]);
+    public function removeItems($id) {
+        $promotion = Promotion::findOrFail($id);
 
-        PromotionItem::where($validated)->delete();
+        $promotion->items()->delete();
 
-        return response()->json(['message' => 'Đã xóa khỏi khuyến mãi']);
+        return response()->json(['message' => 'Đã xóa tất cả sản phẩm khỏi khuyến mãi']);
     }
 }

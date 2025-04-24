@@ -23,6 +23,12 @@ class BlogController extends Controller
         $this->blogCreateService = $blogCreateService;
         $this->blogUpdateService = $blogUpdateService;
         $this->blogDeleteService = $blogDeleteService;
+
+        $permissions = config('permission.blog');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
 
     public function index()

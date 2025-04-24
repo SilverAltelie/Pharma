@@ -25,6 +25,12 @@ class BlogCategoryController extends Controller
         $this->categoryCreateService = $categoryCreateService;
         $this->categoryUpdateService = $categoryUpdateService;
         $this->categoryDeleteService = $categoryDeleteService;
+
+        $permissions = config('permission.blog_category');
+
+        foreach ($permissions as $method => $permission) {
+            $this->middleware("permission:$permission")->only($method);
+        }
     }
 
     public function index()

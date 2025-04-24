@@ -10,7 +10,6 @@ export default function PromotionProductSelector({params}: { params: Promise<{ i
     const [selectedProductIds, setSelectedProductIds] = useState<number[]>([]);
     const [priceFilter, setPriceFilter] = useState({min: '', max: ''});
     const [showAllProducts, setShowAllProducts] = useState<{ [categoryId: number]: boolean }>({});
-    const [initialProductIds, setInitialProductIds] = useState<number[]>([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -19,11 +18,25 @@ export default function PromotionProductSelector({params}: { params: Promise<{ i
                     Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
                 },
             });
+
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
+            if (!res.ok) {
+                throw new Error("Failed to fetch categories");
+            }
             const data = await res.json();
             setCategories(data.categories);
             const existing = data.promotion.items.map((item: PromotionItem) => item.product_id);
             setSelectedProductIds(existing);
-            setInitialProductIds(existing);
         }
 
         fetchData();
@@ -50,6 +63,7 @@ export default function PromotionProductSelector({params}: { params: Promise<{ i
             setSelectedProductIds((prev) => prev.filter((id) => id !== productId));
         }
     }
+
     function toggleSelectAll() {
         const allProductIds = categories.flatMap(c => c.products?.map(p => p.id));
         const filtered = filterByPrice(allProductIds.map(id => {
@@ -78,48 +92,35 @@ export default function PromotionProductSelector({params}: { params: Promise<{ i
 
 
     async function handleAddToPromotion() {
-        const toAdd = selectedProductIds.filter(id => !initialProductIds.includes(id));
-        const toRemove = initialProductIds.filter(id => !selectedProductIds.includes(id));
+        const addRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/promotions/addItems/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
+            },
+            body: JSON.stringify({ items: selectedProductIds.map((id) => ({ product_id: id })) }),
+        });
 
-        try {
-            if (toAdd.length > 0) {
-                const addRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/promotions/addItems/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
-                    },
-                    body: JSON.stringify({ items: toAdd.map((id) => ({ product_id: id })) }),
-                });
-
-                if (!addRes.ok) {
-                    throw new Error("Failed to add products to promotion");
-                }
-            }
-
-            if (toRemove.length > 0) {
-                const removeRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/promotions/removeItems/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
-                    },
-                    body: JSON.stringify({ items: toRemove.map((id) => ({ product_id: id })) }),
-                });
-
-                if (!removeRes.ok) {
-                    throw new Error("Failed to remove products from promotion");
-                }
-            }
-
-            alert("Promotion updated successfully!");
-            window.location.href = `/admin/promotions/`;
-        } catch (error) {
-            console.error(error);
-            alert("An error occurred while updating the promotion.");
+        if (addRes.status === 401) {
+            alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+            window.location.href = "/admin/auth/login"
+            return
         }
+
+        if (addRes.status === 403) {
+            alert("Bạn không có quyền truy cập vào trang này.")
+            window.location.href = "/admin/layout"
+            return
+        }
+
+        if (!addRes.ok) {
+            throw new Error("Failed to add products to promotion");
+        }
+
+        await addRes.json();
+
+        window.location.href = `/admin/promotions/`;
     }
 
     return (

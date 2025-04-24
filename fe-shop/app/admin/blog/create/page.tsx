@@ -51,6 +51,18 @@ const TiptapEditor = () => {
                 }
             })
 
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
+
             if (!res.ok) {
                 console.error("Lỗi khi gọi API:", res.status)
                 return
@@ -100,6 +112,18 @@ const TiptapEditor = () => {
                 },
                 body: JSON.stringify(data),
             });
+
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
 
             if (res.ok) {
                 alert("Đăng bài viết thành công!");

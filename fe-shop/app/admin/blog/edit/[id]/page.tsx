@@ -84,6 +84,18 @@ export default function TiptapEditor({params}: { params: Promise<{ id: string }>
                     },
                 });
 
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
+
                 if (!res.ok) throw new Error("Không thể lấy dữ liệu!");
 
                 const data = await res.json();
@@ -176,6 +188,18 @@ export default function TiptapEditor({params}: { params: Promise<{ id: string }>
                 },
                 body: formData,
             });
+
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
 
             if (res.ok) {
                 alert("Cập nhật bài viết thành công");

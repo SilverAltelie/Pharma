@@ -3,9 +3,14 @@
 import {FaCheckCircle, FaEdit, FaTrash} from "react-icons/fa";
 import AdminLayout from "../admin-layout";
 import {useState, useEffect} from "react";
+import type {Permission} from "../../type";
+
+type extendedPermission = Permission & {
+    roles_count: string;
+}
 
 export default function PermissionsTable() {
-    const [permissions, setPermissions] = useState<any[]>([]);
+    const [permissions, setPermissions] = useState<extendedPermission[]>([]);
     const [isClient, setIsClient] = useState(false);
     const [isAdding, setIsAdding] = useState(false);
     const [newPermissionName, setNewPermissionName] = useState("");
@@ -24,8 +29,17 @@ export default function PermissionsTable() {
                         'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || ''}`
                     }
                 });
+
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
                 if (res.status === 403) {
-                    throw new Error("Bạn không có quyền truy cập API này.");
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
                 }
                 const json = await res.json();
                 setPermissions(json || []);
@@ -45,7 +59,7 @@ export default function PermissionsTable() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${sessionStorage.getItem('adminToken') || ''}`,
                 },
-                body: JSON.stringify({name}),
+                body: JSON.stringify({name, display_name: displayName, description: description || ""}),
             });
 
             if (res.status === 403) {
@@ -161,6 +175,22 @@ export default function PermissionsTable() {
                             className="border p-2 rounded-md w-full mb-4"
                         />
 
+                        <input
+                            type="text"
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
+                            placeholder="Nhập tên hiển thị"
+                            className="border p-2 rounded-md w-full mb-4"
+                        />
+
+                        <input
+                            type="text"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Nhập mô tả"
+                            className="border p-2 rounded-md w-full mb-4"
+                        />
+
                         <button
                             onClick={() => handleAddPermission(newPermissionName)}
                             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
@@ -219,7 +249,7 @@ export default function PermissionsTable() {
                                     ) : (
                                         permission.description
                                     )}</td>
-                                    <td className="p-3 border">{permission.roles ? permission.roles.length : 0}</td>
+                                    <td className="p-3 border">{permission.roles_count ?? 0}</td>
                                     <td className="p-3 border text-center">
                                         {editingPermissionId === permission.id ? (
                                             <button

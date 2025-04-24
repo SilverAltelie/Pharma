@@ -105,6 +105,18 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             body: JSON.stringify(payload),
         });
 
+        if (response.status === 401) {
+            alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+            window.location.href = "/admin/auth/login"
+            return
+        }
+
+        if (response.status === 403) {
+            alert("Bạn không có quyền truy cập vào trang này.")
+            window.location.href = "/admin/layout"
+            return
+        }
+
         if (response.ok) {
             alert("Sản phẩm đã được cập nhật thành công!");
             router.push('/admin/products');
@@ -123,6 +135,30 @@ export default function UpdateProduct( {params}: {params: Promise<{id: number}>}
             const categoryRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/category/`, {
                 headers: {"Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`},
             });
+
+                if (productRes.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (productRes.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
+
+                if (categoryRes.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (categoryRes.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
             const categoryJson = await categoryRes.json();
             setCategories(categoryJson);
             setProduct(ProductJson.data.find((product: Product) => (product.id) == id));

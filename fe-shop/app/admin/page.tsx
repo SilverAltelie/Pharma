@@ -29,6 +29,18 @@ export default function Dashboard() {
           }
         });
 
+        if (res.status === 401) {
+          alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+          window.location.href = "/admin/auth/login"
+          return
+        }
+
+        if (res.status === 403) {
+          alert("Bạn không có quyền truy cập vào trang này.")
+          window.location.href = "/admin/layout"
+          return
+        }
+
         if (!res.ok) {
           throw new Error('Lỗi khi gọi API');
         }
@@ -55,20 +67,6 @@ export default function Dashboard() {
       return total + price * item.quantity;
   }, 0);
 
-  
-//   const totalCompletedOrderValue = completedOrders.reduce((total, order) => {
-//     const orderItems = data.order_items.filter(item => item.order_id === order.id);
-    
-//     const orderTotal = orderItems.reduce((sum, item) => {
-//       const product = productMap[item.product_id];
-//       const variant = variantMap[item.variant_id];
-  
-//       const price = variant ? variant.price : product?.price || 0;
-//       return sum + price * item.quantity;
-//     }, 0);
-  
-//     return total + orderTotal;
-//   }, 0);  
   const recentOrders = data?.orders?.slice(0, 5);
 
   return (

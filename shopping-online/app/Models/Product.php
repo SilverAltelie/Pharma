@@ -42,17 +42,25 @@ class Product extends Model
         return $this->belongsToMany(Order::class, 'order_items')->withPivot('quantity');
     }
 
-    public function getDiscountPrice() {
+    public function getDiscountPrice()
+    {
+        $promotions = $this->promotion;
+
+        if ($promotions->isEmpty()) {
+            return $this->price;
+        }
+
         $discount = 0;
-        if ($this->promotion[0]) {
-            foreach ($this->promotion as $item) {
-                if ($item->promotion->type == 'percent') {
-                    $discount += $this->price * $item->promotion->discount / 100;
-                } else {
-                    $discount += $item->promotion->discount;
-                }
+
+        foreach ($promotions as $item) {
+            if ($item->type === 'percent') {
+                $discount += $this->price * $item->discount / 100;
+            } else {
+                $discount += $item->discount;
             }
         }
-        return $this->price - $discount;
+
+        return max($this->price - $discount, 0); // không cho giá âm
     }
+
 }

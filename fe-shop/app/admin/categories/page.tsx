@@ -21,6 +21,18 @@ export default function CategoriesTable() {
                     }
                 });
 
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
+
                 if (!res.ok) {
                     throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
                 }
@@ -57,6 +69,18 @@ export default function CategoriesTable() {
                         "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
                     },
                 });
+
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
 
                 if (!res.ok) {
                     throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);

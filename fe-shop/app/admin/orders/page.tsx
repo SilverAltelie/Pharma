@@ -48,6 +48,9 @@ const ProductsOrderTable = () => {
     const [isEditStatus, setIsEditStatus] = useState<boolean>(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
+    const [searchOrderId, setSearchOrderId] = useState('');
+    const [searchName, setSearchName] = useState('');
+    const [searchStatus, setSearchStatus] = useState('');
 
     useEffect(() => {
         async function fetchData() {
@@ -59,6 +62,19 @@ const ProductsOrderTable = () => {
                         'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`
                     }
                 });
+
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
+
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }
@@ -112,6 +128,18 @@ const ProductsOrderTable = () => {
                 })
             })
 
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
+
             if (!res.ok) {
                 throw new Error("Network response was not ok");
             }
@@ -132,6 +160,15 @@ const ProductsOrderTable = () => {
         return acc + orderTotal;
     }, 0);
 
+    const filteredOrders = groupedOrders.filter(order => {
+        const matchesOrderId = searchOrderId === '' || order.id.toString().includes(searchOrderId);
+        const matchesName = searchName === '' || order.user?.name?.toLowerCase().includes(searchName.toLowerCase());
+        const matchesStatus = searchStatus === '' || order.status.toString() === searchStatus;
+
+        return matchesOrderId && matchesName && matchesStatus;
+    });
+
+
     return (
         <AdminLayout>
             <div className="w-full min-h-screen p-6 bg-white overflow-x-auto">
@@ -140,9 +177,39 @@ const ProductsOrderTable = () => {
                     Kiểm tra các đơn hàng đã mua trước đây
                 </p>
 
-                {groupedOrders.length > 0 ?
+                <div className=" ml-20 mr-40 mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input
+                        type="text"
+                        placeholder="Tìm mã đơn hàng..."
+                        className="border p-2 rounded"
+                        value={searchOrderId}
+                        onChange={(e) => setSearchOrderId(e.target.value)}
+                    />
+                    <input
+                        type="text"
+                        placeholder="Tìm theo tên người mua..."
+                        className="border p-2 rounded"
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                    />
+                    <select
+                        className="border p-2 rounded bg-white"
+                        value={searchStatus}
+                        onChange={(e) => setSearchStatus(e.target.value)}
+                    >
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="0">Đã đặt hàng</option>
+                        <option value="1">Đã thanh toán</option>
+                        <option value="2">Đang giao</option>
+                        <option value="3">Đã giao</option>
+                        <option value="4">Hủy đơn</option>
+                    </select>
+                </div>
+
+
+                {filteredOrders.length > 0 ?
                     <div className="space-y-6 ml-20 mr-40">
-                        {groupedOrders.map((order: Order, index: number) => (
+                        {filteredOrders.map((order: Order, index: number) => (
                             <div key={index} className="bg-white p-6 shadow-xl rounded-lg border-2">
                                 {/* Order Header */}
                                 <div className="grid grid-cols-5 gap-4 border-b pb-4 text-sm text-gray-700">
@@ -310,17 +377,17 @@ const ProductsOrderTable = () => {
                                                 </div>
                                                 :
                                                 <div className="mb-1 flex items-center gap-2 text-sm text-gray-700">
-                                                <select
-                                                    value={order.status}
-                                                    onChange={(e) => handleStatusChange(order.id, (e.target.value))}
-                                                    className={`block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${colorStatus(order.status)}`}
-                                                >
-                                                    <option value={'0'}>Đã đặt hàng</option>
-                                                    <option value={'1'}>Đã trả tiền</option>
-                                                    <option value={'2'}>Đang giao hàng</option>
-                                                    <option value={'3'}>Đã giao hàng</option>
-                                                    <option value={'4'}>Đã hủy</option>
-                                                </select>
+                                                    <select
+                                                        value={order.status}
+                                                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                                                        className={`block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${colorStatus(order.status)}`}
+                                                    >
+                                                        <option value={'0'} disabled={order.status > 0}>Đã đặt hàng</option>
+                                                        <option value={'1'} disabled={order.status > 1}>Đã trả tiền</option>
+                                                        <option value={'2'} disabled={order.status > 2}>Đang giao hàng</option>
+                                                        <option value={'3'} disabled={order.status > 3}>Đã giao hàng</option>
+                                                        <option value={'4'} disabled={order.status > 4}>Đã hủy</option>
+                                                    </select>
 
                                                     <button onClick={() => setIsEditStatus(!isEditStatus)} className="text-blue-600 font-semibold">
                                                         <FaXmark className="flex text-red-500 size-6 mb-1 mr-2"/>

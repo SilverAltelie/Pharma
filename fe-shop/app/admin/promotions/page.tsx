@@ -39,8 +39,16 @@ export default function PromotionTable() {
                     }
                 });
 
-                if (res.status == 403) {
-                    window.location.href = `/admin/permissions/cannotaccess`;
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
                 }
 
                 const json = await res.json();
@@ -52,6 +60,35 @@ export default function PromotionTable() {
 
         fetchData();
     }, []);
+
+    const handleProductButtonClick = async (promotionId: number) => {
+        const removeRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/promotions/removeItems/${promotionId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                Authorization: `Bearer ${sessionStorage.getItem("adminToken")}`,
+            },
+        });
+
+        if (removeRes.status === 401) {
+            alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+            window.location.href = "/admin/auth/login"
+            return
+        }
+
+        if (removeRes.status === 403) {
+            alert("Bạn không có quyền truy cập vào trang này.")
+            window.location.href = "/admin/layout"
+            return
+        }
+
+        if (!removeRes.ok) {
+            throw new Error("Failed to remove products from promotion");
+        }
+
+        router.push(`/admin/promotions/items/${promotionId}`);
+    }
 
     const handleAddPromotion = async (name: string, code: string, type: string, start_date: string, end_date: string, discount: number) => {
         try {
@@ -65,8 +102,16 @@ export default function PromotionTable() {
                 body: JSON.stringify({name, code, discount, type, start_date, end_date}),
             });
 
-            if (res.status == 403) {
-                window.location.href = `/admin/permissions/cannotaccess`;
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
             }
 
             if (!res.ok) {
@@ -98,8 +143,16 @@ export default function PromotionTable() {
                 },
             });
 
-            if (res.status == 403) {
-                window.location.href = `/admin/permissions/cannotaccess`;
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
             }
 
             if (!res.ok) {
@@ -133,9 +186,9 @@ export default function PromotionTable() {
         setEditedPromotionDiscount(promotionToEdit?.discount || 0);
     };
 
-    const handleSaveEdit = async (roleId: number) => {
+    const handleSaveEdit = async (promotionId: number) => {
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/promotions/update/${roleId}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/promotions/update/${promotionId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -144,6 +197,18 @@ export default function PromotionTable() {
                 },
                 body: JSON.stringify({name: editedPromotionName, code: editedPromotionCode, discount: editedPromotionDiscount, type: editedPromotionType, start_date: editedPromotionStartDate, end_date: editedPromotionEndDate}),
             });
+
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
 
             if (!res.ok) {
                 throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
@@ -310,8 +375,8 @@ export default function PromotionTable() {
                                     )}</td>
                                     <td className="p-3 border">{editingPromotionId === promotion.id ? (
                                         <select
-                                            value={newPromotionType}
-                                            onChange={(e) => setNewPromotionType(e.target.value)}
+                                            value={editedPromotionType}
+                                            onChange={(e) => setEditedPromotionType(e.target.value)}
                                             className="border p-2 rounded-md w-full"
                                         >
                                             <option value="percent">Giảm theo phần trăm</option>
@@ -362,7 +427,7 @@ export default function PromotionTable() {
                                             <FaTrash/> Xóa
                                         </button>
                                         <button
-                                            onClick={() => router.push(`/admin/promotions/items/${promotion.id}`)}
+                                            onClick={() => handleProductButtonClick(promotion.id)}
                                             className="text-yellow-600 hover:text-yellow-800 text-center flex items-center gap-1n"
                                         >
                                             <FaProductHunt /> Thêm sản phẩm khuyến mãi

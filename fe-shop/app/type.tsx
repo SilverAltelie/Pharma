@@ -82,6 +82,7 @@ export type Permission = {
     name: string;
     display_name: string;
     description: string;
+    roles?: Role[];
 }
 
 export type Role = {

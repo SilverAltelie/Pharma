@@ -19,6 +19,22 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
           'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`,
         }
       })
+
+      if (res.status === 401) {
+        alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+        window.location.href = "/admin/auth/login"
+        return
+      }
+
+      if (res.status === 403) {
+        alert("Bạn không có quyền truy cập vào trang này.")
+        window.location.href = "/admin/layout"
+        return
+      }
+        if (!res.ok) {
+            console.error('Lỗi API:', res.status, res.statusText);
+            return;
+        }
         const data = await res.json()
         setCategories(data)
     }
@@ -59,6 +75,18 @@ export default function CategoryUpdate({params}: {params: Promise<{id: string}>}
             },
             body: JSON.stringify({ name, description, status, parent_id })
           })
+
+        if (res.status === 401) {
+          alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+          window.location.href = "/admin/auth/login"
+          return
+        }
+
+        if (res.status === 403) {
+          alert("Bạn không có quyền truy cập vào trang này.")
+          window.location.href = "/admin/layout"
+          return
+        }
 
         const text = await res.text();
         console.log('Phản hồi dạng text:', text);

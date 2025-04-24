@@ -36,7 +36,6 @@ export default function CategoriesTable() {
     const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
     const [editingCategoryName, setEditingCategoryName] = useState("");
     const [isAdding, setIsAdding] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
 
     const router = useRouter();
 
@@ -50,6 +49,18 @@ export default function CategoriesTable() {
                         'Authorization': `Bearer ${sessionStorage.getItem("adminToken")}`,
                     }
                 });
+
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
 
                 if (!res.ok) {
                     throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
@@ -85,6 +96,18 @@ export default function CategoriesTable() {
                 body: JSON.stringify({ name: newCategoryName }),
             });
 
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
+
             if (!res.ok) throw new Error(`Lỗi API: ${res.statusText}`);
 
             const newCat = await res.json();
@@ -105,6 +128,18 @@ export default function CategoriesTable() {
                 },
                 body: JSON.stringify({name: value}),
             });
+
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
 
             if (!res.ok) throw new Error("Lỗi khi cập nhật danh mục");
 
@@ -142,6 +177,18 @@ export default function CategoriesTable() {
                 },
             });
 
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
+
             if (!res.ok) {
                 throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
             }
@@ -178,6 +225,18 @@ export default function CategoriesTable() {
                         "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
                     },
                 });
+
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
 
                 if (!res.ok) {
                     throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);

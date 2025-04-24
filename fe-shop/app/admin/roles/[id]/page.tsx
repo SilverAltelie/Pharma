@@ -21,8 +21,16 @@ export default function RolePermissionsPage() {
                     }
                 });
 
-                if (res.status == 403) {
-                    window.location.href = `/admin/permissions/cannotaccess`;
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
                 }
 
                 const data = await res.json();
@@ -34,6 +42,19 @@ export default function RolePermissionsPage() {
                         'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`
                     }
                 });
+
+                if (roleRes.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (roleRes.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
+
                 const rolesData = await roleRes.json();
                 const currentRole = rolesData.find((role: Role) => role.id.toString() === params.id);
                 const currentPermissions = currentRole?.permissions.map((perm: Permission) => perm.id.toString()) || [];
@@ -83,8 +104,16 @@ export default function RolePermissionsPage() {
                 body: JSON.stringify({permissions: selectedPermissions})
             });
 
-            if (res.status == 403) {
-                window.location.href = `/admin/permissions/cannotaccess`;
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
             }
 
             if (!res.ok) {

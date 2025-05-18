@@ -27,13 +27,38 @@ export default function Products() {
     const [products, setProducts] = useState<Product[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
+    const [hasPromotion, setHasPromotion] = useState(false);
+    const [sortPrice, setSortPrice] = useState("");
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product?page=${currentPage}`, {
+                const queryParams = new URLSearchParams({
+                    page: currentPage.toString(),
+                    search,
+                    min_price: minPrice,
+                    max_price: maxPrice,
+                    has_promotion: hasPromotion ? "1" : "0",
+                    sort_price: sortPrice,
+                });
+
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product?${queryParams}`, {
                     headers: { "Authorization": `Bearer ${sessionStorage.getItem('adminToken')}` },
                 });
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
                 if (!res.ok) {
                     throw new Error("Network response was not ok");
                 }
@@ -45,8 +70,7 @@ export default function Products() {
             }
         }
         fetchData();
-    }, [currentPage]);
-
+    }, [currentPage, search, minPrice, maxPrice, hasPromotion]);
 
     async function handleDelete(id:number) {
         const isConfirmed = window.confirm("Bạn có chắc muốn xóa sản phẩm?")
@@ -61,6 +85,18 @@ export default function Products() {
                     "Authorization": `Bearer ${sessionStorage.getItem("adminToken")}`,
                 },
             });
+
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
 
             if (!res.ok) {
                 throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
@@ -87,7 +123,54 @@ export default function Products() {
           </Link>
 
           </div>
-          <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+
+            <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Tìm theo tên sản phẩm"
+                    className="border p-2 rounded"
+                />
+
+                <input
+                    type="number"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                    placeholder="Giá từ"
+                    className="border p-2 rounded"
+                />
+
+                <input
+                    type="number"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                    placeholder="Giá đến"
+                    className="border p-2 rounded"
+                />
+
+                <label className="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        checked={hasPromotion}
+                        onChange={() => setHasPromotion(!hasPromotion)}
+                    />
+                    <span>Chỉ sản phẩm có khuyến mãi</span>
+                </label>
+
+                <select
+                    value={sortPrice}
+                    onChange={(e) => setSortPrice(e.target.value)}
+                    className="border border-gray-300 bg-white rounded px-4 py-2"
+                >
+                    <option value="">Sắp xếp theo giá</option>
+                    <option value="asc">Giá tăng dần</option>
+                    <option value="desc">Giá giảm dần</option>
+                </select>
+            </div>
+
+
+            <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
             {products?.map((product) => (
               <div key={product.id} className="group relative">
                 <div className="group relative">

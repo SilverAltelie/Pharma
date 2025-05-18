@@ -68,9 +68,22 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
     async function fetchData() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/show/${id}`, {
             headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`,
             }
         });
+
+        if (res.status === 401) {
+            alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+            window.location.href = "/admin/auth/login"
+            return
+        }
+
+        if (res.status === 403) {
+            alert("Bạn không có quyền truy cập vào trang này.")
+            window.location.href = "/admin/layout"
+            return
+        }
+
         const data = await res.json();
         setProduct(data);
 
@@ -114,6 +127,18 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
                 body: JSON.stringify(variantData),
             });
 
+            if (response.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (response.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
+
             console.log("Full response:", response);
 
             const result = await response.json();
@@ -155,6 +180,18 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
                 body: JSON.stringify(reviewData),
             });
 
+            if (response.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (response.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
+
             const result = await response.json();
 
             if (!response.ok) {
@@ -187,6 +224,18 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
                 },
             });
 
+            if (response.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (response.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
+
             const result = await response.json();
 
             if (!response.ok) {
@@ -209,13 +258,25 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/api/admin/variants/delete/${id}`;
         const method = "POST";
-        await fetch(url, {
+        const res = await fetch(url, {
             method,
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${sessionStorage.getItem('token')}`,
             },
         });
+
+        if (res.status === 401) {
+            alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+            window.location.href = "/admin/auth/login"
+            return
+        }
+
+        if (res.status === 403) {
+            alert("Bạn không có quyền truy cập vào trang này.")
+            window.location.href = "/admin/layout"
+            return
+        }
         fetchData();
     }
 

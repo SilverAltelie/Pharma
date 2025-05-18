@@ -40,8 +40,15 @@ export default function AddressCreate({params}: { params: Promise<{ id: number }
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
+    const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
+        const savedToken = sessionStorage.getItem('token');
+        if (savedToken) setToken(savedToken);
+    }, []);
+
+    useEffect(() => {
+
         async function fetchData() {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/addresses/${id}`, {
@@ -49,7 +56,7 @@ export default function AddressCreate({params}: { params: Promise<{ id: number }
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                        'Authorization': `Bearer ${token}`,
                     }
                 });
                 const json = await res.json();
@@ -68,7 +75,7 @@ export default function AddressCreate({params}: { params: Promise<{ id: number }
         }
 
         fetchData();
-    }, []);
+    }, [token]);
 
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement> | undefined) {
@@ -80,7 +87,7 @@ export default function AddressCreate({params}: { params: Promise<{ id: number }
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     first_name: firstName,

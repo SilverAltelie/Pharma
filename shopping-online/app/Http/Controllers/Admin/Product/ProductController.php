@@ -31,10 +31,40 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        return Product::with('images')->paginate(12);
+        $query = Product::with('images');
+
+        if ($search = $request->search) {
+            $query->where('title', 'like', "%$search%");
+        }
+
+        if ($minPrice = $request->min_price) {
+            $query->where('price', '>=', $minPrice);
+        }
+
+        if ($maxPrice = $request->max_price) {
+            $query->where('price', '<=', $maxPrice);
+        }
+
+        if (!is_null($request->promotion)) {
+            $query->whereHas('promotionProducts', function ($q) {
+                $q->whereHas('promotion', function ($subQ) {
+                    $subQ->where('end_time', '>=', now());
+                });
+            }, $request->promotion === 'true' ? '>' : '=', 0);
+        }
+
+        if ($sort = $request->sort_price) {
+            $query->orderBy('price', $sort);
+        }
+
+        $products = $query->paginate(12);
+        foreach ($products as $product) {
+            $product->discounted_price = $product->getDiscountPrice();
+        }
+
+        return $products;
     }
 
     /**

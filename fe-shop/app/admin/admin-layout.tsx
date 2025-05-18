@@ -17,6 +17,7 @@ import {
 } from "react-icons/fa6";
 import type {User, Order, OrderItem, Customer} from "@/app/type";
 import Link from "next/link";
+import {FaBlog, FaPercent} from "react-icons/fa";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 
@@ -41,6 +42,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`
                     }
                 });
+
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
+                }
+
                 if (res.ok) {
                     const json = await res.json();
                     setData(json);
@@ -63,6 +77,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`
                 }
             });
+
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
+
             await res.json();
             localStorage.removeItem('adminToken');
             window.location.href = '/admin/auth/login';
@@ -153,6 +180,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                        className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
                         <FaComment className="text-lg"/>
                         {!isCollapsed && <span>Chat</span>}
+                    </a>
+                    <a href="/admin/blog"
+                       className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+                        <FaBlog className="text-lg"/>
+                        {!isCollapsed && <span>Blogs</span>}
+                    </a>
+                    <a href="/admin/promotions"
+                       className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+                        <FaPercent className="text-lg"/>
+                        {!isCollapsed && <span>Khuyến mãi</span>}
                     </a>
                 </nav>
 

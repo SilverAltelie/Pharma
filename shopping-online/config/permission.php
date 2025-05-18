@@ -28,6 +28,8 @@ return [
         'store' => 'promotion.create',
         'update' => 'promotion.update',
         'destroy' => 'promotion.delete',
+        'addItems' => 'promotion.add_items',
+        'removeItems' => 'promotion.remove_items',
     ],
 
     'user' => [
@@ -70,6 +72,20 @@ return [
 
     'home' => [
         'dashboard' => 'home.dashboard',
+    ],
+
+    'blog' => [
+        'index' => 'blog.view',
+        'store' => 'blog.create',
+        'update' => 'blog.update',
+        'destroy' => 'blog.delete',
+    ],
+
+    'blog_category' => [
+        'index' => 'blog_category.view',
+        'store' => 'blog_category.create',
+        'update' => 'blog_category.update',
+        'destroy' => 'blog_category.delete',
     ],
 
 

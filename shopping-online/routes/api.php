@@ -16,7 +16,9 @@ use App\Http\Controllers\User\Order\OrderController as UserOrderController;
 use App\Http\Controllers\Admin\Order\OrderController;
 use App\Http\Controllers\User\Category\CategoryController as UserCategoryController;
 use App\Http\Controllers\User\Product\ProductController as UserProductController;
-
+use \App\Http\Controllers\Admin\Promotion\PromotionController;
+use \App\Http\Controllers\Admin\Blog\BlogController;
+use \App\Http\Controllers\Admin\BlogCategory\BlogCategoryController;
 use \App\Http\Controllers\Admin\Variant\VariantController;
 use App\Http\Controllers\Admin\AdminController;
 use \App\Http\Controllers\User\Cart\CartController;
@@ -188,6 +190,32 @@ Route::prefix('admin')->middleware('admin.auth')->group(function () {
         Route::get('/edit/{id}', [PermissionController::class, 'edit']);
         Route::post('/update/{id}', [PermissionController::class, 'update']);
         Route::post('/delete/{id}', [PermissionController::class, 'destroy']);
+    });
+
+    Route::prefix('/promotions')->group(function () {
+        Route::get('/', [PromotionController::class, 'index']);
+        Route::post('/create', [PromotionController::class, 'store']);
+        Route::get('/edit/{id}', [PromotionController::class, 'edit']);
+        Route::post('/update/{id}', [PromotionController::class, 'update']);
+        Route::post('/delete/{id}', [PromotionController::class, 'destroy']);
+        Route::get('/getItems/{id}', [PromotionController::class, 'getItems']);
+        Route::post('/addItems/{id}', [PromotionController::class, 'addItems']);
+        Route::get('/show/{id}', [PromotionController::class, 'show']);
+        Route::post('/removeItems/{id}', [PromotionController::class, 'removeItems']);
+    });
+
+    Route::prefix('/blogs')->group(function () {
+        Route::get('/', [BlogController::class, 'index']);
+        Route::post('/create', [BlogController::class, 'store']);
+        Route::get('/edit/{id}', [BlogController::class, 'edit']);
+        Route::post('/update/{id}', [BlogController::class, 'update']);
+        Route::post('/delete/{id}', [BlogController::class, 'destroy']);
+    });
+
+    Route::prefix('/blog-categories')->group(function () {
+        Route::post('/create', [BlogCategoryController::class, 'store']);
+        Route::post('/update/{id}', [BlogCategoryController::class, 'update']);
+        Route::post('/delete/{id}', [BlogCategoryController::class, 'destroy']);
     });
 
 });

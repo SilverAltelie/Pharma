@@ -17,7 +17,6 @@ class CheckRolePermission
         if (!$user || !$user->can($permission)) {
             return response()->json([
                 'message' => 'Bạn không có quyền truy cập',
-                'redirect_url' => 'http://localhost:3000/admin/auth/login',
             ], 403);
         }
 

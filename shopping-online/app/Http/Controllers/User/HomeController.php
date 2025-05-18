@@ -27,7 +27,7 @@ class HomeController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user && !Session::has('user')) {
+        if (!$user && !Session::has('token')) {
             $user = [
               'id' => 'guest_' . Str::uuid(10),
                 'name' => 'Khách hàng',

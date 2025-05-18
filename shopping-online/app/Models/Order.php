@@ -30,4 +30,9 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }
 
+    public function getTotalPriceAttribute() {
+        return $this->orderItems->sum(function ($item) {
+            return $item->variant->price * $item->quantity ?? $item->product->price * $item->quantity;
+        });
+    }
 }

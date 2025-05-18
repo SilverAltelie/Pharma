@@ -34,6 +34,8 @@ const ProductsOrderTable = () => {
     }
 
     const [groupedOrders, setGroupedOrders] = useState<Order[]>([]);
+    const [searchOrderId, setSearchOrderId] = useState('');
+    const [searchStatus, setSearchStatus] = useState('');
     
     useEffect(() => {
         async function fetchData() {
@@ -75,6 +77,13 @@ const ProductsOrderTable = () => {
         return acc + orderTotal;
     }, 0);
 
+    const filteredOrders = groupedOrders.filter(order => {
+        const matchesOrderId = searchOrderId === '' || order.id.toString().includes(searchOrderId);
+        const matchesStatus = searchStatus === '' || order.status.toString() === searchStatus;
+
+        return matchesOrderId && matchesStatus;
+    });
+
     return (
         <MainLayout>
             <div className="w-screen min-h-screen p-6 bg-white">
@@ -83,9 +92,31 @@ const ProductsOrderTable = () => {
                 Kiểm tra các đơn hàng đã mua trước đây
             </p>
 
-                {groupedOrders.length >= 0 ?
+                <div className="mx-80 mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                        type="text"
+                        placeholder="Tìm mã đơn hàng..."
+                        className="border p-2 rounded"
+                        value={searchOrderId}
+                        onChange={(e) => setSearchOrderId(e.target.value)}
+                    />
+                    <select
+                        className="border p-2 rounded bg-white"
+                        value={searchStatus}
+                        onChange={(e) => setSearchStatus(e.target.value)}
+                    >
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="0">Đã đặt hàng</option>
+                        <option value="1">Đã thanh toán</option>
+                        <option value="2">Đang giao</option>
+                        <option value="3">Đã giao</option>
+                        <option value="4">Hủy đơn</option>
+                    </select>
+                </div>
+
+                {filteredOrders.length >= 0 ?
                     <div className="space-y-6 mx-80">
-                    {groupedOrders.map((order: Order) => (
+                    {filteredOrders.map((order: Order) => (
                         <div key={order.id} className="bg-white p-6 shadow-xl rounded-lg border-2">
                             {/* Order Header */}
                             <div className="grid grid-cols-3 gap-4 border-b pb-4 text-sm text-gray-700">

@@ -37,8 +37,16 @@ export default function UsersTable() {
                     }
                 });
 
-                if (res.status == 403) {
-                    window.location.href = `/admin/permissions/cannotaccess`;
+                if (res.status === 401) {
+                    alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                    window.location.href = "/admin/auth/login"
+                    return
+                }
+
+                if (res.status === 403) {
+                    alert("Bạn không có quyền truy cập vào trang này.")
+                    window.location.href = "/admin/layout"
+                    return
                 }
 
                 const json = await res.json();
@@ -62,8 +70,16 @@ export default function UsersTable() {
                 body: JSON.stringify({name}),
             });
 
-            if (res.status == 403) {
-                window.location.href = `/admin/permissions/cannotaccess`;
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
             }
 
             if (!res.ok) {
@@ -93,8 +109,16 @@ export default function UsersTable() {
                 },
             });
 
-            if (res.status == 403) {
-                window.location.href = `/admin/permissions/cannotaccess`;
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
             }
 
             if (!res.ok) {
@@ -123,6 +147,18 @@ export default function UsersTable() {
                 },
                 body: JSON.stringify({name: editedRoleName}),
             });
+
+            if (res.status === 401) {
+                alert("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.")
+                window.location.href = "/admin/auth/login"
+                return
+            }
+
+            if (res.status === 403) {
+                alert("Bạn không có quyền truy cập vào trang này.")
+                window.location.href = "/admin/layout"
+                return
+            }
 
             if (!res.ok) {
                 throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);

@@ -47,6 +47,7 @@ export default function Cart() {
     }
 
     const [data, setData] = useState<CartData[]>();
+    const [token, setToken] = useState<string | null>(null);
 
     const updateQuantityLocally = (itemId: number, newQuantity: number) => {
         setData((prevData) => {
@@ -104,14 +105,19 @@ export default function Cart() {
     }
   };
 
+    useEffect(() => {
+        setToken(sessionStorage.getItem('token'))
+    }, []);
+
 
     useEffect(() => {
+        if (!token) return;
         const fetchData = async () => {
             if (typeof window === 'undefined') return; // Ensure code runs only on the client-side
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                     },
@@ -126,7 +132,7 @@ export default function Cart() {
             }
         };
         fetchData();
-    }, []);
+    }, [token]);
 
     if (!data || !Array.isArray(data)) {
         return <div>Loading... </div>;

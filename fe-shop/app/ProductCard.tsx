@@ -1,4 +1,4 @@
-import { FaCartPlus } from "react-icons/fa";
+import { FaCartPlus, FaFire } from "react-icons/fa";
 
 type Image = {
     id: string;
@@ -15,7 +15,7 @@ type Product = {
     variants: Array<{ id: string; name: string; price: string; quantity: string }>;
     images: Image[];
 }
-export default function ProductCard({ product, handleAddToCart, handleViewProduct }: { product: Product; handleAddToCart: (productId: string) => void; handleViewProduct: (productId: string) => void }) {
+export default function ProductCard({ product, handleAddToCart, handleViewProduct }: { product: Product; handleAddToCart: (productId: string) => void; handleViewProduct: (productId: number) => void }) {
     return (
         <div key={product.id} className="group relative">
             {product.variants.length <= 0 && (
@@ -26,7 +26,7 @@ export default function ProductCard({ product, handleAddToCart, handleViewProduc
                     <FaCartPlus />
                 </button>
             )}
-            <button onClick={() => handleViewProduct(product.id)} className="font-semibold text-gray-900">
+            <button onClick={() => handleViewProduct(parseInt(product.id))} className="font-semibold text-gray-900">
             <img
                 alt={product.title}
                 src={`data:image/jpeg;base64,${product.images[0]?.image}`}
@@ -40,7 +40,21 @@ export default function ProductCard({ product, handleAddToCart, handleViewProduc
 
                     </h3>
                 </div>
-                <p className="text-sm font-medium text-gray-900">{product.price}</p>
+                {product.discounted_price && product.discounted_price < product.price ? (
+                                                <div className="flex items-center space-x-2">
+                                                    <p className="text-sm font-medium text-gray-500 line-through">
+                                                    {product.price.toLocaleString()}₫
+                                                    </p>
+                                                    <p className="text-sm font-bold text-red-600 animate-pulse flex items-center">
+                                                    <FaFire className="text-red" /> {product.discounted_price.toLocaleString()}₫
+                                                    </p>
+                                                </div>
+                                                ) : (
+                                                <p className="text-sm font-medium text-gray-900">
+                                                    {product.price.toLocaleString()}₫
+                                                </p>
+                                                )}
+
             </div>
             </button>
         </div>

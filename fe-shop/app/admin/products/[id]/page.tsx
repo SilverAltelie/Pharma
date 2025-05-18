@@ -68,7 +68,7 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
     async function fetchData() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/product/show/${id}`, {
             headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('token')}`,
+                'Authorization': `Bearer ${sessionStorage.getItem('adminToken')}`,
             }
         });
 

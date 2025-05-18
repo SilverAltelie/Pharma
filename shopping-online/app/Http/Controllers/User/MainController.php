@@ -17,16 +17,44 @@ class MainController extends Controller
         $this->categoriesListService = $categoryListService;
     }
     public function index() {
-        $products = Product::with('variants', 'images')->paginate(10);
+        $products = Product::with('variants', 'images')->paginate(12);
+
+        $bestSelling = Product::with('images', 'variants')
+            ->bestSelling()
+            ->get();
 
         $categories = $this->categoriesListService->handle();
 
         $user = Auth::user();
 
+        $mostDiscounted = Product::with('images', 'variants', 'promotion')
+            ->get()
+            ->sortByDesc(function ($product) {
+                $promotions = $product->promotion;
+        
+                $maxDiscount = 0;
+        
+                foreach ($promotions as $item) {
+                    if ($item->type === 'percent') {
+                        $discount = $product->price * $item->discount / 100;
+                    } else {
+                        $discount = $item->discount;
+                    }
+        
+                    $maxDiscount = max($maxDiscount, $discount);
+                }
+        
+                return $maxDiscount;
+            })
+            ->take(12)
+            ->values();
+    
         return response()->json([
             'products' => $products,
             'categories' => $categories,
-            'user' => $user
+            'user' => $user,
+            'bestSelling' => $bestSelling,
+            'mostDiscounted' => $mostDiscounted
         ]);
     }
 }

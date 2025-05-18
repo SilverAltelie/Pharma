@@ -1,4 +1,4 @@
-import { FaCartPlus } from "react-icons/fa";
+import { FaCartPlus, FaFire } from "react-icons/fa";
 
 type Image = {
     id: string;
@@ -40,7 +40,21 @@ export default function ProductCard({ product, handleAddToCart, handleViewProduc
 
                     </h3>
                 </div>
-                <p className="text-sm font-medium text-gray-900">{product.price}</p>
+                {product.discounted_price && product.discounted_price < product.price ? (
+                                                <div className="flex items-center space-x-2">
+                                                    <p className="text-sm font-medium text-gray-500 line-through">
+                                                    {product.price.toLocaleString()}₫
+                                                    </p>
+                                                    <p className="text-sm font-bold text-red-600 animate-pulse flex items-center">
+                                                    <FaFire className="text-red" /> {product.discounted_price.toLocaleString()}₫
+                                                    </p>
+                                                </div>
+                                                ) : (
+                                                <p className="text-sm font-medium text-gray-900">
+                                                    {product.price.toLocaleString()}₫
+                                                </p>
+                                                )}
+
             </div>
             </button>
         </div>

@@ -42,7 +42,7 @@ export default function CategoriesTable() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch("http://localhost:8000/api/admin/blogs", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/blogs`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
@@ -66,16 +66,22 @@ export default function CategoriesTable() {
                     throw new Error(`Lỗi API: ${res.status} - ${res.statusText}`);
                 }
 
-                const json: PaginatedResponse = await res.json();
+                const json = await res.json();
                 console.log("JSON API response:", json);
 
-                if (!json?.data) {
-                    throw new Error("Dữ liệu API không hợp lệ");
-                }
+                // Kiểm tra nếu json là array thì dùng trực tiếp, nếu không thì lấy từ data
+                const categories = Array.isArray(json) ? json : (json.data || []);
+                
+                // Đảm bảo mỗi category có mảng blogs
+                const formattedCategories = categories.map((category: Partial<Category>) => ({
+                    ...category,
+                    blogs: category.blogs || []
+                }));
 
-                setCategories(json.data);
+                setCategories(formattedCategories as Category[]);
             } catch (error) {
                 console.error("Lỗi khi gọi API:", error);
+                alert("Có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.");
                 setCategories([]);
             }
         }

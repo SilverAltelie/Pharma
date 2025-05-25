@@ -33,17 +33,15 @@ class BlogController extends Controller
 
     public function index()
     {
-        return BlogCategory::with('blogs')->with('blogs.admin')->paginate(10);
+        return BlogCategory::with(['blogs' => function($query) {
+            $query->with('admin');
+        }])->get();
     }
 
     public function store(BlogRequest $request)
     {
         $admin = Auth::guard('admin')->user();
-
-        // Lấy dữ liệu từ request (đã validate)
         $data = $request->validated();
-
-        // Gọi service xử lý tạo blog
         return $this->blogCreateService->handle($admin, $data);
     }
 
@@ -61,14 +59,30 @@ class BlogController extends Controller
     public function update(BlogRequest $request, $id)
     {
         $data = $request->validated();
-
         $admin = Auth::guard('admin')->user();
-
         return $this->blogUpdateService->handle($admin, $id, $data);
     }
 
     public function destroy($id)
     {
         return $this->blogDeleteService->handle($id);
+    }
+
+    public function show($id)
+    {
+        $blog = Blog::with(['admin', 'category'])->findOrFail($id);
+        
+        // Get related blogs from same category
+        $relatedBlogs = Blog::where('category_id', $blog->category_id)
+            ->where('id', '!=', $blog->id)
+            ->with(['admin', 'category'])
+            ->latest()
+            ->take(3)
+            ->get();
+
+        return response()->json([
+            'blog' => $blog,
+            'related_blogs' => $relatedBlogs
+        ]);
     }
 }

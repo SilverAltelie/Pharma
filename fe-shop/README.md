@@ -34,3 +34,9 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+| Ngân hàng   | Số thẻ (card number) | Ngày hết hạn (expiry) | CVC   | Ghi chú                 |
+| ----------- | -------------------- | --------------------- | ----- | ----------------------- |
+| MB Bank     | `9704123456789012`   | `12/26`               | `123` | ✅ Thanh toán thành công |
+| BIDV        | `9706223456789012`   | `11/25`               | `456` | ❌ Không đủ số dư        |
+| Vietcombank | `9707367890123456`   | `01/27`               | `789` | ❌ Tài khoản từ chối thanh toán|

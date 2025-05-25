@@ -26,9 +26,26 @@ class ProductController extends Controller
         $this->productGetRelateService = $productGetRelateService;
         $this->productUpdateRelateService = $productUpdateRelateService;
     }
+
     public function index()
     {
-        return Product::paginnate(10);
+        $products = Product::with(['images'])
+            ->paginate(12);
+
+        // Transform products data
+        $products->getCollection()->transform(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'discounted_price' => $product->price, // For now, same as price
+                'image' => $product->images->first() ? $product->images->first()->image : null,
+                'status' => $product->status,
+                'category_id' => $product->category_id,
+            ];
+        });
+
+        return response()->json($products);
     }
 
     public function show($id)
@@ -36,13 +53,9 @@ class ProductController extends Controller
         return $this->productShowService->handle($id);
     }
 
-    public function updateRelate(UpdateRelateRequest $request)
+    public function updateRelate(Request $request)
     {
-        $request = $request->validated();
-
-        $id = $request->input('product_id');
-
-        $this->productUpdateRelateService->handle($id, $request);
+        return $this->productUpdateRelateService->handle($request);
     }
 
     public function getRelate($id)

@@ -444,7 +444,7 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
                                                 value={editingVariant?.name || ""}
                                                 onChange={(e) =>
                                                     setEditingVariant((prev) => ({
-                                                        ...(prev || { id: '', name: '', price: 0, quantity: 0, product_id: null }),
+                                                        ...(prev || { id: '', name: '', price: 0, quantity: 0, product_id: null, discounted_price: 0 }),
                                                         name: e.target.value
                                                     }))
                                                 }
@@ -457,7 +457,7 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
                                                 value={editingVariant?.quantity || ""}
                                                 onChange={(e) =>
                                                     setEditingVariant((prev) => ({
-                                                        ...(prev || { id: '', name: '', price: 0, quantity: 0, product_id: null }),
+                                                        ...(prev || { id: '', name: '', price: 0, quantity: 0, product_id: null, discounted_price: 0 }),
                                                         quantity: parseInt(e.target.value) || 0
                                                     }))
                                                 }
@@ -470,7 +470,7 @@ export default function Show({params}: { params: Promise<{ id: string }>}) {
                                                 value={editingVariant?.price || ""}
                                                 onChange={(e) =>
                                                     setEditingVariant((prev) => ({
-                                                        ...(prev || { id: '', name: '', price: 0, quantity: 0, product_id: '' }),
+                                                        ...(prev || { id: '', name: '', price: 0, quantity: 0, product_id: '', discounted_price: 0 }),
                                                         price: parseInt(e.target.value)
                                                     }))
                                                 }

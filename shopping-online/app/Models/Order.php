@@ -12,7 +12,7 @@ class Order extends Model
 
     protected $table = 'orders';
 
-    protected $fillable = ['user_id', 'status', 'payment_id', 'note', 'address_id'];
+    protected $fillable = ['user_id', 'status', 'payment_id', 'note', 'address_id', 'amount'];
 
     public function user() {
         return $this->belongsTo(User::class);

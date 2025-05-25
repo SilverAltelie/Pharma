@@ -22,7 +22,7 @@ class OrderController extends Controller
     }
     public function index()
     {
-        return Order::with('user')->with('orderItems')->with('orderItems.product.images')->with('orderItems.variant')->paginate(10);
+        return Order::with('user')->with('orderItems')->with('orderItems.product.images')->with('orderItems.variant')->orderBy('updated_at', 'desc')->paginate(10);
     }
 
     public function updateOrderStatus($id, Request $request) {

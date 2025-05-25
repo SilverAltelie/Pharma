@@ -24,6 +24,8 @@ use App\Http\Controllers\Admin\AdminController;
 use \App\Http\Controllers\User\Cart\CartController;
 use \App\Http\Controllers\Admin\User\UserController;
 use \App\Http\Controllers\Admin\HomeController;
+use \App\Http\Controllers\BankWebhookController;
+use App\Http\Controllers\User\Blog\BlogController as UserBlogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,13 +71,22 @@ Route::prefix('/')->group(function () {
 });
 
 Route::prefix('')->middleware('optional-auth')->group(function () {
-
     Route::get('/home', [UserHomeController::class, 'index']);
     Route::get('/main', [MainController::class, 'index']);
-    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories', [UserCategoryController::class, 'index']);
     Route::get('/product', [ProductController::class, 'index']);
     Route::get('/products', [UserProductController::class, 'index']);
     Route::get('/products/{id}', [UserProductController::class, 'show']);
+    
+    // Test route to check products
+    Route::get('/test-products', function() {
+        $products = \App\Models\Product::with('images')->get();
+        return response()->json([
+            'total_products' => $products->count(),
+            'products' => $products->take(5) // Show first 5 products
+        ]);
+    });
+    
     Route::prefix('/category')->group(function () {
         Route::get('/{id}', [UserCategoryController::class, 'show']);
     });
@@ -100,7 +111,16 @@ Route::prefix('')->middleware('optional-auth')->group(function () {
         Route::get('/checkout', [UserOrderController::class, 'checkout']);
         Route::post('/create', [UserOrderController::class, 'store']);
     });
+
+    // Blog routes
+    Route::get('/blogs', [UserBlogController::class, 'index']);
+    Route::get('/blogs/{id}', [UserBlogController::class, 'show']);
 });
+
+Route::post('/bank/webhook', [BankWebhookController::class, 'receiveTransaction']);
+
+Route::get('/orders/{id}', [UserOrderController::class, 'show']);
+
 
 Route::prefix('')->middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
@@ -125,6 +145,9 @@ Route::prefix('/admin/auth')->group(function () {
     Route::post('/login', [AdminController::class, 'login']);
     Route::post('/register', [AdminController::class, 'register']);
 });
+
+Route::post('/mock-bank/webhook', [BankWebhookController::class, 'simulate']);
+
 
 Route::prefix('admin')->middleware('admin.auth')->group(function () {
 

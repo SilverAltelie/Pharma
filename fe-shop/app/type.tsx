@@ -4,6 +4,7 @@ export type Variant = {
     name: string;
     price: number;
     quantity: number;
+    discounted_price: number;
 }
 
 export type Address = {
@@ -107,6 +108,7 @@ export type Product = {
     quantity: number;
     variants?: Variant[];
     reviews?: ReviewType[];
+    discounted_price: number;
 }
 
 export type CartItem = {
@@ -147,6 +149,7 @@ export type Order = {
     order_items: OrderItem[];
     created_at: string;
     updated_at: string;
+    amount: string;
 };
 
 export type Customer = {

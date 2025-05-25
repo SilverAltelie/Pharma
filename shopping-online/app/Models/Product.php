@@ -12,7 +12,7 @@ class Product extends Model
 
     protected $table = 'products';
 
-    protected $fillable = ['title', 'description', 'content', 'price', 'quantity', 'status', 'category_id'];
+    protected $fillable = ['name', 'description', 'content', 'price', 'quantity', 'status', 'category_id'];
 
     protected $appends = ['discounted_price'];
 

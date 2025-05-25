@@ -10,11 +10,23 @@ class CategoryShowService
     {
         $category = Category::findOrFail($id);
 
-        $products = $category->products()->with('variants')->paginate(20);
+        // Get products for this category
+        $products = $category->products()
+            ->with(['images'])
+            ->paginate(12);
 
-        foreach ($products as $product) {
-            $product->image = $product->images->first();
-        }
+        // Transform products data
+        $products->getCollection()->transform(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'price' => $product->price,
+                'discounted_price' => $product->price, // For now, same as price
+                'image' => $product->images->first() ? $product->images->first()->image : null,
+                'status' => $product->status,
+                'category_id' => $product->category_id,
+            ];
+        });
 
         return response()->json([
             'category' => $category,

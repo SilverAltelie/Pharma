@@ -16,8 +16,16 @@ const FloatingMenu = ({ user }: { user: User | undefined }) => {
   const [open, setOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+
+  const quickMessages = [
+    "Làm sao để biết được mình có bệnh gì?",
+    "Tôi bị đau bụng thì làm sao?",
+    "Tôi bị nhức đầu thì làm sao?",
+    "Tôi bị mất ngủ thì làm sao?",
+  ];
 
   useEffect(() => {
     const storedMessages = localStorage.getItem("messages");
@@ -53,6 +61,7 @@ const FloatingMenu = ({ user }: { user: User | undefined }) => {
 
     const currentMessage = message;
     setMessage("");
+    setIsLoading(true);
 
     try {
       const res = await fetch("/api/chat", {
@@ -85,7 +94,13 @@ const FloatingMenu = ({ user }: { user: User | undefined }) => {
       }
     } catch (error) {
       console.error("Error sending request:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleQuickMessage = (msg: string) => {
+    setMessage(msg);
   };
 
   return (
@@ -107,6 +122,23 @@ const FloatingMenu = ({ user }: { user: User | undefined }) => {
                 </div>
 
                 <div className="flex-1 z-50 overflow-y-auto p-2 space-y-2">
+                  {messages.length === 0 && (
+                    <div className="flex flex-col gap-2 p-4">
+                      <p className="text-gray-500 text-sm text-center mb-2">Chọn câu hỏi thường gặp:</p>
+                      <div className="grid grid-cols-1 gap-2">
+                        {quickMessages.map((msg, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleQuickMessage(msg)}
+                            className="text-left px-4 py-2 text-sm bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors duration-200 text-gray-700 hover:text-gray-900"
+                          >
+                            {msg}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   {messages.map((msg) => (
                       <div key={msg.id} className={`flex ${msg.role === 'user' ? "justify-end" : "justify-start"}`}>
                         <div className={`p-2 rounded-lg max-w-xs text-sm ${msg.role === 'assistant' ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"}`}>
@@ -114,21 +146,58 @@ const FloatingMenu = ({ user }: { user: User | undefined }) => {
                         </div>
                       </div>
                   ))}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-gray-100 text-gray-600 p-2 rounded-lg max-w-xs">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                          <span className="text-sm">Đang phân tích...</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div ref={chatEndRef}></div>
                 </div>
 
-                <div className="flex items-center border-t pt-2">
-                  <input
-                      type="text"
-                      className="flex-1 p-2 border rounded-lg outline-none text-sm"
-                      placeholder="Nhập tin nhắn..."
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                  />
-                  <button onClick={sendMessage} className="ml-2 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600">
-                    <FaPaperPlane />
-                  </button>
+                <div className="space-y-2">
+                  {messages.length > 0 && (
+                    <div className="flex gap-2 overflow-x-auto py-2 px-1 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                      {quickMessages.map((msg, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleQuickMessage(msg)}
+                          className="flex-shrink-0 px-3 py-1 text-xs bg-gray-50 hover:bg-gray-100 rounded-full transition-colors duration-200 text-gray-700 hover:text-gray-900 whitespace-nowrap"
+                        >
+                          {msg}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex items-center border-t pt-2">
+                    <input
+                        type="text"
+                        className="flex-1 p-2 border rounded-lg outline-none text-sm"
+                        placeholder="Nhập tin nhắn..."
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && !isLoading && sendMessage()}
+                        disabled={isLoading}
+                    />
+                    <button 
+                      onClick={sendMessage} 
+                      disabled={isLoading}
+                      className={`ml-2 p-2 rounded-full transition-colors duration-200 ${
+                        isLoading 
+                          ? 'bg-gray-400 cursor-not-allowed' 
+                          : 'bg-blue-500 hover:bg-blue-600'
+                      } text-white`}
+                    >
+                      <FaPaperPlane />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
           )}

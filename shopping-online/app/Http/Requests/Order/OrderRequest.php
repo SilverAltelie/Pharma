@@ -29,6 +29,7 @@ class OrderRequest extends FormRequest
             'address_id' => 'required|integer|exists:addresses,id',
             'note' => 'nullable|string',
             'payment_id' => 'required|integer|exists:payments,id',
+            'amount' => 'required|string',
         ];
     }
 

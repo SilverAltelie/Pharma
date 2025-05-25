@@ -15,25 +15,28 @@ class OrderCreateService
             'status' => '0',
             'note' => $data['note'],
             'payment_id' => $data['payment_id'],
+            'amount' => $data['amount'], // Total amount is stored here
         ]);
 
         foreach ($data['cartItems'] as $cartItem) {
-            $order->orderItems()->create([
+            $orderItem = $order->orderItems()->create([
                 'quantity' => $cartItem['quantity'],
                 'variant_id' => $cartItem['variant_id'] ?? null,
                 'product_id' => $cartItem['product_id'],
+                'promotion_id' => $cartItem['promotion_id'] ?? null, // Store which promotion was applied
             ]);
 
-            $cartItem = CartItem::findOrFail($cartItem['id']);
+            $cartItemModel = CartItem::findOrFail($cartItem['id']);
 
-            if ($cartItem->variant()) {
-                $cartItem->variant()->decrement('quantity', $cartItem['quantity']);
+            // Decrease inventory
+            if ($cartItemModel->variant_id) {
+                $cartItemModel->variant()->decrement('quantity', $cartItem['quantity']);
             } else {
-                $cartItem->product()->decrement('quantity', $cartItem['quantity']);
+                $cartItemModel->product()->decrement('quantity', $cartItem['quantity']);
             }
 
-            CartItem::destroy($cartItem['id']);
-
+            // Remove from cart
+            $cartItemModel->delete();
         }
 
         return [

@@ -49,6 +49,7 @@ export default function Home() {
         title: string;
         href: string;
         image: Image;
+        discounted_price: number;
         price: string;
         color: string;
         variants: Array<{ id: string; name: string; price: string; quantity: string }>;
@@ -304,10 +305,10 @@ export default function Home() {
                 </div>
             </div>
 
-            <section className="bg-blue-100 py-10 z-0">
-                <div className="container mx-auto grid grid-cols-3 gap-4">
+            <section className="bg-gradient-to-b from-blue-50 to-white py-12">
+                <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
                     {/* Swiper bên trái */}
-                    <div className="col-span-2">
+                    <div className="md:col-span-2">
                         <Swiper
                             modules={[Navigation, Pagination, Autoplay]}
                             spaceBetween={20}
@@ -315,16 +316,17 @@ export default function Home() {
                             navigation
                             pagination={{clickable: true}}
                             autoplay={{delay: 3000, disableOnInteraction: false}}
-                            className="w-full rounded-lg overflow-hidden shadow-lg"
+                            className="rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300"
                         >
                             {images.map((image, index) => (
                                 <SwiperSlide key={index}>
-                                    <Link href={image.link} target="_blank" rel="noopener noreferrer">
+                                    <Link href={image.link} className="block relative group">
                                         <img
                                             src={image.src}
                                             alt={`Slide ${index + 1}`}
-                                            className="w-full h-72 object-cover rounded-lg"
+                                            className="w-full h-[400px] object-cover transform group-hover:scale-105 transition-transform duration-500"
                                         />
+                                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"/>
                                     </Link>
                                 </SwiperSlide>
                             ))}
@@ -332,32 +334,34 @@ export default function Home() {
                     </div>
 
                     {/* Hai ảnh tĩnh bên phải */}
-                    <div className="flex flex-col gap-4">
-                        <Link href="/promotion/1" target="_blank" rel="noopener noreferrer">
+                    <div className="flex flex-col gap-6">
+                        <Link href="/promotion/1" className="block relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
                             <img
                                 src="/img/bg-img/voucher.png"
-                                alt="Image 1"
-                                className="w-full h-36 object-cover rounded-lg shadow-lg"
+                                alt="Promotion"
+                                className="w-full h-[190px] object-cover transform group-hover:scale-105 transition-transform duration-500"
                             />
+                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"/>
                         </Link>
-                        <Link href="/product/1" target="_blank" rel="noopener noreferrer">
+                        <Link href="/product/1" className="block relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
                             <img
                                 src="/img/bg-img/calci.png"
-                                alt="Image 2"
-                                className="w-full h-36 object-cover rounded-lg shadow-lg"
+                                alt="Product"
+                                className="w-full h-[190px] object-cover transform group-hover:scale-105 transition-transform duration-500"
                             />
+                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"/>
                         </Link>
                     </div>
                 </div>
             </section>
 
-            <div className="bg-white py-24 sm:py-32">
+            <div className="bg-white py-20">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-4">
+                    <dl className="grid grid-cols-1 gap-x-8 gap-y-12 text-center lg:grid-cols-4">
                         {stats.map((stat) => (
-                            <div key={stat.id} className="mx-auto flex max-w-xs flex-col gap-y-4">
-                                <dt className="text-base/7 text-gray-600">{stat.name}</dt>
-                                <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                            <div key={stat.id} className="mx-auto flex max-w-xs flex-col gap-y-4 bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                                <dt className="text-base leading-7 text-gray-600">{stat.name}</dt>
+                                <dd className="order-first text-3xl font-semibold tracking-tight text-green-600 sm:text-5xl">
                                     {stat.value}
                                 </dd>
                             </div>
@@ -366,184 +370,186 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="bg-white">
-                <div
-                    className="mx-auto grid max-w-2xl grid-cols-1 items-center gap-x-8 gap-y-16 px-4 py-24 sm:px-6 sm:py-32 lg:max-w-7xl lg:grid-cols-2 lg:px-8">
+            <div className="bg-gradient-to-b from-white to-gray-50">
+                <div className="mx-auto grid max-w-2xl grid-cols-1 items-center gap-x-8 gap-y-16 px-4 py-24 sm:px-6 sm:py-32 lg:max-w-7xl lg:grid-cols-2 lg:px-8">
                     <div>
-                        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Chuyên bán các sản
-                            phẩm</h2>
+                        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Chuyên bán các sản phẩm</h2>
                         <p className="mt-4 text-gray-500">
-                            Chuyên bán các sản phẩm về dược phẩm, thực phẩm chức năng, kem/thuốc mỹ phẩm, vitamin các
-                            loại.
+                            Chuyên bán các sản phẩm về dược phẩm, thực phẩm chức năng, kem/thuốc mỹ phẩm, vitamin các loại.
                         </p>
 
                         <dl className="mt-16 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 sm:gap-y-16 lg:gap-x-8">
                             {features.map((feature) => (
-                                <div key={feature.name} className="border-t border-gray-200 pt-4">
-                                    <dt className="font-medium text-gray-900">{feature.name}</dt>
+                                <div key={feature.name} className="border-t border-gray-200 pt-4 group">
+                                    <dt className="font-medium text-gray-900 group-hover:text-green-600 transition-colors duration-200">{feature.name}</dt>
                                     <dd className="mt-2 text-sm text-gray-500">{feature.description}</dd>
                                 </div>
                             ))}
                         </dl>
                     </div>
                     <div className="grid grid-cols-2 grid-rows-2 gap-4 sm:gap-6 lg:gap-8">
-                        <img
-                            alt="Walnut card tray with white powder coated steel divider and 3 punchout holes."
-                            src="/img/product-img/pills.png"
-                            className="rounded-lg bg-gray-100"
-                        />
-                        <img
-                            alt="Top down view of walnut card tray with embedded magnets and card groove."
-                            src="/img/product-img/products.jpg"
-                            className="rounded-lg bg-gray-100"
-                        />
-                        <img
-                            alt="Side of walnut card tray with card groove and recessed card area."
-                            src="/img/product-img/beauty.jpg"
-                            className="rounded-lg bg-gray-100"
-                        />
-                        <img
-                            alt="Walnut card tray filled with cards and card angled in dedicated groove."
-                            src="/img/product-img/vitamins.png"
-                            className="rounded-lg bg-gray-100"
-                        />
+                        {[
+                            { src: "/img/product-img/pills.png", alt: "Pills" },
+                            { src: "/img/product-img/products.jpg", alt: "Products" },
+                            { src: "/img/product-img/beauty.jpg", alt: "Beauty" },
+                            { src: "/img/product-img/vitamins.png", alt: "Vitamins" }
+                        ].map((img, index) => (
+                            <div key={index} className="relative group rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                                <img
+                                    src={img.src}
+                                    alt={img.alt}
+                                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                                />
+                                <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"/>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
 
-            <div className={"mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8"}>
+            <div className="bg-white">
+                <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+                    <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold tracking-tight text-gray-900">Sản phẩm bán chạy</h2>
-                    <div className="mt-8 my-8 px-3 py-4">
+                        <div className="h-0.5 flex-1 bg-gray-200 ml-6"/>
+                    </div>
 
+                    <div className="relative">
                         <Swiper
                             modules={[Navigation, Pagination]}
-                            spaceBetween={10}
+                            spaceBetween={24}
                             slidesPerView={2}
                             navigation
                             pagination={{clickable: true}}
                             breakpoints={{
-                                640: {
-                                    slidesPerView: 2,
-                                },
-                                768: {
-                                    slidesPerView: 3,
-                                },
-                                1024: {
-                                    slidesPerView: 4,
-                                },
+                                640: { slidesPerView: 2 },
+                                768: { slidesPerView: 3 },
+                                1024: { slidesPerView: 4 },
                             }}
+                            className="py-4"
                         >
                             {data?.bestSelling.map((product: Product, index: number) => (
                                 <SwiperSlide key={index}>
-                                    <Link href={`/product/${product.id}`} onClick={() => handleViewProduct(parseInt(product.id))} className={"no-underline group"}>
+                                    <Link href={`/product/${product.id}`} onClick={() => handleViewProduct(parseInt(product.id))} 
+                                          className="block group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 no-underline">
+                                        <div className="aspect-square relative overflow-hidden">
                                         <img
                                             alt={product.title}
                                             src={`data:image/jpeg;base64,${product.images[0]?.image}`}
-                                            className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
+                                                className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                                         />
-                                        <div className="mt-4 flex justify-between">
-                                            <div>
-                                                <h3 className="text-sm text-gray-700 mb-8 no-underline">
-
+                                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"/>
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <h3 className="text-sm font-medium text-gray-900 group-hover:text-green-600 transition-colors duration-200 line-clamp-2">
                                                     {product.title}
-
                                                 </h3>
-                                            </div>
-                                            {product.discounted_price && product.discounted_price < product.price ? (
-                                                <div className="flex items-center space-x-2">
-                                                    <p className="text-sm font-medium text-gray-500 line-through">
-                                                    {product.price.toLocaleString()}₫
+                                            <div className="mt-2">
+                                                {product.discounted_price && product.discounted_price < parseInt(product.price) ? (
+                                                    <div className="space-y-1">
+                                                        <p className="text-sm text-gray-500 line-through">
+                                                            {parseInt(product.price).toLocaleString()}₫
                                                     </p>
-                                                    <p className="text-sm font-bold text-red-600 animate-pulse flex items-center">
-                                                    <FaFire className="text-red" /> {product.discounted_price.toLocaleString()}₫
+                                                        <p className="text-sm font-bold text-red-600 flex items-center gap-1">
+                                                            <FaFire className="animate-pulse"/> 
+                                                            {product.discounted_price.toLocaleString()}₫
                                                     </p>
                                                 </div>
                                                 ) : (
                                                 <p className="text-sm font-medium text-gray-900">
-                                                    {product.price.toLocaleString()}₫
+                                                        {parseInt(product.price).toLocaleString()}₫
                                                 </p>
                                                 )}
-
+                                            </div>
                                         </div>
                                     </Link>
                                 </SwiperSlide>
                             ))}
                         </Swiper>
+                    </div>
                 </div>
             </div>
 
-            <div className={"mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8"}>
+            <div className="bg-gray-50">
+                <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+                    <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold tracking-tight text-gray-900">Sản phẩm giảm giá hot</h2>
-                    <div className="mt-8 my-8 px-3 py-4">
+                        <div className="h-0.5 flex-1 bg-gray-200 ml-6"/>
+                    </div>
 
+                    <div className="relative">
                         <Swiper
                             modules={[Navigation, Pagination]}
-                            spaceBetween={10}
+                            spaceBetween={24}
                             slidesPerView={2}
                             navigation
                             pagination={{clickable: true}}
                             breakpoints={{
-                                640: {
-                                    slidesPerView: 2,
-                                },
-                                768: {
-                                    slidesPerView: 3,
-                                },
-                                1024: {
-                                    slidesPerView: 4,
-                                },
+                                640: { slidesPerView: 2 },
+                                768: { slidesPerView: 3 },
+                                1024: { slidesPerView: 4 },
                             }}
+                            className="py-4"
                         >
                             {data?.mostDiscounted.map((product: Product, index: number) => (
                                 <SwiperSlide key={index}>
-                                    <Link href={`/product/${product.id}`} onClick={() => handleViewProduct(parseInt(product.id))} className={"no-underline group"}>
+                                    <Link href={`/product/${product.id}`} onClick={() => handleViewProduct(parseInt(product.id))} 
+                                          className="block group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 no-underline">
+                                        <div className="aspect-square relative overflow-hidden">
                                         <img
                                             alt={product.title}
                                             src={`data:image/jpeg;base64,${product.images[0]?.image}`}
-                                            className="aspect-square w-full rounded-md bg-gray-200 object-cover group-hover:opacity-75 lg:aspect-auto lg:h-80"
+                                                className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                                         />
-                                        <div className="mt-4 flex justify-between">
-                                            <div>
-                                                <h3 className="text-sm text-gray-700 mb-8 no-underline">
-
+                                            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300"/>
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <h3 className="text-sm font-medium text-gray-900 group-hover:text-green-600 transition-colors duration-200 line-clamp-2">
                                                     {product.title}
-
                                                 </h3>
-                                            </div>
-                                            {product.discounted_price && product.discounted_price < product.price ? (
-                                                <div className="flex items-center space-x-2">
-                                                    <p className="text-sm font-medium text-gray-500 line-through">
-                                                    {product.price.toLocaleString()}₫
+                                            <div className="mt-2">
+                                            {product.discounted_price && product.discounted_price < parseInt(product.price) ? (
+                                                    <div className="space-y-1">
+                                                        <p className="text-sm text-gray-500 line-through">
+                                                            {parseInt(product.price).toLocaleString()}₫
                                                     </p>
-                                                    <p className="text-sm font-bold text-red-600 animate-pulse flex items-center">
-                                                    <FaFire className="text-red" /> {product.discounted_price.toLocaleString()}₫
+                                                        <p className="text-sm font-bold text-red-600 flex items-center gap-1">
+                                                            <FaFire className="animate-pulse"/> 
+                                                            {product.discounted_price.toLocaleString()}₫
                                                     </p>
                                                 </div>
                                                 ) : (
                                                 <p className="text-sm font-medium text-gray-900">
-                                                    {product.price.toLocaleString()}₫
+                                                        {parseInt(product.price).toLocaleString()}₫
                                                 </p>
                                                 )}
-
+                                            </div>
                                         </div>
                                     </Link>
                                 </SwiperSlide>
                             ))}
                         </Swiper>
+                    </div>
                 </div>
             </div>
 
+            <div className="bg-white">
             <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-
                 <Recommend
                     productIds={viewedProducts}
                     handleViewProduct={handleViewProduct}
                 />
+                </div>
             </div>
 
+            <div className="bg-gray-50">
             <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
-              <h2 className='text-2xl font-bold tracking-tight text-gray-900'>Khám phá thêm sản phẩm</h2>
-                <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-2xl font-bold tracking-tight text-gray-900">Khám phá thêm sản phẩm</h2>
+                        <div className="h-0.5 flex-1 bg-gray-200 ml-6"/>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                     {data?.products?.data.map((product: Product) => (
                         <ProductCard
                             key={product.id}
@@ -554,9 +560,16 @@ export default function Home() {
                     ))}
                 </div>
 
-              <button onClick={() => window.location.href = '/products/'} className="btn btn-primary" >
-                <FaCaretDown />
+                    <div className="flex justify-center mt-12">
+                        <button 
+                            onClick={() => window.location.href = '/products/'} 
+                            className="group relative inline-flex items-center gap-x-2 rounded-full bg-green-600 px-8 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 transition-all duration-200"
+                        >
+                            Xem thêm sản phẩm
+                            <FaCaretDown className="text-lg group-hover:translate-y-0.5 transition-transform duration-200"/>
               </button>
+                    </div>
+                </div>
             </div>
         </MainLayout>
     );

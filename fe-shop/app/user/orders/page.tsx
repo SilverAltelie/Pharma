@@ -3,6 +3,7 @@ import MainLayout from "@/app/_userlayout";
 import React, { useState, useEffect } from "react";
 import { FaMoneyCheck } from "react-icons/fa";
 import { FaCartShopping, FaCircleCheck, FaTruckFast, FaCircleXmark } from "react-icons/fa6";
+import OrderPaymentButton from "@/app/components/OrderPaymentButton";
 
 const ProductsOrderTable = () => {
 
@@ -28,6 +29,7 @@ const ProductsOrderTable = () => {
     type Order = {
         id: number;
         status: number;
+        payment_id: number;
         order_items: OrderItem[];
         created_at: string;
         updated_at: string;
@@ -137,9 +139,16 @@ const ProductsOrderTable = () => {
                                         timeZone: 'Asia/Ho_Chi_Minh'
                                     })}</p>
                                 </div>
-                                <div>
-                                    <p className="font-semibold text-sm">Tổng giá trị đơn hàng</p>
-                                    <p className="font-bold text-red-500">{totalAmount} VND</p>
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="font-semibold text-sm">Tổng giá trị đơn hàng</p>
+                                        <p className="font-bold text-red-500">{totalAmount} VND</p>
+                                    </div>
+                                    <OrderPaymentButton 
+                                        orderId={order.id} 
+                                        paymentId={order.payment_id} 
+                                        status={order.status.toString()} 
+                                    />
                                 </div>
                             </div>
 

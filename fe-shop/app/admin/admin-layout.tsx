@@ -106,19 +106,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
         <div className="flex min-h-screen bg-gray-100">
             {/* Sidebar */}
-            <aside className={`bg-white p-4 shadow-md flex flex-col fixed top-0 left-0 h-screen transition-all duration-300
+            <aside className={`bg-white p-6 shadow-lg flex flex-col fixed top-0 left-0 h-screen transition-all duration-300 ease-in-out
             ${isCollapsed ? "w-20" : "w-64"}`}>
 
-
-                {/* Toggle Button */}
-                <a href="/admin">
-                    <img src="/favicon.ico" width={30} height={30} alt=""/>
+                {/* Logo */}
+                <a href="/admin" className="flex items-center gap-3 mb-8">
+                    <img src="/favicon.ico" width={30} height={30} alt="" className="rounded shadow-sm"/>
+                    {!isCollapsed && <span className="font-bold text-xl text-gray-800">Admin</span>}
                 </a>
 
                 {/* Sidebar Menu */}
-                <nav className="flex flex-col flex-grow gap-4 mt-5">
+                <nav className="flex flex-col flex-grow gap-2">
                     <a href="/admin/"
-                       className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+                       className="flex items-center font-medium gap-3 p-3 hover:bg-green-50 rounded-lg text-gray-700 hover:text-green-600 transition-all duration-200">
                         <FaChartLine className="text-lg"/>
                         {!isCollapsed && <span>Bảng điều khiển</span>}
                     </a>
@@ -126,137 +126,135 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <div>
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="flex items-center font-semibold gap-3 p-2 w-full text-left hover:bg-green-100 rounded text-black text-base no-underline"
+                            className="flex items-center font-medium gap-3 p-3 w-full text-left hover:bg-green-50 rounded-lg text-gray-700 hover:text-green-600 transition-all duration-200"
                         >
                             <FaUsers className="text-lg"/>
-                            {!isCollapsed && <span>Người dùng</span>}
-                            {!isCollapsed && <FaChevronDown
-                                className={`ml-auto transition-transform ${isMenuOpen ? "rotate-180" : ""}`}/>}
+                            {!isCollapsed && (
+                                <>
+                                    <span>Người dùng</span>
+                                    <FaChevronDown
+                                        className={`ml-auto transition-transform duration-200 ${isMenuOpen ? "rotate-180" : ""}`}
+                                    />
+                                </>
+                            )}
                         </button>
 
-                        {/* Danh sách con */}
+                        {/* Submenu */}
                         {isMenuOpen && !isCollapsed && (
-                            <div className="pl-7 mt-1 flex flex-col gap-2">
-                                <div className="flex items-center gap-3 mt-4">
-                                    <FaFlag className="text-base"/>
-                                    <a href="/admin/permissions"
-                                       className="text-black no-underline text-sm font-medium hover:text-green-600">Quản
-                                        lý phân quyền</a>
-                                </div>
+                            <div className="pl-4 mt-2 space-y-2">
+                                <Link href="/admin/permissions"
+                                   className="flex items-center gap-3 p-2 text-gray-600 hover:text-green-600 rounded-lg transition-colors duration-200 group">
+                                    <FaFlag className="text-base group-hover:scale-110 transition-transform duration-200"/>
+                                    <span className="text-sm">Quản lý phân quyền</span>
+                                </Link>
 
-                                <div className="flex items-center gap-3 mt-4">
-                                    <FaWebAwesome className="text-base"/>
                                     <Link href="/admin/roles"
-                                       className="text-black no-underline text-sm font-medium hover:text-green-600">Quản
-                                        lý vai trò</Link>
-                                </div>
+                                   className="flex items-center gap-3 p-2 text-gray-600 hover:text-green-600 rounded-lg transition-colors duration-200 group">
+                                    <FaWebAwesome className="text-base group-hover:scale-110 transition-transform duration-200"/>
+                                    <span className="text-sm">Quản lý vai trò</span>
+                                </Link>
 
-                                <div className="flex items-center gap-3 mt-4">
-                                    <FaUser className="text-base"/>
-                                    <a href="/admin/users"
-                                       className="text-black no-underline text-sm font-medium hover:text-green-600">Quản
-                                        lý người dùng</a>
-                                </div>
+                                <Link href="/admin/users"
+                                   className="flex items-center gap-3 p-2 text-gray-600 hover:text-green-600 rounded-lg transition-colors duration-200 group">
+                                    <FaUser className="text-base group-hover:scale-110 transition-transform duration-200"/>
+                                    <span className="text-sm">Quản lý người dùng</span>
+                                </Link>
                             </div>
                         )}
                     </div>
 
-                    <a href="/admin/categories"
-                       className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+                    <Link href="/admin/categories"
+                       className="flex items-center font-medium gap-3 p-3 hover:bg-green-50 rounded-lg text-gray-700 hover:text-green-600 transition-all duration-200">
                         <FaList className="text-lg"/>
                         {!isCollapsed && <span>Danh mục</span>}
-                    </a>
+                    </Link>
+
                     <Link href="/admin/products"
-                       className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+                       className="flex items-center font-medium gap-3 p-3 hover:bg-green-50 rounded-lg text-gray-700 hover:text-green-600 transition-all duration-200">
                         <FaBox className="text-lg"/>
                         {!isCollapsed && <span>Sản phẩm</span>}
                     </Link>
-                    <a href="/admin/orders"
-                       className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+
+                    <Link href="/admin/orders"
+                       className="flex items-center font-medium gap-3 p-3 hover:bg-green-50 rounded-lg text-gray-700 hover:text-green-600 transition-all duration-200">
                         <FaInbox className="text-lg"/>
                         {!isCollapsed && <span>Đơn hàng</span>}
-                    </a>
-                    <a href="#"
-                       className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+                    </Link>
+
+                    <Link href="#"
+                       className="flex items-center font-medium gap-3 p-3 hover:bg-green-50 rounded-lg text-gray-700 hover:text-green-600 transition-all duration-200">
                         <FaComment className="text-lg"/>
                         {!isCollapsed && <span>Chat</span>}
-                    </a>
-                    <a href="/admin/blog"
-                       className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+                    </Link>
+
+                    <Link href="/admin/blog"
+                       className="flex items-center font-medium gap-3 p-3 hover:bg-green-50 rounded-lg text-gray-700 hover:text-green-600 transition-all duration-200">
                         <FaBlog className="text-lg"/>
                         {!isCollapsed && <span>Blogs</span>}
-                    </a>
-                    <a href="/admin/promotions"
-                       className="flex items-center font-semibold gap-3 p-2 hover:bg-green-100 rounded text-black text-base no-underline">
+                    </Link>
+
+                    <Link href="/admin/promotions"
+                       className="flex items-center font-medium gap-3 p-3 hover:bg-green-50 rounded-lg text-gray-700 hover:text-green-600 transition-all duration-200">
                         <FaPercent className="text-lg"/>
                         {!isCollapsed && <span>Khuyến mãi</span>}
-                    </a>
+                    </Link>
                 </nav>
 
-                {/* Đăng xuất */}
+                {/* Logout Button */}
                 <button onClick={handleLogout}
-                        className="mt-auto flex items-center font-semibold gap-3 p-2 hover:bg-red-100 rounded text-red-500 text-base no-underline">
+                        className="mt-auto flex items-center font-medium gap-3 p-3 hover:bg-red-50 rounded-lg text-red-600 hover:text-red-700 transition-all duration-200">
                     <FaArrowRightFromBracket className="text-lg"/>
                     {!isCollapsed && <span>Đăng xuất</span>}
                 </button>
 
             </aside>
 
-
             {/* Main Content */}
-            <div className={`flex-1 flex flex-col ${isCollapsed ? "ml-20" : "ml-64"}`}>
+            <div className={`flex-1 flex flex-col transition-all duration-300 ${isCollapsed ? "ml-20" : "ml-64"}`}>
                 {/* Navbar */}
-
-                <header className="bg-white shadow-md p-3 flex justify-between items-center w-full overflow-hidden">
-                    {/* Phần bên trái (Nút Sidebar) */}
-                    <div className="flex items-center">
+                <header className="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center sticky top-0 z-10">
+                    <div className="flex items-center gap-4">
                         <button
-                            className="p-2 rounded-md bg-gray-200 hover:bg-gray-300 transition-all"
+                            className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                             onClick={() => setIsCollapsed(!isCollapsed)}
                         >
-                            <FaBars/>
+                            <FaBars className="text-gray-600"/>
                         </button>
-                        <h2 className="relative mb-0 ml-4 text-lg font-semibold">Dashboard</h2>
-                        <div className="relative ml-4">
+                        <h2 className="text-xl font-semibold text-gray-800">Dashboard</h2>
+                        <div className="relative">
                             <button
-                                className="text-black font-bold hover:text-gray-700 focus:outline-none"
+                                className="text-gray-700 font-medium hover:text-green-600 transition-colors duration-200 focus:outline-none"
                                 onClick={() => setIsOpen(!isOpen)}
                             >
                                 Liên hệ
                             </button>
 
-                            {/* Dropdown menu */}
                             {isOpen && (
-                                <div
-                                    className="absolute left-0 z-50 mt-2 w-[250px] bg-white shadow-lg rounded-lg border border-gray-200">
-                                    <a
-                                        href="#"
-                                        className="block no-underline px-4 py-2 text-center text-gray-500 hover:bg-gray-100"
-                                    >
-                                        Contact us: 0123456789
+                                <div className="absolute left-0 z-50 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-100 transform transition-all duration-200 ease-out opacity-0 scale-95 data-[state=open]:opacity-100 data-[state=open]:scale-100">
+                                    <a href="#"
+                                       className="block px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                                        Liên hệ: 0123456789
                                     </a>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="flex items-center space-x-4 pr-4 flex-shrink-0">
-                        <a className="flex flex-col items-center justify-center no-underline" href="#">
+                    <div className="flex items-center gap-4">
+                        <a className="flex items-center gap-3 group" href="#">
                             <img
                                 alt="User"
                                 src="/UserCircle.svg"
-                                className="size-7 rounded-full object-cover"
+                                className="size-8 rounded-full object-cover ring-2 ring-gray-100 group-hover:ring-green-200 transition-all duration-200"
                             />
-                            <p className="text-black font-semibold no-underline mb-0">
+                            <span className="font-medium text-gray-700 group-hover:text-green-600 transition-colors duration-200">
                                 {data?.name ?? "Người lạ"}
-                            </p>
+                            </span>
                         </a>
                     </div>
-
                 </header>
 
-                <div className={`flex-1 flex flex-col transition-all duration-300 overflow-hidden`}>
-
+                <div className="flex-1 p-6 bg-gray-50">
                     {children}
                 </div>
             </div>

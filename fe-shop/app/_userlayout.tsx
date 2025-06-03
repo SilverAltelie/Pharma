@@ -249,6 +249,13 @@ const MainLayout = ({children}: { children: React.ReactNode }) => {
                                             Liên hệ
                                         </button>
 
+                                        <Link 
+                                            href="/blogs"
+                                            className="text-black font-bold hover:text-gray-700 transition-colors duration-200"
+                                        >
+                                            Tin tức
+                                        </Link>
+
                                         {/* Dropdown menu */}
                                         {isMenuOpen && (
                                             <div

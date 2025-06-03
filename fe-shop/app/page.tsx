@@ -2,7 +2,7 @@
 
 import MainLayout from "./_userlayout";
 import "bootstrap/dist/css/bootstrap.css";
-
+import { Modal } from "bootstrap";
 import {useState, useEffect} from "react";
 import {Swiper, SwiperSlide} from "swiper/react";
 import "swiper/css";
@@ -14,6 +14,7 @@ import ProductCard from "@/app/ProductCard";
 import Link from "next/link";
 import Recommend from "@/app/Recommend";
 import {FaCaretDown, FaFire} from "react-icons/fa";
+import { initBootstrap, initModal } from './lib/bootstrap';
 
 
 const stats = [
@@ -92,23 +93,24 @@ export default function Home() {
     };
 
     useEffect(() => {
-        setViewedProducts(sessionStorage.getItem('viewed') ? JSON.parse(sessionStorage.getItem('viewed') || '[]') : []);
-        setToken(sessionStorage.getItem('token') ?? '');
+        if (typeof window !== 'undefined') {
+            setViewedProducts(sessionStorage.getItem('viewed') ? JSON.parse(sessionStorage.getItem('viewed') || '[]') : []);
+            setToken(sessionStorage.getItem('token') ?? '');
 
-        if (typeof window !== "undefined" && typeof document !== "undefined") {
-            import('bootstrap').then(({Modal}) => {
-                const storageKey = "popupClosedTime";
-                const displayAfterMillis = 3600000;
+            // Initialize Bootstrap
+            initBootstrap();
 
-                const lastClosedTime = localStorage.getItem(storageKey);
-                if (!lastClosedTime || Date.now() - parseInt(lastClosedTime, 10) >= displayAfterMillis) {
-                    const popup = document.getElementById("salePopup");
-                    if (popup) {
-                        const modalInstance = new Modal(popup);
-                        modalInstance.show();
-                    }
+            // Handle popup display
+            const storageKey = "popupClosedTime";
+            const displayAfterMillis = 3600000;
+
+            const lastClosedTime = localStorage.getItem(storageKey);
+            if (!lastClosedTime || Date.now() - parseInt(lastClosedTime, 10) >= displayAfterMillis) {
+                const modalInstance = initModal('salePopup');
+                if (modalInstance) {
+                    modalInstance.show();
                 }
-            });
+            }
         }
     }, []);
 

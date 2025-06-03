@@ -8,6 +8,8 @@ use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Product;
+use App\Models\Promotion;
 
 class HomeController extends Controller
 {
@@ -34,12 +36,22 @@ class HomeController extends Controller
             }])->get();
 
         $categories = Category::all();
+        $products = Product::all();
+        $promotions = Promotion::where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->with('products')
+            ->get();
+        foreach ($promotions as $promotion) {
+            $promotion->items_count = $promotion->products->count();
+        }
 
         return response()->json([
             'orders' => $orders,
             'customers' => $customers,
             'categories' => $categories,
             'order_items' => $orderItems,
+            'products' => $products,
+            'promotions' => $promotions,
         ]);
     }
 

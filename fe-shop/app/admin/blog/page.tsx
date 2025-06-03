@@ -320,6 +320,15 @@ export default function CategoriesTable() {
                         <td colSpan={3} className="p-0">
                             <div className="bg-gray-50 p-4">
                                 <div className="flex flex-col space-y-4 ml-4">
+                                    <div className="flex justify-end mb-4">
+                                        <button
+                                            onClick={() => router.push(`/admin/blog/create?category_id=${category.id}`)}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2"
+                                        >
+                                            <FaPlus className="w-4 h-4" />
+                                            Thêm bài viết mới
+                                        </button>
+                                    </div>
                                     {category.blogs.map(blog => (
                                         <div
                                             key={blog.id}

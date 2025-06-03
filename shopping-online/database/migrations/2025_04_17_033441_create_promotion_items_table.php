@@ -16,6 +16,8 @@ return new class extends Migration
             $table->timestamps();
             $table->unsignedBigInteger('promotion_id')->index();
             $table->unsignedBigInteger('product_id')->index()->nullable();
+            $table->decimal('discount', 10, 2)->default(0);
+            $table->enum('type', ['percent', 'fixed'])->default('fixed');
         });
     }
 

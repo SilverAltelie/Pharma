@@ -145,7 +145,7 @@ export type Order = {
     note: string;
     user_id: string;
     id: number;
-    status: number;
+    status: string;
     order_items: OrderItem[];
     created_at: string;
     updated_at: string;

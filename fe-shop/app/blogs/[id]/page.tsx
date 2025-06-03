@@ -1,11 +1,9 @@
 import BlogDetailClient from './BlogDetailClient';
 
-type Props = {
-    params: {
-        id: string;
-    };
-};
-
-export default function BlogDetailPage({ params }: Props) {
+export default function BlogDetailPage({
+    params,
+}: {
+    params: { id: string }
+}) {
     return <BlogDetailClient id={params.id} />;
 }

@@ -25,6 +25,11 @@ class Promotion extends Model
         return $this->hasMany(PromotionItem::class);
     }
 
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'promotion_items');
+    }
+
     public function getPromotionTypeAttribute()
     {
         return $this->type === 'percent' ? 'Giảm giá theo phần trăm' : 'Giảm giá theo giá tiền';
